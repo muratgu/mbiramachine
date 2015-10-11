@@ -1,0 +1,507 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Mbira Machine</title>
+<link rel="stylesheet" type="text/css" href = "style/font-michroma.css" />
+<link rel="stylesheet" type="text/css" href = "style/font-droidsans.css" />
+<link rel="stylesheet" type="text/css" href = "style/mbiramachine.css" />
+<script type="text/javascript">
+
+function log(msg) {
+    console.log(msg);
+}
+
+if (window.hasOwnProperty('AudioContext') && !window.hasOwnProperty('webkitAudioContext'))
+    window.webkitAudioContext = AudioContext
+
+var keyCodes = ['X', 'B1','B2','B3','B4','B5','B6','B7','B8','R1','R2','R3','R4','R5','R6','R7','R8','R9','R10','R11','L1','L2','L3','L4','L5','L6','L7','L8']
+
+var kMinTempo = 50
+var kMaxTempo = 180
+var kMaxSwing = .08
+var noteTime = 0.0
+var tabIndex = 0
+var effectDryMix = 1.0
+var effectWetMix = 1.0
+var kitName = ['nyamaropa_b', 'dambatsoko']
+var currentKit
+var convolver
+
+function Kit(name) {
+    this.name = name
+    this.pathName = 'sounds/' 
+    this.buffer = {}
+    this.pitch = 0
+    this.startedLoading = false
+    this.isLoaded = false
+    this.instrumentLoadCount = 0
+    this.instrumentCount = keyCodes.length
+
+    Kit.prototype.load = function() {
+        if (this.startedLoading)
+            return
+            
+        this.startedLoading = true
+        for(var i in keyCodes) {
+            this.loadSample(keyCodes[i], false)  
+        }
+    }
+
+    Kit.prototype.loadSample = function(sampleID, mixToMono) {
+        var url = this.pathName + this.name + '_' + sampleID + '.mp3'    
+        log('loading ' + url);
+        var request = new XMLHttpRequest()
+        request.open("GET", url, true)
+        request.responseType = "arraybuffer"
+        var kit = this
+        request.onload = function() {
+            context.decodeAudioData(
+                request.response,
+                function(buffer) {
+                    kit.buffer[sampleID] = buffer
+                    kit.instrumentLoadCount++
+                    if (kit.instrumentLoadCount == kit.instrumentCount) {
+                        kit.isLoaded = true
+                        log(kit.name + ' kit is loaded')
+                        showPlayAvailable()
+                    }
+                },            
+                function(buffer) {
+                    kit.buffer.sampleID = 0
+                    kit.instrumentLoadCount++
+                    console.log("kit sample " + sampleID + ' cannot be loaded')
+                    if (kit.instrumentLoadCount == kit.instrumentCount) {
+                        kit.isLoaded = true
+                        log(kit.name + ' kit is loaded')
+                        showPlayAvailable()
+                    }
+                }
+            )
+        }
+        request.send()
+    }
+}
+
+function makeKitList() {
+    var elList = document.getElementById('kitlist');
+    var numKits = kitName.length;
+    
+    for (var i = 0; i < numKits; i++) {
+        var elItem = document.createElement('li');
+        elItem.innerHTML = kitName[i];
+        elList.appendChild(elItem);
+        elItem.addEventListener("mousedown", handleKitMouseDown, true);
+    }
+}
+
+function makeBeatList() {
+    var elList = document.getElementById('beatlist');
+    var numBeats = beatDemo.length;
+    
+    for (var i = 0; i < numBeats; i++) {
+        var elItem = document.createElement('li');
+        elItem.innerHTML = kitNamePretty[i];
+        elList.appendChild(elItem);
+        elItem.addEventListener("mousedown", handleBeatMouseDown, true);
+    }
+}
+
+impulseResponses = [
+ {"name":"Medium Hall 1", "url":"impulse-responses/matrix-reverb2.wav", "dryMix":1, "wetMix":1}, 
+ {"name":"Binaural Hall", "url":"impulse-responses/s2_r4_bd.wav", "dryMix":1, "wetMix":0.5},
+ {"name":"Kitchen", "url":"impulse-responses/kitchen.wav", "dryMix":1, "wetMix":1},
+ {"name":"Kitchen", "url":"impulse-responses/filter-telephone.wav", "dryMix":0, "wetMix":1.2}
+]
+
+var impulseResponse
+
+function loadEffect() {
+    impulseResponse = impulseResponses[0]
+    impulseResponse.startedLoading = false;
+    impulseResponse.isLoaded = false;
+    impulseResponse.buffer = 0;
+    impulseResponse.load = function() {
+        if (impulseResponse.startedLoading)
+            return
+            
+        impulseResponse.startedLoading = true
+        var request = new XMLHttpRequest()
+        request.open("GET", impulseResponse.url, true)
+        request.responseType = "arraybuffer"    
+        request.onload = function() {
+            context.decodeAudioData(
+                request.response,
+                function(buffer) {
+                    impulseResponse.buffer = buffer
+                    impulseResponse.isLoaded = true
+                    log('impulse response ' + impulseResponse.name + ' is loaded')
+                    setEffect(impulseResponse)
+                },            
+                function(buffer) {
+                    log("Error decoding impulse response!");
+                }
+            );
+        }
+        request.send();
+    }
+}
+
+var theBeat 
+var beatDemo
+
+function loadBeats() {
+    beatDemo = []
+    var beat = {}
+    beat.name = 'nhemamusasa kushaura'
+    beat.pitch = 0  
+    beat.volume = 1.0  
+    beat.tempo = 80
+    beat.swingFactor = 0
+    beat.effectMix = 0.5
+    beat.tab = [
+    'L3','R2','B3 X','R5','L4','R2','B5 X','R4','L4','R3','B7 X','R5',
+    'L3','R2','B3 X','R5','L5','R3','B6 X','R5','L4','R3','B7 X','R6',
+    'L2','R3','B4 X','R6','L5','R3','B6 X','R5','L4','R3','B7 X','R5',
+    'L3','R2','B3 X','R5','L4','R2','B5 X','R4','L2','R2','L1 X','R5'
+    ]
+    beatDemo[beat.name] = beat
+
+    var beat = {}
+    beat.name = 'karigamombe kushaura'  
+    beat.pitch = 0  
+    beat.volume = 1.0 
+    beat.tempo = 80
+    beat.swingFactor = 0
+    beat.effectMix = 0.5
+    beat.tab = [
+    'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R1 L4','R4','R1 L4','R4',
+    'R2 L1','R6','R2 L2','R6','R2 L3','R5','R2 L3','R5','R1 L4','R4','R1 L4','R4',
+    'R3 L4','R5','R3 L4','R5','R2 L3','R5','R2 L3','R5','R1 L4','R4','R1 L4','R4',
+    'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R3 L2','R6','R3 L2','R6'
+    ]
+    beatDemo[beat.name] = beat
+
+    var beat = {}
+    beat.name = 'karigamombe kutsinhira'
+    beat.pitch = 0
+    beat.volume = 1.0 
+    beat.tempo = 80
+    beat.swingFactor = 0
+    beat.effectMix = 0.5
+    beat.tab = [
+    'R2','L1','R6 B1','','R4 R1 B6','L2','R4 R1','L1','R7 B5'   ,'','R7 L1','L5',
+    'R2','L1','R6 B4','','R5 B6'   ,'B5','R5'   ,'L1','R4 R1 B2','','R4 R1','B2',
+    'R3','B5','R3 B1','','R5 B6'   ,'B5','R5'   ,'L1','R4 R1 B2','','R4 R1','B2',
+    'R2','B4','R2 B1','','R4 R1 B6','B2','R4 R1','B6','R3 B4'   ,'','R3 B7','B4'
+    ]
+    beatDemo[beat.name] = beat
+
+    var beat = {}
+    beat.name = 'kuzanga variation 5'
+    beat.pitch = 0
+    beat.volume = 1.0 
+    beat.tempo = 80
+    beat.swingFactor = 0
+    beat.effectMix = 0.5
+    beat.tab = [
+    'R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1','',
+    'R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1','',
+    'R6 L2','B4','R6','L5','R3 B6','R6','L2','R2 B1','',
+    'R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1',''
+    ]
+    beatDemo[beat.name] = beat;
+
+    var beat = {}
+    beat.name = 'kuzanga variation 5 kutsinhira'
+    beat.pitch = 0.97
+    beat.volume = 0.8
+    beat.tempo = 80
+    beat.swingFactor = 0
+    beat.effectMix = 0.5
+    beat.tab = [
+    '','R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1',
+    '','R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1',
+    '','R6 L2','B4','R6','L5','R3 B6','R6','L2','R2 B1',
+    '','R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1'
+    ]
+    beatDemo[beat.name] = beat;
+
+    var beat = {}
+    beat.name = 'nyamaropa kushaura'
+    beat.pitch = 0
+    beat.volume = 1.0 
+    beat.tempo = 80
+    beat.swingFactor = 0
+    beat.effectMix = 0.5
+    beat.tab = [
+    'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', '',
+    'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', '',
+    'R2 L1','B1','R2','L1','R2 B1','','R5 L3','B3','R5','L4','R4 B5', '',
+    'R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5', ''
+    ]
+    beatDemo[beat.name] = beat;
+
+    var beat = {}
+    beat.name = 'nyamaropa kutsinhira'
+    beat.pitch = 0.98
+    beat.volume = 0.5
+    beat.tempo = 80
+    beat.swingFactor = 0
+    beat.effectMix = 0.5
+    beat.tab = [
+    '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', 
+    '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', 
+    '','R2 L1','B1','R2','L1','R2 B1','','R5 L3','B3','R5','L4','R4 B5', 
+    '','R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5' 
+    ]
+    beatDemo[beat.name] = beat;
+}
+
+function startLoadingAssets(){
+    loadBeats()
+
+    // Initialize drum kits
+    var numKits = kitName.length
+    kits = new Array(numKits)
+    for (var i  = 0; i < numKits; i++) {
+        kits[i] = new Kit(kitName[i])
+        kits[i].load()
+    }  
+}
+
+function init() {
+    context = new webkitAudioContext()
+
+    startLoadingAssets();
+    makeKitList()
+    makeBeatList()
+    loadEffect()
+    impulseResponse.load()
+    theBeat = beatDemo['kuzanga variation 5']
+    currentKit = kits[0]
+
+    document.getElementById('play').addEventListener('mousedown', handlePlay, true);
+    document.getElementById('stop').addEventListener('mousedown', handleStop, true);
+
+    var finalMixNode
+    if (context.createDynamicsCompressor) {
+        // Create a dynamics compressor to sweeten the overall mix.
+        compressor = context.createDynamicsCompressor()
+        compressor.connect(context.destination)
+        finalMixNode = compressor
+    } else {
+        // No compressor available in this implementation.
+        finalMixNode = context.destination
+    }
+
+    masterGainNode = context.createGain() 
+    masterGainNode.gain.value = 0.7 // reduce overall volume to avoid clipping
+    masterGainNode.connect(finalMixNode)
+
+    // convolver for effect
+    convolver = context.createConvolver()
+}
+    
+function advanceNote() {
+    // Advance time by a 16th note...
+    var secondsPerBeat = 60.0 / theBeat.tempo
+
+    tabIndex++;
+    if (tabIndex == theBeat.tab.length) {
+        tabIndex = 0
+    }
+
+        // apply swing    
+    if (tabIndex % 3) {
+        noteTime += (0.25 + kMaxSwing * theBeat.swingFactor) * secondsPerBeat
+    } else {
+        noteTime += (0.25 - kMaxSwing * theBeat.swingFactor) * secondsPerBeat
+    }
+}
+
+function playNote(buffer, sendGain, mainGain, playbackRate, noteTime) {
+    // Create the note
+    var voice = context.createBufferSource()
+    voice.buffer = buffer
+    voice.playbackRate.value = playbackRate
+
+    var finalNode = voice
+
+    // Connect to dry mix
+    var dryGainNode = context.createGain();
+    dryGainNode.gain.value = mainGain * effectDryMix;
+    finalNode.connect(dryGainNode);
+    dryGainNode.connect(masterGainNode);
+
+    // Connect to wet mix
+    var wetGainNode = context.createGain();
+    wetGainNode.gain.value = sendGain;
+    finalNode.connect(wetGainNode);
+    wetGainNode.connect(convolver);
+
+    voice.start(noteTime);
+}
+
+function schedule() {
+    var currentTime = context.currentTime;
+
+    // The sequence starts at startTime, so normalize currentTime so that it's 0 at the start of the sequence.
+    currentTime -= startTime;
+
+    while (noteTime < currentTime + 0.200) {
+        // Convert noteTime to context time.
+        var contextPlayTime = noteTime + startTime;
+            if(theBeat && theBeat.tab[tabIndex]) {
+                var currentBufferCode = theBeat.tab[tabIndex].split(' ')
+                for(var c in currentBufferCode) {
+                    if(currentBufferCode[c] > '') {
+                        var currentBuffer  =  currentKit.buffer[currentBufferCode[c]]
+                        if(currentBuffer) {
+                            playNote(currentBuffer, 1.0, theBeat.volume, theBeat.pitch, contextPlayTime);
+                        }
+                    }
+                }
+            }
+        advanceNote();
+    }
+
+    timeoutId = setTimeout("schedule()", 0);
+}
+
+function tempoIncrease() {
+    theBeat.tempo = Math.min(kMaxTempo, theBeat.tempo+4);
+}
+
+function tempoDecrease() {
+    theBeat.tempo = Math.max(kMinTempo, theBeat.tempo-4);
+}
+
+
+function setEffect() {
+    if (!impulseResponse.isLoaded) {
+        alert('Sorry, this effect is still loading.  Try again in a few seconds :)');
+        return;
+    }
+
+    effectLevelNode = context.createGain()
+    effectLevelNode.gain.value = 1.0  
+    effectLevelNode.connect(masterGainNode)
+
+    convolver.connect(effectLevelNode)
+
+    effectDryMix = impulseResponse.dryMix;
+    effectWetMix = impulseResponse.wetMix;            
+    convolver.buffer = impulseResponse.buffer;
+
+    if (effectDryMix == 0)
+        theBeat.effectMix = 1;
+
+    effectLevelNode.gain.value = theBeat.effectMix * effectWetMix;
+}
+
+
+function stopPlay() {
+    clearTimeout(timeoutId);
+    tabIndex = 0;
+}
+
+
+window.onload = function(){
+    init()
+}
+
+
+function handlePlay(event) {
+    noteTime = 0.0;
+    startTime = context.currentTime + 0.005;
+    schedule();
+
+    document.getElementById('play').classList.add('playing');
+    document.getElementById('stop').classList.add('playing');
+}
+
+function handleStop(event) {
+    clearTimeout(timeoutId);
+
+    tabIndex = 0;
+
+    document.getElementById('play').classList.remove('playing');
+    document.getElementById('stop').classList.remove('playing');
+}
+
+function handleKitComboMouseDown(event) {
+    document.getElementById('kitcombo').classList.toggle('active');
+}
+
+function handleKitMouseDown(event) {
+    var index = kitName.indexOf(event.target.innerHTML);
+    theBeat.kitIndex = index;
+    currentKit = kits[index];
+    document.getElementById('kitname').innerHTML = kitNamePretty[index];
+}
+
+function showPlayAvailable() {
+    var play = document.getElementById("play");
+    play.src = "images/btn_play.png";
+}
+
+function startDemo() {
+    showPlayAvailable();
+    //startPlay();
+}
+
+</script>
+</head>
+<body id='body'>
+
+    <div id='title'>
+        WebAudio Mbira Machine <span id='version'>1.0</span>
+    </div>    
+    <section class='container active' id='params'>
+        <div id='paramsleft_container'>
+            <div id='beatcombo_container'>
+                <span class='label' id='beatlabel'>Beat</span>
+                <div class='combo' id='beatcombo'>
+                    <span id='beatname'></span>
+                    <img src='images/drop_arrow.png'>
+                    <ul class='combolist' id='beatlist'>
+                    </ul>
+                </div>
+            </div>
+            <div id='kitcombo_container'>
+                <span class='label' id='kitlabel'>Kit</span>
+                <div class='combo' id='kitcombo'>
+                    <span id='kitname'></span>
+                    <img src='images/drop_arrow.png'>
+                    <ul class='combolist' id='kitlist'>
+                    </ul>
+                </div>
+            </div>
+            <div id='effectcombo_container'>
+                <span class='label' id='effectlabel'>Effect</span>
+                <div class='combo' id='effectcombo'>
+                    <span id='effectname'></span>
+                    <img src='images/drop_arrow.png'>
+                    <ul class='combolist' id='effectlist'>
+                    </ul>
+                </div>
+            </div>
+            <div id='tempo_container'>
+                <span class='label' id='tempolabel'>Tempo</span>
+                <div id='tempodisplay'>
+                <span id='tempo'></span>&nbsp;<span id='bpm'>bpm</span>
+                </div>
+                <img id='tempodec' src='images/tempo_dec.png'><img id='tempoinc' src='images/tempo_inc.png'>
+            </div>
+        </div>
+    </section>
+    <section class='container active' id='tools'>
+        <span class='label' id='beatlabel'>Beat</span>
+        <img id='play' src='images/btn_play_loading.gif' width='80' height='33'>
+        <img id='stop' src='images/btn_stop.png'>
+    </section>
+</body>
+</html>
+
