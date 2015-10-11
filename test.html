@@ -16,7 +16,21 @@ function log(msg) {
 if (window.hasOwnProperty('AudioContext') && !window.hasOwnProperty('webkitAudioContext'))
     window.webkitAudioContext = AudioContext
 
-var keyCodes = ['X', 'B1','B2','B3','B4','B5','B6','B7','B8','R1','R2','R3','R4','R5','R6','R7','R8','R9','R10','R11','L1','L2','L3','L4','L5','L6','L7','L8']
+var keyCodes = ['X','X2','X3','B1','B2','B3','B4','B5','B6','B7','B8','R1','R2','R3','R4','R5','R6','R7','R8','R9','R10','R11','L1','L2','L3','L4','L5','L6','L7','L8']
+
+
+impulseResponseInfoList = [
+ {"name":"No Effect", "url":"undefined", "dryMix":1, "wetMix":0},
+ {"name":"Medium Hall 1", "url":"impulse-responses/matrix-reverb2.wav", "dryMix":1, "wetMix":1}, 
+ {"name":"Binaural Hall", "url":"impulse-responses/s2_r4_bd.wav", "dryMix":1, "wetMix":0.5},
+ {"name":"Kitchen", "url":"impulse-responses/kitchen.wav", "dryMix":1, "wetMix":1},
+ {"name":"Telephone", "url":"impulse-responses/filter-telephone.wav", "dryMix":0, "wetMix":1.2}
+]
+
+var timeoutId
+var impulseResponseList
+var theBeat
+var beatList
 
 var kMinTempo = 50
 var kMaxTempo = 180
@@ -25,9 +39,15 @@ var noteTime = 0.0
 var tabIndex = 0
 var effectDryMix = 1.0
 var effectWetMix = 1.0
+var beatName = []
+var beatNamePretty = []
 var kitName = ['nyamaropa_b', 'dambatsoko']
+var kitNamePretty = ['nyamaropa_b', 'dambatsoko']
 var currentKit
 var convolver
+var compressor;
+var masterGainNode;
+var effectLevelNode;
 
 function Kit(name) {
     this.name = name
@@ -51,7 +71,9 @@ function Kit(name) {
 
     Kit.prototype.loadSample = function(sampleID, mixToMono) {
         var url = this.pathName + this.name + '_' + sampleID + '.mp3'    
-        log('loading ' + url);
+        if (sampleID[0] == 'X') { // hosho beats are shared
+            url = this.pathName + 'hosho_' + sampleID + '.mp3';
+        }
         var request = new XMLHttpRequest()
         request.open("GET", url, true)
         request.responseType = "arraybuffer"
@@ -59,7 +81,7 @@ function Kit(name) {
         request.onload = function() {
             context.decodeAudioData(
                 request.response,
-                function(buffer) {
+                function(buffer) { // success
                     kit.buffer[sampleID] = buffer
                     kit.instrumentLoadCount++
                     if (kit.instrumentLoadCount == kit.instrumentCount) {
@@ -68,10 +90,10 @@ function Kit(name) {
                         showPlayAvailable()
                     }
                 },            
-                function(buffer) {
+                function(buffer) { // error
                     kit.buffer.sampleID = 0
-                    kit.instrumentLoadCount++
-                    console.log("kit sample " + sampleID + ' cannot be loaded')
+                    kit.instrumentLoadCount++;
+                    log('kit sample ' + url + ' cannot be loaded')
                     if (kit.instrumentLoadCount == kit.instrumentCount) {
                         kit.isLoaded = true
                         log(kit.name + ' kit is loaded')
@@ -98,61 +120,88 @@ function makeKitList() {
 
 function makeBeatList() {
     var elList = document.getElementById('beatlist');
-    var numBeats = beatDemo.length;
+    var numBeats = beatList.length;
     
     for (var i = 0; i < numBeats; i++) {
         var elItem = document.createElement('li');
-        elItem.innerHTML = kitNamePretty[i];
+        elItem.innerHTML = beatNamePretty[i];
         elList.appendChild(elItem);
         elItem.addEventListener("mousedown", handleBeatMouseDown, true);
     }
 }
 
-impulseResponses = [
- {"name":"Medium Hall 1", "url":"impulse-responses/matrix-reverb2.wav", "dryMix":1, "wetMix":1}, 
- {"name":"Binaural Hall", "url":"impulse-responses/s2_r4_bd.wav", "dryMix":1, "wetMix":0.5},
- {"name":"Kitchen", "url":"impulse-responses/kitchen.wav", "dryMix":1, "wetMix":1},
- {"name":"Kitchen", "url":"impulse-responses/filter-telephone.wav", "dryMix":0, "wetMix":1.2}
-]
-
-var impulseResponse
-
-function loadEffect() {
-    impulseResponse = impulseResponses[0]
-    impulseResponse.startedLoading = false;
-    impulseResponse.isLoaded = false;
-    impulseResponse.buffer = 0;
-    impulseResponse.load = function() {
-        if (impulseResponse.startedLoading)
-            return
-            
-        impulseResponse.startedLoading = true
-        var request = new XMLHttpRequest()
-        request.open("GET", impulseResponse.url, true)
-        request.responseType = "arraybuffer"    
-        request.onload = function() {
-            context.decodeAudioData(
-                request.response,
-                function(buffer) {
-                    impulseResponse.buffer = buffer
-                    impulseResponse.isLoaded = true
-                    log('impulse response ' + impulseResponse.name + ' is loaded')
-                    setEffect(impulseResponse)
-                },            
-                function(buffer) {
-                    log("Error decoding impulse response!");
-                }
-            );
-        }
-        request.send();
+function makeEffectList() {
+    var elList = document.getElementById('effectlist');
+    var numEffects = impulseResponseInfoList.length;
+    
+    var elItem = document.createElement('li');
+    elItem.innerHTML = 'None';
+    elItem.addEventListener("mousedown", handleEffectMouseDown, true);
+    
+    for (var i = 0; i < numEffects; i++) {
+        var elItem = document.createElement('li');
+        elItem.innerHTML = impulseResponseInfoList[i].name;
+        elList.appendChild(elItem);
+        elItem.addEventListener("mousedown", handleEffectMouseDown, true);
     }
 }
 
-var theBeat 
-var beatDemo
+function ImpulseResponse(url, index) {
+    this.url = url;
+    this.index = index;
+    this.startedLoading = false;
+    this.isLoaded_ = false;
+    this.buffer = 0;
+    
+    this.demoIndex = -1; // no demo
+}
+
+ImpulseResponse.prototype.setDemoIndex = function(index) {
+    this.demoIndex = index;
+}
+
+ImpulseResponse.prototype.isLoaded = function() {
+    return this.isLoaded_;
+}
+
+ImpulseResponse.prototype.load = function() {
+    if (this.startedLoading) {
+        return;
+    }
+    
+    this.startedLoading = true;
+
+    // Load asynchronously
+    var request = new XMLHttpRequest();
+    request.open("GET", this.url, true);
+    request.responseType = "arraybuffer";
+    this.request = request;
+    
+    var asset = this;
+
+    request.onload = function() {
+        context.decodeAudioData(
+            request.response,
+            function(buffer) {
+                asset.buffer = buffer;
+                asset.isLoaded_ = true;
+
+                if (asset.demoIndex != -1) {
+                    beatList[asset.demoIndex].setEffectLoaded();
+                }                
+            },
+            
+            function(buffer) {
+                console.log("Error decoding impulse response!");
+            }
+        );
+    }
+
+    request.send();
+}
 
 function loadBeats() {
-    beatDemo = []
+    beatList = []
     var beat = {}
     beat.name = 'nhemamusasa kushaura'
     beat.pitch = 0  
@@ -160,13 +209,14 @@ function loadBeats() {
     beat.tempo = 80
     beat.swingFactor = 0
     beat.effectMix = 0.5
+    beat.effectIndex = 0
     beat.tab = [
-    'L3','R2','B3 X','R5','L4','R2','B5 X','R4','L4','R3','B7 X','R5',
-    'L3','R2','B3 X','R5','L5','R3','B6 X','R5','L4','R3','B7 X','R6',
-    'L2','R3','B4 X','R6','L5','R3','B6 X','R5','L4','R3','B7 X','R5',
-    'L3','R2','B3 X','R5','L4','R2','B5 X','R4','L2','R2','L1 X','R5'
+    'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L4 X2','R3 X3','B7 X','R5 X2',
+    'L3 X3','R2 X','B3 X2','R5 X3','L5 X','R3 X2','B6 X3','R5 X','L4 X2','R3 X3','B7 X','R6 X2',
+    'L2 X3','R3 X','B4 X2','R6 X3','L5 X','R3 X2','B6 X3','R5 X','L4 X2','R3 X3','B7 X','R5 X2',
+    'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L2 X2','R2 X3','L1 X','R5 X2'
     ]
-    beatDemo[beat.name] = beat
+    beatList.push(beat);
 
     var beat = {}
     beat.name = 'karigamombe kushaura'  
@@ -175,13 +225,14 @@ function loadBeats() {
     beat.tempo = 80
     beat.swingFactor = 0
     beat.effectMix = 0.5
+    beat.effectIndex = 0
     beat.tab = [
     'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R1 L4','R4','R1 L4','R4',
     'R2 L1','R6','R2 L2','R6','R2 L3','R5','R2 L3','R5','R1 L4','R4','R1 L4','R4',
     'R3 L4','R5','R3 L4','R5','R2 L3','R5','R2 L3','R5','R1 L4','R4','R1 L4','R4',
     'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R3 L2','R6','R3 L2','R6'
     ]
-    beatDemo[beat.name] = beat
+    beatList.push(beat);
 
     var beat = {}
     beat.name = 'karigamombe kutsinhira'
@@ -190,13 +241,14 @@ function loadBeats() {
     beat.tempo = 80
     beat.swingFactor = 0
     beat.effectMix = 0.5
+    beat.effectIndex = 0
     beat.tab = [
     'R2','L1','R6 B1','','R4 R1 B6','L2','R4 R1','L1','R7 B5'   ,'','R7 L1','L5',
     'R2','L1','R6 B4','','R5 B6'   ,'B5','R5'   ,'L1','R4 R1 B2','','R4 R1','B2',
     'R3','B5','R3 B1','','R5 B6'   ,'B5','R5'   ,'L1','R4 R1 B2','','R4 R1','B2',
     'R2','B4','R2 B1','','R4 R1 B6','B2','R4 R1','B6','R3 B4'   ,'','R3 B7','B4'
     ]
-    beatDemo[beat.name] = beat
+    beatList.push(beat);
 
     var beat = {}
     beat.name = 'kuzanga variation 5'
@@ -205,13 +257,14 @@ function loadBeats() {
     beat.tempo = 80
     beat.swingFactor = 0
     beat.effectMix = 0.5
+    beat.effectIndex = 0
     beat.tab = [
     'R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1','',
     'R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1','',
     'R6 L2','B4','R6','L5','R3 B6','R6','L2','R2 B1','',
     'R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1',''
     ]
-    beatDemo[beat.name] = beat;
+    beatList.push(beat);
 
     var beat = {}
     beat.name = 'kuzanga variation 5 kutsinhira'
@@ -220,13 +273,14 @@ function loadBeats() {
     beat.tempo = 80
     beat.swingFactor = 0
     beat.effectMix = 0.5
+    beat.effectIndex = 0
     beat.tab = [
     '','R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1',
     '','R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1',
     '','R6 L2','B4','R6','L5','R3 B6','R6','L2','R2 B1',
     '','R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1'
     ]
-    beatDemo[beat.name] = beat;
+    beatList.push(beat);
 
     var beat = {}
     beat.name = 'nyamaropa kushaura'
@@ -235,13 +289,14 @@ function loadBeats() {
     beat.tempo = 80
     beat.swingFactor = 0
     beat.effectMix = 0.5
+    beat.effectIndex = 0
     beat.tab = [
     'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', '',
     'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', '',
     'R2 L1','B1','R2','L1','R2 B1','','R5 L3','B3','R5','L4','R4 B5', '',
     'R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5', ''
     ]
-    beatDemo[beat.name] = beat;
+    beatList.push(beat);
 
     var beat = {}
     beat.name = 'nyamaropa kutsinhira'
@@ -250,60 +305,176 @@ function loadBeats() {
     beat.tempo = 80
     beat.swingFactor = 0
     beat.effectMix = 0.5
+    beat.effectIndex = 0
     beat.tab = [
     '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', 
     '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', 
     '','R2 L1','B1','R2','L1','R2 B1','','R5 L3','B3','R5','L4','R4 B5', 
     '','R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5' 
     ]
-    beatDemo[beat.name] = beat;
+    beatList.push(beat);
+
+    beatName = []
+    beatNamePretty = []
+    for(var b in beatList) {
+        beatName.push(beatList[b].name);
+        beatNamePretty.push(beatList[b].name);
+    }
 }
 
 function startLoadingAssets(){
     loadBeats()
 
-    // Initialize drum kits
+    impulseResponseList = []
+
+    for (i = 0; i < impulseResponseInfoList.length; i++) {
+        impulseResponseList[i] = new ImpulseResponse(impulseResponseInfoList[i].url, i);
+    }
+
+    // Initialize mbira kits
     var numKits = kitName.length
     kits = new Array(numKits)
     for (var i  = 0; i < numKits; i++) {
         kits[i] = new Kit(kitName[i])
         kits[i].load()
-    }  
+    } 
+
+    // Start at 1 to skip "No Effect"
+    for (i = 1; i < impulseResponseInfoList.length; i++) {
+        impulseResponseList[i].load();
+    } 
 }
 
 function init() {
-    context = new webkitAudioContext()
 
     startLoadingAssets();
-    makeKitList()
-    makeBeatList()
-    loadEffect()
-    impulseResponse.load()
-    theBeat = beatDemo['kuzanga variation 5']
-    currentKit = kits[0]
+    
+    context = new webkitAudioContext();
 
-    document.getElementById('play').addEventListener('mousedown', handlePlay, true);
-    document.getElementById('stop').addEventListener('mousedown', handleStop, true);
-
-    var finalMixNode
+    var finalMixNode;
     if (context.createDynamicsCompressor) {
         // Create a dynamics compressor to sweeten the overall mix.
-        compressor = context.createDynamicsCompressor()
-        compressor.connect(context.destination)
-        finalMixNode = compressor
+        compressor = context.createDynamicsCompressor();
+        compressor.connect(context.destination);
+        finalMixNode = compressor;
     } else {
         // No compressor available in this implementation.
-        finalMixNode = context.destination
+        finalMixNode = context.destination;
     }
 
-    masterGainNode = context.createGain() 
-    masterGainNode.gain.value = 0.7 // reduce overall volume to avoid clipping
-    masterGainNode.connect(finalMixNode)
+    // Create master volume.
+    masterGainNode = context.createGain();
+    masterGainNode.gain.value = 0.7; // reduce overall volume to avoid clipping
+    masterGainNode.connect(finalMixNode);
 
-    // convolver for effect
-    convolver = context.createConvolver()
-}
+    // Create effect volume.
+    effectLevelNode = context.createGain();
+    effectLevelNode.gain.value = 1.0; // effect level slider controls this
+    effectLevelNode.connect(masterGainNode);
+
+    // Create convolver for effect
+    convolver = context.createConvolver();
+    convolver.connect(effectLevelNode);
+
+    var elBeatCombo = document.getElementById('beatcombo');
+    elBeatCombo.addEventListener("mousedown", handleBeatComboMouseDown, true);
+
+    var elKitCombo = document.getElementById('kitcombo');
+    elKitCombo.addEventListener("mousedown", handleKitComboMouseDown, true);
+
+    var elEffectCombo = document.getElementById('effectcombo');
+    elEffectCombo.addEventListener("mousedown", handleEffectComboMouseDown, true);
+
+    document.body.addEventListener("mousedown", handleBodyMouseDown, true);
+
+    makeKitList()
+    makeBeatList()
+    makeEffectList()
+
+    selectBeat(0)
+    selectKit(0)
+    selectEffect(0)
     
+    initControls();
+    updateControls();
+}
+
+function initControls() {
+    // Initialize note buttons
+    //initButtons();
+
+    // sliders
+    //document.getElementById('effect_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+    //document.getElementById('tom1_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+    //document.getElementById('tom2_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+    //document.getElementById('tom3_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+    //document.getElementById('hihat_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+    //document.getElementById('snare_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+    //document.getElementById('kick_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+    //document.getElementById('swing_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+
+    //document.getElementById('effect_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+    //document.getElementById('tom1_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+    //document.getElementById('tom2_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+    //document.getElementById('tom3_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+    //document.getElementById('hihat_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+    //document.getElementById('snare_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+    //document.getElementById('kick_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+    //document.getElementById('swing_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+
+    // tool buttons
+    document.getElementById('play').addEventListener('mousedown', handlePlay, true);
+    document.getElementById('stop').addEventListener('mousedown', handleStop, true);
+    //document.getElementById('save').addEventListener('mousedown', handleSave, true);
+    //document.getElementById('save_ok').addEventListener('mousedown', handleSaveOk, true);
+    //document.getElementById('load').addEventListener('mousedown', handleLoad, true);
+    //document.getElementById('load_ok').addEventListener('mousedown', handleLoadOk, true);
+    //document.getElementById('load_cancel').addEventListener('mousedown', handleLoadCancel, true);
+    //document.getElementById('reset').addEventListener('mousedown', handleReset, true);
+    //document.getElementById('demo1').addEventListener('mousedown', handleDemoMouseDown, true);
+    //document.getElementById('demo2').addEventListener('mousedown', handleDemoMouseDown, true);
+    //document.getElementById('demo3').addEventListener('mousedown', handleDemoMouseDown, true);
+    //document.getElementById('demo4').addEventListener('mousedown', handleDemoMouseDown, true);
+    //document.getElementById('demo5').addEventListener('mousedown', handleDemoMouseDown, true);
+
+    //var elBody = document.getElementById('body');
+    //elBody.addEventListener('mousemove', handleMouseMove, true);
+    //elBody.addEventListener('mouseup', handleMouseUp, true);
+
+    document.getElementById('tempoinc').addEventListener('mousedown', tempoIncrease, true);
+    document.getElementById('tempodec').addEventListener('mousedown', tempoDecrease, true);
+}
+
+function updateControls() {
+    /*for (i = 0; i < loopLength; ++i) {
+        for (j = 0; j < kNumInstruments; j++) {
+            switch (j) {
+                case 0: notes = theBeat.rhythm1; break;
+                case 1: notes = theBeat.rhythm2; break;
+                case 2: notes = theBeat.rhythm3; break;
+                case 3: notes = theBeat.rhythm4; break;
+                case 4: notes = theBeat.rhythm5; break;
+                case 5: notes = theBeat.rhythm6; break;
+            }
+
+            drawNote(notes[i], i, j);
+        }
+    }*/
+
+    document.getElementById('beatname').innerHTML = theBeat.name;
+    document.getElementById('kitname').innerHTML = kitNamePretty[theBeat.kitIndex];
+    document.getElementById('effectname').innerHTML = impulseResponseInfoList[theBeat.effectIndex].name;
+    document.getElementById('tempo').innerHTML = theBeat.tempo;
+    //sliderSetPosition('swing_thumb', theBeat.swingFactor);
+    //sliderSetPosition('effect_thumb', theBeat.effectMix);
+    //sliderSetPosition('kick_thumb', theBeat.kickPitchVal);
+    //sliderSetPosition('snare_thumb', theBeat.snarePitchVal);
+    //sliderSetPosition('hihat_thumb', theBeat.hihatPitchVal);
+    //sliderSetPosition('tom1_thumb', theBeat.tom1PitchVal);        
+    //sliderSetPosition('tom2_thumb', theBeat.tom2PitchVal);
+    //sliderSetPosition('tom3_thumb', theBeat.tom3PitchVal);
+}
+
 function advanceNote() {
     // Advance time by a 16th note...
     var secondsPerBeat = 60.0 / theBeat.tempo
@@ -372,38 +543,72 @@ function schedule() {
 
 function tempoIncrease() {
     theBeat.tempo = Math.min(kMaxTempo, theBeat.tempo+4);
+    document.getElementById('tempo').innerHTML = theBeat.tempo;
 }
 
 function tempoDecrease() {
     theBeat.tempo = Math.max(kMinTempo, theBeat.tempo-4);
+    document.getElementById('tempo').innerHTML = theBeat.tempo;
 }
 
+function selectBeat(index) {
+    stopPlay(); // the beat has changed
+    theBeat = beatList[index];
+    document.getElementById('beatname').innerHTML = beatNamePretty[index];
+}
 
-function setEffect() {
-    if (!impulseResponse.isLoaded) {
+function selectKit(index) {
+    theBeat.kitIndex = index;
+    currentKit = kits[index];
+    document.getElementById('kitname').innerHTML = kitNamePretty[index];
+}
+
+function selectEffect(name) {
+    for (var i = 0; i < impulseResponseInfoList.length; ++i) {
+        if (impulseResponseInfoList[i].name == name) {
+
+            // since they just explicitly chose an effect from the list.
+            if (theBeat.effectMix == 0)
+                theBeat.effectMix = 0.5;
+
+            setEffect(i);
+            break;
+        }
+    }   
+}
+
+function setEffect(index) {
+    if (index > 0 && !impulseResponseList[index].isLoaded()) {
         alert('Sorry, this effect is still loading.  Try again in a few seconds :)');
         return;
     }
 
-    effectLevelNode = context.createGain()
-    effectLevelNode.gain.value = 1.0  
-    effectLevelNode.connect(masterGainNode)
+    theBeat.effectIndex = index;
+    effectDryMix = impulseResponseInfoList[index].dryMix;
+    effectWetMix = impulseResponseInfoList[index].wetMix;            
+    convolver.buffer = impulseResponseList[index].buffer;
 
-    convolver.connect(effectLevelNode)
-
-    effectDryMix = impulseResponse.dryMix;
-    effectWetMix = impulseResponse.wetMix;            
-    convolver.buffer = impulseResponse.buffer;
-
+  // Hack - if the effect is meant to be entirely wet (not unprocessed signal)
+  // then put the effect level all the way up.
     if (effectDryMix == 0)
         theBeat.effectMix = 1;
 
+    setEffectLevel();
+    //sliderSetValue('effect_thumb', theBeat.effectMix);
+    updateControls();
+
+    document.getElementById('effectname').innerHTML = impulseResponseInfoList[index].name;
+}
+
+function setEffectLevel() {        
+    // Factor in both the preset's effect level and the blending level (effectWetMix) stored in the effect itself.
     effectLevelNode.gain.value = theBeat.effectMix * effectWetMix;
 }
 
-
 function stopPlay() {
-    clearTimeout(timeoutId);
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }        
     tabIndex = 0;
 }
 
@@ -412,6 +617,47 @@ window.onload = function(){
     init()
 }
 
+function handleBodyMouseDown(event) {
+    var elBeatcombo = document.getElementById('beatcombo');
+    var elKitcombo = document.getElementById('kitcombo');
+    var elEffectcombo = document.getElementById('effectcombo');
+
+    if (elBeatcombo.classList.contains('active') && !isDescendantOfId(event.target, 'beatcombo_container')) {
+        elBeatcombo.classList.remove('active');
+        if ( !isDescendantOfId(event.target, 'effectcombo_container') 
+            && !isDescendantOfId(event.target, 'kitcombo_container') ) {
+            event.stopPropagation();
+        }
+    }
+
+    if (elKitcombo.classList.contains('active') && !isDescendantOfId(event.target, 'kitcombo_container')) {
+        elKitcombo.classList.remove('active');
+        if ( !isDescendantOfId(event.target, 'effectcombo_container') 
+            && !isDescendantOfId(event.target, 'beatcombo_container') ) {
+            event.stopPropagation();
+        }
+    }
+    
+    if (elEffectcombo.classList.contains('active') && !isDescendantOfId(event.target, 'effectcombo_container')) {
+        elEffectcombo.classList.remove('active');
+        if ( !isDescendantOfId(event.target, 'kitcombo_container') 
+            && !isDescendantOfId(event.target, 'beatcombo_container') ) {
+            event.stopPropagation();
+        }
+    }    
+}
+
+function isDescendantOfId(el, id) {
+    if (el.parentElement) {
+        if (el.parentElement.id == id) {
+            return true;
+        } else {
+            return isDescendantOfId(el.parentElement, id);
+        }
+    } else {
+        return false;
+    }
+}
 
 function handlePlay(event) {
     noteTime = 0.0;
@@ -431,20 +677,49 @@ function handleStop(event) {
     document.getElementById('stop').classList.remove('playing');
 }
 
+function handleBeatComboMouseDown(event) {
+    document.getElementById('beatcombo').classList.toggle('active');
+}
+
+function handleBeatMouseDown(event) {
+    var index = beatName.indexOf(event.target.innerHTML);
+    selectBeat(index)
+}
+
 function handleKitComboMouseDown(event) {
     document.getElementById('kitcombo').classList.toggle('active');
 }
 
 function handleKitMouseDown(event) {
     var index = kitName.indexOf(event.target.innerHTML);
-    theBeat.kitIndex = index;
-    currentKit = kits[index];
-    document.getElementById('kitname').innerHTML = kitNamePretty[index];
+    selectKit(index)
+}
+
+function handleEffectComboMouseDown(event) {
+    if (event.target.id != 'effectlist') {
+        document.getElementById('effectcombo').classList.toggle('active');
+    }
+}
+
+function handleEffectMouseDown(event) {
+    var name = event.target.innerHTML;
+    selectEffect(name);
+}
+
+function handleTempoIncrease(event) {
+    tempoIncrease();
+    document.getElementById('tempo').innerHTML = theBeat.tempo;
+}
+
+function handleTempoDecrease(event) {
+    tempoDecrease();
+    document.getElementById('tempo').innerHTML = theBeat.tempo;
 }
 
 function showPlayAvailable() {
     var play = document.getElementById("play");
     play.src = "images/btn_play.png";
+    document.getElementById('tempo').innerHTML = theBeat.tempo;
 }
 
 function startDemo() {
@@ -493,7 +768,8 @@ function startDemo() {
                 <div id='tempodisplay'>
                 <span id='tempo'></span>&nbsp;<span id='bpm'>bpm</span>
                 </div>
-                <img id='tempodec' src='images/tempo_dec.png'><img id='tempoinc' src='images/tempo_inc.png'>
+                <img id='tempodec' src='images/tempo_dec.png'>
+                <img id='tempoinc' src='images/tempo_inc.png'>
             </div>
         </div>
     </section>
