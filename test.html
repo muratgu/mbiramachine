@@ -32,8 +32,8 @@ var impulseResponseList
 var theBeat
 var beatList
 
-var kMinTempo = 50
-var kMaxTempo = 180
+var kMinTempo = 30
+var kMaxTempo = 120
 var kMaxSwing = .08
 var noteTime = 0.0
 var tabIndex = 0
@@ -152,12 +152,6 @@ function ImpulseResponse(url, index) {
     this.startedLoading = false;
     this.isLoaded_ = false;
     this.buffer = 0;
-    
-    this.demoIndex = -1; // no demo
-}
-
-ImpulseResponse.prototype.setDemoIndex = function(index) {
-    this.demoIndex = index;
 }
 
 ImpulseResponse.prototype.isLoaded = function() {
@@ -184,11 +178,7 @@ ImpulseResponse.prototype.load = function() {
             request.response,
             function(buffer) {
                 asset.buffer = buffer;
-                asset.isLoaded_ = true;
-
-                if (asset.demoIndex != -1) {
-                    beatList[asset.demoIndex].setEffectLoaded();
-                }                
+                asset.isLoaded_ = true;           
             },
             
             function(buffer) {
@@ -199,6 +189,7 @@ ImpulseResponse.prototype.load = function() {
 
     request.send();
 }
+
 
 function loadBeats() {
     beatList = []
@@ -286,7 +277,7 @@ function loadBeats() {
     beat.name = 'nyamaropa kushaura'
     beat.pitch = 0
     beat.volume = 1.0 
-    beat.tempo = 80
+    beat.tempo = 60
     beat.swingFactor = 0
     beat.effectMix = 0.5
     beat.effectIndex = 0
@@ -311,6 +302,22 @@ function loadBeats() {
     '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', 
     '','R2 L1','B1','R2','L1','R2 B1','','R5 L3','B3','R5','L4','R4 B5', 
     '','R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5' 
+    ]
+    beatList.push(beat);
+
+    var beat = {}
+    beat.name = 'mahororo kushaura'
+    beat.pitch = 0.98
+    beat.volume = 0.5
+    beat.tempo = 80
+    beat.swingFactor = 0
+    beat.effectMix = 0.5
+    beat.effectIndex = 0
+    beat.tab = [
+    'L2','X','R2','','R1 R4','X','L4','','R2','X','R1 R4','', 
+    'L2','X','R2','','L3 R5','X','L4','','R2','X','R1 R4','', 
+    'L4','X','R3','','L3 R5','X','L4','','R2','X','R1 R4','', 
+    'L2','X','R2','','R1 R4','X','L2','','R3','X','R1 R4','', 
     ]
     beatList.push(beat);
 
@@ -349,7 +356,7 @@ function init() {
 
     startLoadingAssets();
     
-    context = new webkitAudioContext();
+    context = new AudioContext();
 
     var finalMixNode;
     if (context.createDynamicsCompressor) {
@@ -375,17 +382,6 @@ function init() {
     // Create convolver for effect
     convolver = context.createConvolver();
     convolver.connect(effectLevelNode);
-
-    var elBeatCombo = document.getElementById('beatcombo');
-    elBeatCombo.addEventListener("mousedown", handleBeatComboMouseDown, true);
-
-    var elKitCombo = document.getElementById('kitcombo');
-    elKitCombo.addEventListener("mousedown", handleKitComboMouseDown, true);
-
-    var elEffectCombo = document.getElementById('effectcombo');
-    elEffectCombo.addEventListener("mousedown", handleEffectComboMouseDown, true);
-
-    document.body.addEventListener("mousedown", handleBodyMouseDown, true);
 
     makeKitList()
     makeBeatList()
@@ -423,8 +419,8 @@ function initControls() {
     //document.getElementById('swing_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
 
     // tool buttons
-    document.getElementById('play').addEventListener('mousedown', handlePlay, true);
-    document.getElementById('stop').addEventListener('mousedown', handleStop, true);
+    document.getElementById('play').addEventListener('mousedown', startPlay, true);
+    document.getElementById('stop').addEventListener('mousedown', stopPlay, true);
     //document.getElementById('save').addEventListener('mousedown', handleSave, true);
     //document.getElementById('save_ok').addEventListener('mousedown', handleSaveOk, true);
     //document.getElementById('load').addEventListener('mousedown', handleLoad, true);
@@ -441,8 +437,13 @@ function initControls() {
     //elBody.addEventListener('mousemove', handleMouseMove, true);
     //elBody.addEventListener('mouseup', handleMouseUp, true);
 
-    document.getElementById('tempoinc').addEventListener('mousedown', tempoIncrease, true);
-    document.getElementById('tempodec').addEventListener('mousedown', tempoDecrease, true);
+    document.getElementById('beatcombo').addEventListener("mousedown", handleBeatComboMouseDown, true);
+    document.getElementById('kitcombo').addEventListener("mousedown", handleKitComboMouseDown, true);
+    document.getElementById('effectcombo').addEventListener("mousedown", handleEffectComboMouseDown, true);
+    document.getElementById('tempoinc').addEventListener('mousedown', increaseTempo, true);
+    document.getElementById('tempodec').addEventListener('mousedown', decreaseTempo, true);
+    
+    document.body.addEventListener("mousedown", handleBodyMouseDown, true);
 }
 
 function updateControls() {
@@ -465,6 +466,7 @@ function updateControls() {
     document.getElementById('kitname').innerHTML = kitNamePretty[theBeat.kitIndex];
     document.getElementById('effectname').innerHTML = impulseResponseInfoList[theBeat.effectIndex].name;
     document.getElementById('tempo').innerHTML = theBeat.tempo;
+    
     //sliderSetPosition('swing_thumb', theBeat.swingFactor);
     //sliderSetPosition('effect_thumb', theBeat.effectMix);
     //sliderSetPosition('kick_thumb', theBeat.kickPitchVal);
@@ -484,7 +486,7 @@ function advanceNote() {
         tabIndex = 0
     }
 
-        // apply swing    
+    // apply swing    
     if (tabIndex % 3) {
         noteTime += (0.25 + kMaxSwing * theBeat.swingFactor) * secondsPerBeat
     } else {
@@ -528,7 +530,7 @@ function schedule() {
                 var currentBufferCode = theBeat.tab[tabIndex].split(' ')
                 for(var c in currentBufferCode) {
                     if(currentBufferCode[c] > '') {
-                        var currentBuffer  =  currentKit.buffer[currentBufferCode[c]]
+                        var currentBuffer = currentKit.buffer[currentBufferCode[c]]
                         if(currentBuffer) {
                             playNote(currentBuffer, 1.0, theBeat.volume, theBeat.pitch, contextPlayTime);
                         }
@@ -541,12 +543,12 @@ function schedule() {
     timeoutId = setTimeout("schedule()", 0);
 }
 
-function tempoIncrease() {
+function increaseTempo() {
     theBeat.tempo = Math.min(kMaxTempo, theBeat.tempo+4);
     document.getElementById('tempo').innerHTML = theBeat.tempo;
 }
 
-function tempoDecrease() {
+function decreaseTempo() {
     theBeat.tempo = Math.max(kMinTempo, theBeat.tempo-4);
     document.getElementById('tempo').innerHTML = theBeat.tempo;
 }
@@ -588,16 +590,14 @@ function setEffect(index) {
     effectWetMix = impulseResponseInfoList[index].wetMix;            
     convolver.buffer = impulseResponseList[index].buffer;
 
-  // Hack - if the effect is meant to be entirely wet (not unprocessed signal)
-  // then put the effect level all the way up.
+    // Hack - if the effect is meant to be entirely wet (not unprocessed signal)
+    // then put the effect level all the way up.
     if (effectDryMix == 0)
         theBeat.effectMix = 1;
 
     setEffectLevel();
     //sliderSetValue('effect_thumb', theBeat.effectMix);
     updateControls();
-
-    document.getElementById('effectname').innerHTML = impulseResponseInfoList[index].name;
 }
 
 function setEffectLevel() {        
@@ -605,16 +605,24 @@ function setEffectLevel() {
     effectLevelNode.gain.value = theBeat.effectMix * effectWetMix;
 }
 
+function startPlay() {
+    noteTime = 0.0;
+    startTime = context.currentTime + 0.005;
+    schedule();
+
+    document.getElementById('play').classList.add('playing');
+    document.getElementById('stop').classList.add('playing');
+}
+
 function stopPlay() {
     if (timeoutId) {
         clearTimeout(timeoutId);
     }        
+
     tabIndex = 0;
-}
 
-
-window.onload = function(){
-    init()
+    document.getElementById('play').classList.remove('playing');
+    document.getElementById('stop').classList.remove('playing');
 }
 
 function handleBodyMouseDown(event) {
@@ -659,24 +667,6 @@ function isDescendantOfId(el, id) {
     }
 }
 
-function handlePlay(event) {
-    noteTime = 0.0;
-    startTime = context.currentTime + 0.005;
-    schedule();
-
-    document.getElementById('play').classList.add('playing');
-    document.getElementById('stop').classList.add('playing');
-}
-
-function handleStop(event) {
-    clearTimeout(timeoutId);
-
-    tabIndex = 0;
-
-    document.getElementById('play').classList.remove('playing');
-    document.getElementById('stop').classList.remove('playing');
-}
-
 function handleBeatComboMouseDown(event) {
     document.getElementById('beatcombo').classList.toggle('active');
 }
@@ -706,16 +696,6 @@ function handleEffectMouseDown(event) {
     selectEffect(name);
 }
 
-function handleTempoIncrease(event) {
-    tempoIncrease();
-    document.getElementById('tempo').innerHTML = theBeat.tempo;
-}
-
-function handleTempoDecrease(event) {
-    tempoDecrease();
-    document.getElementById('tempo').innerHTML = theBeat.tempo;
-}
-
 function showPlayAvailable() {
     var play = document.getElementById("play");
     play.src = "images/btn_play.png";
@@ -725,6 +705,10 @@ function showPlayAvailable() {
 function startDemo() {
     showPlayAvailable();
     //startPlay();
+}
+
+window.onload = function(){
+    init()
 }
 
 </script>
