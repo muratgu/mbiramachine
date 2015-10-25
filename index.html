@@ -1,37 +1,90 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-  "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'
+  'http://www.w3.org/TR/html4/loose.dtd'>
 <html>
 <head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv='content-type' content='text/html; charset=UTF-8'>
 <title>Mbira Machine</title>
-<link rel="stylesheet" type="text/css" href = "style/font-michroma.css" />
-<link rel="stylesheet" type="text/css" href = "style/font-droidsans.css" />
-<link rel="stylesheet" type="text/css" href = "style/mbiramachine.css" />
-<script type="text/javascript">
+<link rel='stylesheet' type='text/css' href = 'style/font-michroma.css' />
+<link rel='stylesheet' type='text/css' href = 'style/font-droidsans.css' />
+<link rel='stylesheet' type='text/css' href = 'style/mbiramachine.css' />
+<script type='text/javascript'>
+
+var DEBUG = true
+var debugWarning = false
 
 function log(msg) {
-    console.log(msg);
+    if (!debugWarning) {
+        console.log('DEBUG is ' + (DEBUG ? 'on' : 'off'))
+        debugWarning = true
+    }
+    if (DEBUG) {
+        console.log(msg)
+    }
 }
 
-if (window.hasOwnProperty('AudioContext') && !window.hasOwnProperty('webkitAudioContext'))
-    window.webkitAudioContext = AudioContext
+if (!window.hasOwnProperty('AudioContext') && window.hasOwnProperty('webkitAudioContext'))
+    window.AudioContext = webkitAudioContext
 
-var keyCodes = ['X','X2','X3','B1','B2','B3','B4','B5','B6','B7','B8','R1','R2','R3','R4','R5','R6','R7','R8','R9','R10','R11','L1','L2','L3','L4','L5','L6','L7','L8']
+var keyCodes = [
+    'X','X2','X3',
+    'R1','R2','R3','R4','R5','R6','R7','R8','R9','R10','R11',
+    'L1','L2','L3','L4','L5','L6','L7','L8',
+    'B1','B2','B3','B4','B5','B6','B7','B8',
+    ]
 
 
-impulseResponseInfoList = [
- {"name":"No Effect", "url":"undefined", "dryMix":1, "wetMix":0},
- {"name":"Medium Hall 1", "url":"impulse-responses/matrix-reverb2.wav", "dryMix":1, "wetMix":1}, 
- {"name":"Binaural Hall", "url":"impulse-responses/s2_r4_bd.wav", "dryMix":1, "wetMix":0.5},
- {"name":"Kitchen", "url":"impulse-responses/kitchen.wav", "dryMix":1, "wetMix":1},
- {"name":"Telephone", "url":"impulse-responses/filter-telephone.wav", "dryMix":0, "wetMix":1.2}
+var effectOptions = [
+    // Impulse responses - each one represents a unique linear effect.
+    {'name':'No Effect', 'url':'undefined', isLoaded: true,                     'dryMix':1,   'wetMix':0   },
+    {'name':'Spreader 1', 'url':'impulse-responses/spreader50-65ms.wav',        'dryMix':0.8, 'wetMix':1.4 },
+    {'name':'Spreader 2', 'url':'impulse-responses/noise-spreader1.wav',        'dryMix':1,   'wetMix':1   },
+    {'name':'Spring Reverb', 'url':'impulse-responses/feedback-spring.wav',     'dryMix':1,   'wetMix':1   },
+    {'name':'Space Oddity', 'url':'impulse-responses/filter-rhythm3.wav',       'dryMix':1,   'wetMix':0.7 },
+    {'name':'Reverse', 'url':'impulse-responses/spatialized5.wav',              'dryMix':1,   'wetMix':1   },
+    {'name':'Huge Reverse', 'url':'impulse-responses/matrix6-backwards.wav',    'dryMix':0,   'wetMix':0.7 },
+    {'name':'Telephone', 'url':'impulse-responses/filter-telephone.wav',        'dryMix':0,   'wetMix':1.2 },
+    {'name':'Lopass Filter', 'url':'impulse-responses/filter-lopass160.wav',    'dryMix':0,   'wetMix':0.5 },
+    {'name':'Hipass Filter', 'url':'impulse-responses/filter-hipass5000.wav',   'dryMix':0,   'wetMix':4.0 },
+    {'name':'Midpass Filter', 'url':'impulse-responses/filter-midbandpass.wav', 'dryMix':0,   'wetMix':4.0 },
+    {'name':'Comb 1', 'url':'impulse-responses/comb-saw1.wav',                  'dryMix':0,   'wetMix':0.7 },
+    {'name':'Comb 2', 'url':'impulse-responses/comb-saw2.wav',                  'dryMix':0,   'wetMix':1.0 },
+    {'name':'Cosmic Ping', 'url':'impulse-responses/cosmic-ping-long.wav',      'dryMix':0,   'wetMix':0.9 },
+    {'name':'Kitchen', 'url':'impulse-responses/house-impulses/kitchen-true-stereo.wav', 
+                                                                                'dryMix':1,   'wetMix':1   },
+    {'name':'Living Room', 'url':'impulse-responses/house-impulses/dining-living-true-stereo.wav', 
+                                                                                'dryMix':1,   'wetMix':1   },
+    {'name':'Living-Bedroom', 'url':'impulse-responses/house-impulses/living-bedroom-leveled.wav', 
+                                                                                'dryMix':1,   'wetMix':1   },
+    {'name':'Dining-Far-Kitchen', 'url':'impulse-responses/house-impulses/dining-far-kitchen.wav', 
+                                                                                'dryMix':1,   'wetMix':1   },
+    {'name':'Medium Hall 1', 'url':'impulse-responses/matrix-reverb2.wav',      'dryMix':1,   'wetMix':1   },
+    {'name':'Medium Hall 2', 'url':'impulse-responses/matrix-reverb3.wav',      'dryMix':1,   'wetMix':1   },
+    {'name':'Large Hall', 'url':'impulse-responses/spatialized4.wav',           'dryMix':1,   'wetMix':0.5 },
+    {'name':'Peculiar', 'url':'impulse-responses/peculiar-backwards.wav',       'dryMix':1,   'wetMix':1   },
+    {'name':'Backslap', 'url':'impulse-responses/backslap1.wav',                'dryMix':1,   'wetMix':1   },
+    {'name':'Warehouse', 'url':'impulse-responses/tim-warehouse/cardiod-rear-35-10/cardiod-rear-levelled.wav', 
+                                                                                'dryMix':1,   'wetMix':1   },
+    {'name':'Diffusor', 'url':'impulse-responses/diffusor3.wav',                'dryMix':1,   'wetMix':1   },
+    {'name':'Binaural Hall', 'url':'impulse-responses/bin_dfeq/s2_r4_bd.wav',   'dryMix':1,   'wetMix':0.5 },
+    {'name':'Huge', 'url':'impulse-responses/matrix-reverb6.wav',               'dryMix':1,   'wetMix':0.7 },
+]
+
+var kitOptions= [ 
+    { name: 'nyamaropa_b' }, 
+    { name: 'gandanga_b' }, 
+    { name:'dambatsoko_e' },
 ]
 
 var timeoutId
-var impulseResponseList
-var theBeat
+
+var effectList
+var kitList
 var beatList
 
+var theBeat
+var currentKit
+
+var NUM_LED = 6
 var kMinTempo = 30
 var kMaxTempo = 120
 var kMaxSwing = .08
@@ -39,66 +92,82 @@ var noteTime = 0.0
 var tabIndex = 0
 var effectDryMix = 1.0
 var effectWetMix = 1.0
-var beatName = []
-var beatNamePretty = []
-var kitName = ['nyamaropa_b', 'dambatsoko']
-var kitNamePretty = ['nyamaropa_b', 'dambatsoko']
-var currentKit
-var convolver
-var compressor;
-var masterGainNode;
-var effectLevelNode;
 
-function Kit(name) {
-    this.name = name
+var convolver
+var compressor
+var masterGainNode
+var effectLevelNode
+var startTime
+var lastDrawTime = -1
+
+var mouseCapture = null;
+var mouseCaptureOffset = 0;
+
+function Beat(options) {
+    this.name = options.name
+    this.defaultKitName = options.kitName
+    this.pitch = options.pitch || 0
+    this.volume = options.volume || 1.0  
+    this.tempo = options.tempo || 60
+    this.swingFactor = options.swingFactor || 0
+    this.effectMix = options.effectMix || 0.5
+    this.tab = options.tab || []
+
+    Beat.prototype.setTab = function (tab) {
+        this.tab = tab;
+        return this;
+    }
+
+    Beat.prototype.load = function () {
+        addToBeatList(this);
+        return this;
+    }
+}
+
+function Kit(options) {
+    this.name = options.name
     this.pathName = 'sounds/' 
     this.buffer = {}
-    this.pitch = 0
+    this.pitch = options.pitch || 0
     this.startedLoading = false
     this.isLoaded = false
-    this.instrumentLoadCount = 0
-    this.instrumentCount = keyCodes.length
+    this.keys = options.keys || keyCodes
+    this.keyLoadCount = 0
+    
+    Kit.prototype.areAllKeysLoaded = function () {
+        return this.keyLoadCount == this.keys.length
+    }
 
     Kit.prototype.load = function() {
         if (this.startedLoading)
             return
             
         this.startedLoading = true
-        for(var i in keyCodes) {
-            this.loadSample(keyCodes[i], false)  
+        for(var i in this.keys) {
+            this.loadKey(this.keys[i], false)  
         }
     }
 
-    Kit.prototype.loadSample = function(sampleID, mixToMono) {
-        var url = this.pathName + this.name + '_' + sampleID + '.mp3'    
-        if (sampleID[0] == 'X') { // hosho beats are shared
-            url = this.pathName + 'hosho_' + sampleID + '.mp3';
+    Kit.prototype.loadKey = function(keyCode, mixToMono) {
+        var url = this.pathName + this.name + '_' + keyCode + '.mp3'    
+        if (keyCode[0] == 'X') { // hosho beats are shared
+            url = this.pathName + 'hosho_' + keyCode + '.mp3';
         }
         var request = new XMLHttpRequest()
-        request.open("GET", url, true)
-        request.responseType = "arraybuffer"
+        request.open('GET', url, true)
+        request.responseType = 'arraybuffer'
         var kit = this
         request.onload = function() {
             context.decodeAudioData(
                 request.response,
                 function(buffer) { // success
-                    kit.buffer[sampleID] = buffer
-                    kit.instrumentLoadCount++
-                    if (kit.instrumentLoadCount == kit.instrumentCount) {
-                        kit.isLoaded = true
-                        log(kit.name + ' kit is loaded')
-                        showPlayAvailable()
-                    }
+                    kit.buffer[keyCode] = buffer
+                    onKitKeyLoaded(kit, keyCode)                    
                 },            
                 function(buffer) { // error
-                    kit.buffer.sampleID = 0
-                    kit.instrumentLoadCount++;
-                    log('kit sample ' + url + ' cannot be loaded')
-                    if (kit.instrumentLoadCount == kit.instrumentCount) {
-                        kit.isLoaded = true
-                        log(kit.name + ' kit is loaded')
-                        showPlayAvailable()
-                    }
+                    log('kit key missing: ' + keyCode)
+                    kit.buffer.keyCode = 0
+                    onKitKeyLoaded(kit, keyCode) 
                 }
             )
         }
@@ -106,411 +175,320 @@ function Kit(name) {
     }
 }
 
-function makeKitList() {
-    var elList = document.getElementById('kitlist');
-    var numKits = kitName.length;
-    
-    for (var i = 0; i < numKits; i++) {
-        var elItem = document.createElement('li');
-        elItem.innerHTML = kitName[i];
-        elList.appendChild(elItem);
-        elItem.addEventListener("mousedown", handleKitMouseDown, true);
+function onKitKeyLoaded(kit, keyCode) {
+    log('onKitKeyLoaded: ' +keyCode)
+    kit.keyLoadCount++
+    if (kit.areAllKeysLoaded()) {
+        onKitLoaded(kit)
     }
 }
 
-function makeBeatList() {
-    var elList = document.getElementById('beatlist');
-    var numBeats = beatList.length;
+function onKitLoaded(kit) {
+    log('onKitLoaded: ' +kit.name)
+
+    kit.isLoaded = true     
+    addToKitList(kit)                   
+    showPlayAvailable()    
+}
+
+function addToKitList(kit) {
+    log('addToKitList: name=' + kit.name)
+
+    var elList = document.getElementById('kitlist')   
+    var elItem = document.createElement('li')
+    elItem.innerHTML = kit.name
+    elList.appendChild(elItem)
+    elItem.addEventListener('mousedown', handleKitMouseDown, true)
+}
+
+function addToBeatList(beat) {
+    log('addToBeatList: name=' + beat.name)
     
-    for (var i = 0; i < numBeats; i++) {
-        var elItem = document.createElement('li');
-        elItem.innerHTML = beatNamePretty[i];
-        elList.appendChild(elItem);
-        elItem.addEventListener("mousedown", handleBeatMouseDown, true);
-    }
+    var elList = document.getElementById('beatlist')
+    var elItem = document.createElement('li')
+    elItem.innerHTML = beat.name
+    elList.appendChild(elItem)
+    elItem.addEventListener('mousedown', handleBeatMouseDown, true)
 }
 
-function makeEffectList() {
-    var elList = document.getElementById('effectlist');
-    var numEffects = impulseResponseInfoList.length;
+function addToEffectList(effect) {
+    log('addToEffectList: name=' + effect.name)
     
-    var elItem = document.createElement('li');
-    elItem.innerHTML = 'None';
-    elItem.addEventListener("mousedown", handleEffectMouseDown, true);
-    
-    for (var i = 0; i < numEffects; i++) {
-        var elItem = document.createElement('li');
-        elItem.innerHTML = impulseResponseInfoList[i].name;
-        elList.appendChild(elItem);
-        elItem.addEventListener("mousedown", handleEffectMouseDown, true);
-    }
+    var elList = document.getElementById('effectlist')
+    var elItem = document.createElement('li')
+    elItem.innerHTML = effect.name
+    elList.appendChild(elItem)
+    elItem.addEventListener('mousedown', handleEffectMouseDown, true)
 }
 
-function ImpulseResponse(url, index) {
-    this.url = url;
-    this.index = index;
-    this.startedLoading = false;
-    this.isLoaded_ = false;
-    this.buffer = 0;
+function Effect(options) {
+    this.name = options.name
+    this.url = options.url
+    this.startedLoading = false
+    this.isLoaded_ = options.isLoaded
+    this.dryMix = options.dryMix;
+    this.wetMix = options.wetMix;
+    this.buffer = 0
 }
 
-ImpulseResponse.prototype.isLoaded = function() {
-    return this.isLoaded_;
+Effect.prototype.isLoaded = function() {
+    return this.isLoaded_
 }
 
-ImpulseResponse.prototype.load = function() {
+Effect.prototype.load = function() {
     if (this.startedLoading) {
-        return;
+        return
     }
     
-    this.startedLoading = true;
+    this.startedLoading = true
 
     // Load asynchronously
-    var request = new XMLHttpRequest();
-    request.open("GET", this.url, true);
-    request.responseType = "arraybuffer";
-    this.request = request;
+    var request = new XMLHttpRequest()
+    request.open('GET', this.url, true)
+    request.responseType = 'arraybuffer'
+    this.request = request
     
-    var asset = this;
+    var asset = this
 
     request.onload = function() {
         context.decodeAudioData(
             request.response,
-            function(buffer) {
-                asset.buffer = buffer;
-                asset.isLoaded_ = true;           
-            },
-            
-            function(buffer) {
-                console.log("Error decoding impulse response!");
-            }
+            function(buffer) { onEffectLoaded(asset, buffer) },            
+            function(buffer) { onEffectLoadFailed(asset) }
         );
     }
 
-    request.send();
+    request.send()
 }
 
+function onEffectLoaded(effect, buffer) {
+    log('onEffectLoaded: name=' +effect.name)
 
-function loadBeats() {
-    beatList = []
-    var beat = {}
-    beat.name = 'nhemamusasa kushaura'
-    beat.pitch = 0  
-    beat.volume = 1.0  
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L4 X2','R3 X3','B7 X','R5 X2',
-    'L3 X3','R2 X','B3 X2','R5 X3','L5 X','R3 X2','B6 X3','R5 X','L4 X2','R3 X3','B7 X','R6 X2',
-    'L2 X3','R3 X','B4 X2','R6 X3','L5 X','R3 X2','B6 X3','R5 X','L4 X2','R3 X3','B7 X','R5 X2',
-    'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L2 X2','R2 X3','L1 X','R5 X2'
+    effect.buffer = buffer
+    effect.isLoaded_ = true
+    addToEffectList(effect)
+}
+
+function onEffectLoadFailed(effect) {
+    log('onEffectLoadFailed: name=' +effect.name)   
+}
+
+function initBeatList() {
+    log('initBeatList')
+
+    beatList = [
+    new Beat({ 
+        name: 'nhemamusasa kushaura', 
+        tab: [
+        'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L4 X2','R3 X3','B7 X','R5 X2',
+        'L3 X3','R2 X','B3 X2','R5 X3','L5 X','R3 X2','B6 X3','R5 X','L4 X2','R3 X3','B7 X','R6 X2',
+        'L2 X3','R3 X','B4 X2','R6 X3','L5 X','R3 X2','B6 X3','R5 X','L4 X2','R3 X3','B7 X','R5 X2',
+        'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L2 X2','R2 X3','L1 X','R5 X2'
+        ]}),
+    new Beat({ 
+        name: 'karigamombe kushaura',
+        tab: [
+        'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R1 L4','R4','R1 L4','R4',
+        'R2 L1','R6','R2 L2','R6','R2 L3','R5','R2 L3','R5','R1 L4','R4','R1 L4','R4',
+        'R3 L4','R5','R3 L4','R5','R2 L3','R5','R2 L3','R5','R1 L4','R4','R1 L4','R4',
+        'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R3 L2','R6','R3 L2','R6'
+        ]}),
+    new Beat({ 
+        name: 'karigamombe kutsinhira',
+        tab: [
+        'R2','L1','R6 B1','','R4 R1 B6','L2','R4 R1','L1','R7 B5'   ,'','R7 L1','L5',
+        'R2','L1','R6 B4','','R5 B6'   ,'B5','R5'   ,'L1','R4 R1 B2','','R4 R1','B2',
+        'R3','B5','R3 B1','','R5 B6'   ,'B5','R5'   ,'L1','R4 R1 B2','','R4 R1','B2',
+        'R2','B4','R2 B1','','R4 R1 B6','B2','R4 R1','B6','R3 B4'   ,'','R3 B7','B4'
+        ]}),
+    new Beat({ 
+        name: 'kuzanga variation 5',
+        tab: [
+        'R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1','',
+        'R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1','',
+        'R6 L2','B4','R6','L5','R3 B6','R6','L2','R2 B1','',
+        'R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1',''
+        ]}),
+    new Beat({ 
+        name: 'kuzanga variation 5 kutsinhira',
+        tab: [
+        '','R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1',
+        '','R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1',
+        '','R6 L2','B4','R6','L5','R3 B6','R6','L2','R2 B1',
+        '','R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1'
+        ]}),
+    new Beat({ 
+        name: 'nyamaropa kushaura',
+        tab: [
+        'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', '',
+        'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', '',
+        'R2 L1','B1','R2','L1','R2 B1','','R5 L3','B3','R5','L4','R4 B5', '',
+        'R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5', ''
+        ]}),
+    new Beat({ 
+        name: 'nyamaropa kutsinhira',
+        tab: [
+        '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', 
+        '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', 
+        '','R2 L1','B1','R2','L1','R2 B1','','R5 L3','B3','R5','L4','R4 B5', 
+        '','R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5' 
+        ]}),
+    new Beat({ 
+        name: 'mahororo kushaura',
+        tab: [
+        'L2','X','R2','','R1 R4 X','','L4','X','R2','','R1 R4 X','', 
+        'L2','X','R2','','L3 R5 X','','L4','X','R2','','R1 R4 X','', 
+        'L4','X','R3','','L3 R5 X','','L4','X','R2','','R1 R4 X','', 
+        'L2','X','R2','','R1 R4 X','','L2','X','R3','','R1 R4 X','', 
+        ]}),
+    new Beat({ 
+        name: 'shumba kushaura 1',
+        tab: [
+        'B5','X R4 R1 L2','','R4 R1 B5','X L2','R4 R1','B2','X R3 L4','','R2 B2','X B1','R2', 
+        'B5','X R4 R1 L2','','R4 R1 B5','X L2','R4 R1','B4','X R4 L5','','R2 B2','X B1','R2', 
+        'B3','X R5 R2 L3','','R5 R2 B3','X L3','R5 R2','B4','X R4 L5','','R3 B4','X L7','R3', 
+        'B3','X    R2 L3','','R9    B3','X L3','R9'   ,'B5','X R8 B5','','R7 B4','X B3','R5', 
+        ]}),
+    new Beat({ 
+        name: 'chamunika basic',
+        tab: [
+        'R6 R2 L2','X L1','R6 R2','L2','X R6 R2 B4','','R5 R2 L3','X R5 R2 B3','','R4 R1 L4','X B5','', 
+        'R3 L4'   ,'X B7','R3'   ,'L4','X R3 B5'   ,'','R2 L3'   ,'X R2 B3'   ,'','R4 R1 L4','X B5','', 
+        'R6 R2 L2','X L1','R6 R2','L2','X R6 R2 B4','','R4 R1 L5','X B6'      ,'','R3 L2'   ,'X B4','', 
+        'R2 L2'   ,'X L1','R2'   ,'L2','X R2 B4'   ,'','R4 R1 L5','X L6'      ,'','R4 R1 L4','X B5','', 
+        ]})
     ]
-    beatList.push(beat);
+}
 
-    var beat = {}
-    beat.name = 'karigamombe kushaura'  
-    beat.pitch = 0  
-    beat.volume = 1.0 
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R1 L4','R4','R1 L4','R4',
-    'R2 L1','R6','R2 L2','R6','R2 L3','R5','R2 L3','R5','R1 L4','R4','R1 L4','R4',
-    'R3 L4','R5','R3 L4','R5','R2 L3','R5','R2 L3','R5','R1 L4','R4','R1 L4','R4',
-    'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R3 L2','R6','R3 L2','R6'
-    ]
-    beatList.push(beat);
+function initEffectList(){
+    log('initEffectList')
 
-    var beat = {}
-    beat.name = 'karigamombe kutsinhira'
-    beat.pitch = 0
-    beat.volume = 1.0 
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    'R2','L1','R6 B1','','R4 R1 B6','L2','R4 R1','L1','R7 B5'   ,'','R7 L1','L5',
-    'R2','L1','R6 B4','','R5 B6'   ,'B5','R5'   ,'L1','R4 R1 B2','','R4 R1','B2',
-    'R3','B5','R3 B1','','R5 B6'   ,'B5','R5'   ,'L1','R4 R1 B2','','R4 R1','B2',
-    'R2','B4','R2 B1','','R4 R1 B6','B2','R4 R1','B6','R3 B4'   ,'','R3 B7','B4'
-    ]
-    beatList.push(beat);
+    effectList = []
 
-    var beat = {}
-    beat.name = 'kuzanga variation 5'
-    beat.pitch = 0
-    beat.volume = 1.0 
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    'R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1','',
-    'R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1','',
-    'R6 L2','B4','R6','L5','R3 B6','R6','L2','R2 B1','',
-    'R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1',''
-    ]
-    beatList.push(beat);
-
-    var beat = {}
-    beat.name = 'kuzanga variation 5 kutsinhira'
-    beat.pitch = 0.97
-    beat.volume = 0.8
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    '','R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1',
-    '','R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1',
-    '','R6 L2','B4','R6','L5','R3 B6','R6','L2','R2 B1',
-    '','R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1'
-    ]
-    beatList.push(beat);
-
-    var beat = {}
-    beat.name = 'nyamaropa kushaura'
-    beat.pitch = 0
-    beat.volume = 1.0 
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', '',
-    'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', '',
-    'R2 L1','B1','R2','L1','R2 B1','','R5 L3','B3','R5','L4','R4 B5', '',
-    'R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5', ''
-    ]
-    beatList.push(beat);
-
-    var beat = {}
-    beat.name = 'nyamaropa kutsinhira'
-    beat.pitch = 0.98
-    beat.volume = 0.5
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', 
-    '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', 
-    '','R2 L1','B1','R2','L1','R2 B1','','R5 L3','B3','R5','L4','R4 B5', 
-    '','R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5' 
-    ]
-    beatList.push(beat);
-
-    var beat = {}
-    beat.name = 'mahororo kushaura'
-    beat.pitch = 0.98
-    beat.volume = 0.5
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    'L2','X','R2','','R1 R4 X','','L4','X','R2','','R1 R4 X','', 
-    'L2','X','R2','','L3 R5 X','','L4','X','R2','','R1 R4 X','', 
-    'L4','X','R3','','L3 R5 X','','L4','X','R2','','R1 R4 X','', 
-    'L2','X','R2','','R1 R4 X','','L2','X','R3','','R1 R4 X','', 
-    ]
-    beatList.push(beat);
-
-    var beat = {}
-    beat.name = 'shumba kushaura 1'
-    beat.pitch = 0.98
-    beat.volume = 0.5
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    'B5','X R4 R1 L2','','R4 R1 B5','X L2','R4 R1','B2','X R3 L4','','R2 B2','X B1','R2', 
-    'B5','X R4 R1 L2','','R4 R1 B5','X L2','R4 R1','B4','X R4 L5','','R2 B2','X B1','R2', 
-    'B3','X R5 R2 L3','','R5 R2 B3','X L3','R5 R2','B4','X R4 L5','','R3 B4','X L7','R3', 
-    'B3','X    R2 L3','','R9    B3','X L3','R9'   ,'B5','X R8 B5','','R7 B4','X B3','R5', 
-    ]
-    beatList.push(beat);
-
-    var beat = {}
-    beat.name = 'chamunika basic'
-    beat.pitch = 0.98
-    beat.volume = 0.5
-    beat.tempo = 60
-    beat.swingFactor = 0
-    beat.effectMix = 0.5
-    beat.effectIndex = 0
-    beat.tab = [
-    'R6 R2 L2','X L1','R6 R2','L2','X R6 R2 B4','','R5 R2 L3','X R5 R2 B3','','R4 R1 L4','X B5','', 
-    'R3 L4'   ,'X B7','R3'   ,'L4','X R3 B5'   ,'','R2 L3'   ,'X R2 B3'   ,'','R4 R1 L4','X B5','', 
-    'R6 R2 L2','X L1','R6 R2','L2','X R6 R2 B4','','R4 R1 L5','X B6'      ,'','R3 L2'   ,'X B4','', 
-    'R2 L2'   ,'X L1','R2'   ,'L2','X R2 B4'   ,'','R4 R1 L5','X L6'      ,'','R4 R1 L4','X B5','', 
-    ]
-    beatList.push(beat);
-
-    beatName = []
-    beatNamePretty = []
-    for(var b in beatList) {
-        beatName.push(beatList[b].name);
-        beatNamePretty.push(beatList[b].name);
+    for (i = 0; i < effectOptions.length; i++) {
+        effectList[i] = new Effect(effectOptions[i])
     }
+}
+
+function initKitList(){
+    log('initKitList')
+    
+    kitList = []
+
+    for (i = 0; i < kitOptions.length; i++) {
+        kitList[i] = new Kit(kitOptions[i])
+        kitList[i].load()
+    } 
+}
+
+function startLoadingBeats(){
+    log('startLoadingBeats')
+
+    for (i = 0; i < beatList.length; i++) {
+        beatList[i].load()
+    } 
+}
+
+function startLoadingKits(){
+    log('startLoadingKits')
+    
+    for (i = 0; i < kitList.length; i++) {
+        kitList[i].load()
+    } 
+}
+
+function startLoadingEffects(){
+    log('startLoadingEffects')
+
+    // Start at 1 to skip 'No Effect'
+    for (i = 1; i < effectList.length; i++) {
+        effectList[i].load()
+    } 
 }
 
 function startLoadingAssets(){
-    loadBeats()
+    log('startLoadingAssets')
 
-    impulseResponseList = []
+    initKitList()
+    initEffectList()    
+    initBeatList()
 
-    for (i = 0; i < impulseResponseInfoList.length; i++) {
-        impulseResponseList[i] = new ImpulseResponse(impulseResponseInfoList[i].url, i);
-    }
-
-    // Initialize mbira kits
-    var numKits = kitName.length
-    kits = new Array(numKits)
-    for (var i  = 0; i < numKits; i++) {
-        kits[i] = new Kit(kitName[i])
-        kits[i].load()
-    } 
-
-    // Start at 1 to skip "No Effect"
-    for (i = 1; i < impulseResponseInfoList.length; i++) {
-        impulseResponseList[i].load();
-    } 
+    startLoadingKits()
+    startLoadingEffects()     
+    startLoadingBeats()
 }
 
 function init() {
+    log('init')
 
-    startLoadingAssets();
+    startLoadingAssets()
     
-    context = new AudioContext();
+    context = new AudioContext()
 
     var finalMixNode;
     if (context.createDynamicsCompressor) {
         // Create a dynamics compressor to sweeten the overall mix.
-        compressor = context.createDynamicsCompressor();
-        compressor.connect(context.destination);
-        finalMixNode = compressor;
+        compressor = context.createDynamicsCompressor()
+        compressor.connect(context.destination)
+        finalMixNode = compressor
     } else {
         // No compressor available in this implementation.
-        finalMixNode = context.destination;
+        finalMixNode = context.destination
     }
 
     // Create master volume.
-    masterGainNode = context.createGain();
+    masterGainNode = context.createGain()
     masterGainNode.gain.value = 0.7; // reduce overall volume to avoid clipping
-    masterGainNode.connect(finalMixNode);
+    masterGainNode.connect(finalMixNode)
 
     // Create effect volume.
-    effectLevelNode = context.createGain();
+    effectLevelNode = context.createGain()
     effectLevelNode.gain.value = 1.0; // effect level slider controls this
-    effectLevelNode.connect(masterGainNode);
+    effectLevelNode.connect(masterGainNode)
 
     // Create convolver for effect
-    convolver = context.createConvolver();
-    convolver.connect(effectLevelNode);
+    convolver = context.createConvolver()
+    convolver.connect(effectLevelNode)
 
-    makeKitList()
-    makeBeatList()
-    makeEffectList()
-
-    selectBeat(0)
-    selectKit(0)
-    selectEffect(0)
+    //selectBeat()
+    //selectKit()
+    //selectEffect()
     
     initControls();
-    updateControls();
 }
 
 function initControls() {
-    // Initialize note buttons
-    //initButtons();
-
     // sliders
-    //document.getElementById('effect_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    //document.getElementById('tom1_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    //document.getElementById('tom2_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    //document.getElementById('tom3_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    //document.getElementById('hihat_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    //document.getElementById('snare_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    //document.getElementById('kick_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    //document.getElementById('swing_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-
-    //document.getElementById('effect_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    //document.getElementById('tom1_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    //document.getElementById('tom2_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    //document.getElementById('tom3_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    //document.getElementById('hihat_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    //document.getElementById('snare_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    //document.getElementById('kick_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    //document.getElementById('swing_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+    document.getElementById('effect_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+    document.getElementById('swing_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
+    document.getElementById('effect_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
+    document.getElementById('swing_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
 
     // tool buttons
-    document.getElementById('play').addEventListener('mousedown', startPlay, true);
-    document.getElementById('stop').addEventListener('mousedown', stopPlay, true);
+    document.getElementById('play').addEventListener('mousedown', startPlay, true)
+    document.getElementById('stop').addEventListener('mousedown', stopPlay, true)
     //document.getElementById('save').addEventListener('mousedown', handleSave, true);
     //document.getElementById('save_ok').addEventListener('mousedown', handleSaveOk, true);
     //document.getElementById('load').addEventListener('mousedown', handleLoad, true);
     //document.getElementById('load_ok').addEventListener('mousedown', handleLoadOk, true);
     //document.getElementById('load_cancel').addEventListener('mousedown', handleLoadCancel, true);
     //document.getElementById('reset').addEventListener('mousedown', handleReset, true);
-    //document.getElementById('demo1').addEventListener('mousedown', handleDemoMouseDown, true);
-    //document.getElementById('demo2').addEventListener('mousedown', handleDemoMouseDown, true);
-    //document.getElementById('demo3').addEventListener('mousedown', handleDemoMouseDown, true);
-    //document.getElementById('demo4').addEventListener('mousedown', handleDemoMouseDown, true);
-    //document.getElementById('demo5').addEventListener('mousedown', handleDemoMouseDown, true);
 
-    //var elBody = document.getElementById('body');
-    //elBody.addEventListener('mousemove', handleMouseMove, true);
-    //elBody.addEventListener('mouseup', handleMouseUp, true);
+    var elBody = document.getElementById('body');
+    elBody.addEventListener("mousedown", handleBodyMouseDown, true);
+    elBody.addEventListener('mousemove', handleMouseMove, true);
+    elBody.addEventListener('mouseup', handleMouseUp, true);
 
-    document.getElementById('beatcombo').addEventListener("mousedown", handleBeatComboMouseDown, true);
-    document.getElementById('kitcombo').addEventListener("mousedown", handleKitComboMouseDown, true);
-    document.getElementById('effectcombo').addEventListener("mousedown", handleEffectComboMouseDown, true);
-    document.getElementById('tempoinc').addEventListener('mousedown', increaseTempo, true);
-    document.getElementById('tempodec').addEventListener('mousedown', decreaseTempo, true);
+    document.getElementById('beatcombo').addEventListener('mousedown', handleBeatComboMouseDown, true)
+    document.getElementById('kitcombo').addEventListener('mousedown', handleKitComboMouseDown, true)
+    document.getElementById('effectcombo').addEventListener('mousedown', handleEffectComboMouseDown, true)
+    document.getElementById('tempoinc').addEventListener('mousedown', increaseTempo, true)
+    document.getElementById('tempodec').addEventListener('mousedown', decreaseTempo, true)
     
-    document.body.addEventListener("mousedown", handleBodyMouseDown, true);
-}
-
-function updateControls() {
-    /*for (i = 0; i < loopLength; ++i) {
-        for (j = 0; j < kNumInstruments; j++) {
-            switch (j) {
-                case 0: notes = theBeat.rhythm1; break;
-                case 1: notes = theBeat.rhythm2; break;
-                case 2: notes = theBeat.rhythm3; break;
-                case 3: notes = theBeat.rhythm4; break;
-                case 4: notes = theBeat.rhythm5; break;
-                case 5: notes = theBeat.rhythm6; break;
-            }
-
-            drawNote(notes[i], i, j);
-        }
-    }*/
-
-    document.getElementById('beatname').innerHTML = theBeat.name;
-    document.getElementById('kitname').innerHTML = kitNamePretty[theBeat.kitIndex];
-    document.getElementById('effectname').innerHTML = impulseResponseInfoList[theBeat.effectIndex].name;
-    document.getElementById('tempo').innerHTML = theBeat.tempo;
-    
-    //sliderSetPosition('swing_thumb', theBeat.swingFactor);
-    //sliderSetPosition('effect_thumb', theBeat.effectMix);
-    //sliderSetPosition('kick_thumb', theBeat.kickPitchVal);
-    //sliderSetPosition('snare_thumb', theBeat.snarePitchVal);
-    //sliderSetPosition('hihat_thumb', theBeat.hihatPitchVal);
-    //sliderSetPosition('tom1_thumb', theBeat.tom1PitchVal);        
-    //sliderSetPosition('tom2_thumb', theBeat.tom2PitchVal);
-    //sliderSetPosition('tom3_thumb', theBeat.tom3PitchVal);
+    document.body.addEventListener('mousedown', handleBodyMouseDown, true)
 }
 
 function advanceNote() {
-    // Advance time by a 16th note...
     var secondsPerBeat = 60.0 / theBeat.tempo
 
     tabIndex++;
@@ -535,154 +513,295 @@ function playNote(buffer, sendGain, mainGain, playbackRate, noteTime) {
     var finalNode = voice
 
     // Connect to dry mix
-    var dryGainNode = context.createGain();
-    dryGainNode.gain.value = mainGain * effectDryMix;
-    finalNode.connect(dryGainNode);
-    dryGainNode.connect(masterGainNode);
+    var dryGainNode = context.createGain()
+    dryGainNode.gain.value = mainGain * effectDryMix
+    finalNode.connect(dryGainNode)
+    dryGainNode.connect(masterGainNode)
 
     // Connect to wet mix
-    var wetGainNode = context.createGain();
-    wetGainNode.gain.value = sendGain;
-    finalNode.connect(wetGainNode);
-    wetGainNode.connect(convolver);
+    var wetGainNode = context.createGain()
+    wetGainNode.gain.value = sendGain
+    finalNode.connect(wetGainNode)
+    wetGainNode.connect(convolver)
 
-    voice.start(noteTime);
+    voice.start(noteTime)
 }
 
 function schedule() {
-    var currentTime = context.currentTime;
+    var currentTime = context.currentTime
 
     // The sequence starts at startTime, so normalize currentTime so that it's 0 at the start of the sequence.
-    currentTime -= startTime;
+    currentTime -= startTime
 
     while (noteTime < currentTime + 0.200) {
         // Convert noteTime to context time.
-        var contextPlayTime = noteTime + startTime;
+        var contextPlayTime = noteTime + startTime
             if(theBeat && theBeat.tab[tabIndex]) {
                 var currentBufferCode = theBeat.tab[tabIndex].split(' ')
                 for(var c in currentBufferCode) {
                     if(currentBufferCode[c] > '') {
                         var currentBuffer = currentKit.buffer[currentBufferCode[c]]
                         if(currentBuffer) {
-                            playNote(currentBuffer, 1.0, theBeat.volume, theBeat.pitch, contextPlayTime);
+                            playNote(currentBuffer, 1.0, theBeat.volume, theBeat.pitch, contextPlayTime)
                         }
                     }
                 }
             }
-        advanceNote();
+
+        // Attempt to synchronize drawing time with sound
+        if (noteTime != lastDrawTime) {
+            lastDrawTime = noteTime;
+            drawPlayhead((tabIndex+NUM_LED-1) % NUM_LED)
+        }
+
+        advanceNote()
     }
 
-    timeoutId = setTimeout("schedule()", 0);
+    timeoutId = setTimeout('schedule()', 0)
+}
+
+function selectTempo(value) {
+    theBeat.tempo = Math.min(kMaxTempo, Math.max(kMinTempo, value));
+    document.getElementById('tempo').innerHTML = theBeat.tempo
 }
 
 function increaseTempo() {
-    theBeat.tempo = Math.min(kMaxTempo, theBeat.tempo+4);
-    document.getElementById('tempo').innerHTML = theBeat.tempo;
+    selectTempo(theBeat.tempo + 1)
 }
 
 function decreaseTempo() {
-    theBeat.tempo = Math.max(kMinTempo, theBeat.tempo-4);
-    document.getElementById('tempo').innerHTML = theBeat.tempo;
+    selectTempo(theBeat.tempo - 1)
 }
 
-function selectBeat(index) {
-    stopPlay(); // the beat has changed
-    theBeat = beatList[index];
-    document.getElementById('beatname').innerHTML = beatNamePretty[index];
+function selectBeat(name) {
+    log('selectBeat: ' + name)
+
+    stopPlay() // the beat has changed
+
+    var beat = getBeatByName(name);
+    if (!beat) {
+        alert ('Beat not found: ' + name)
+        return
+    }
+
+    theBeat = beat
+
+    selectKit(theBeat.defaultKitName)
+
+    selectEffect(theBeat.defaultEffectName)
+
+    selectEffectLevel(theBeat.effectMix)  
+
+    selectSwingLevel(theBeat.swingFactor)
+
+    selectTempo(theBeat.tempo);
+
+    document.getElementById('beatname').innerHTML = theBeat.name
+
+    return true
 }
 
-function selectKit(index) {
-    theBeat.kitIndex = index;
-    currentKit = kits[index];
-    document.getElementById('kitname').innerHTML = kitNamePretty[index];
+function selectKit(name) {
+    log('selectKit: ' +name)
+
+    var kit = getKitByName(name)
+    if (!kit) {
+        alert('kit ' +name+ ' not found!')
+        return
+    }
+
+    currentKit = kit
+
+    document.getElementById('kitname').innerHTML = currentKit.name
 }
 
 function selectEffect(name) {
-    for (var i = 0; i < impulseResponseInfoList.length; ++i) {
-        if (impulseResponseInfoList[i].name == name) {
+    log('selectEffect: ' + name)
 
-            // since they just explicitly chose an effect from the list.
-            if (theBeat.effectMix == 0)
-                theBeat.effectMix = 0.5;
-
-            setEffect(i);
-            break;
-        }
-    }   
-}
-
-function setEffect(index) {
-    if (index > 0 && !impulseResponseList[index].isLoaded()) {
-        alert('Sorry, this effect is still loading.  Try again in a few seconds :)');
-        return;
+    var effect = getEffectByName(name)
+    
+    if (!effect) {
+        alert('Effect not found: ' +name)
+        return
+    }
+    
+    if (!effect.isLoaded()) {
+        alert('Sorry, the effect ' +name+ ' is still loading. Try again in a few seconds.')
+        return
     }
 
-    theBeat.effectIndex = index;
-    effectDryMix = impulseResponseInfoList[index].dryMix;
-    effectWetMix = impulseResponseInfoList[index].wetMix;            
-    convolver.buffer = impulseResponseList[index].buffer;
+    // the 'no effect' has no buffer
+    if (effect.buffer) {        
+        convolver.buffer = effect.buffer
+    }
 
-    // Hack - if the effect is meant to be entirely wet (not unprocessed signal)
-    // then put the effect level all the way up.
-    if (effectDryMix == 0)
-        theBeat.effectMix = 1;
+    effectDryMix = effect.dryMix
+    effectWetMix = effect.wetMix
 
-    setEffectLevel();
-    //sliderSetValue('effect_thumb', theBeat.effectMix);
-    updateControls();
+    if (theBeat) {
+        theBeat.effect = effect
+        // since they just explicitly chose an effect from the list.
+        if (theBeat.effectMix == 0)
+            theBeat.effectMix = 0.5
+
+        // Hack - if the effect is meant to be entirely wet (not unprocessed signal)
+        // then put the effect level all the way up.
+        if (effectDryMix == 0)
+            theBeat.effectMix = 1
+
+        selectEffectLevel(theBeat.effectMix)
+    }
+
+    document.getElementById('effectname').innerHTML = effect.name
 }
 
-function setEffectLevel() {        
+function selectEffectLevel(value) {
+    setVerticalThumbPosition(value);
+    setEffectLevel(value);
+}
+
+function setEffectLevel(value) {
+    if (!theBeat) return // no beat
+    theBeat.effectMix = value;
     // Factor in both the preset's effect level and the blending level (effectWetMix) stored in the effect itself.
-    effectLevelNode.gain.value = theBeat.effectMix * effectWetMix;
+    effectLevelNode.gain.value = theBeat.effectMix * effectWetMix;  
+}
+
+function selectSwingLevel(value) {
+    setVerticalThumbPosition(value);
+    setSwingLevel(value);
+}
+
+function setSwingLevel(value) {
+    if (!theBeat) return // no beat
+    theBeat.swingFactor = value;
+}
+
+function setVerticalThumbPosition(value) {
+    var elThumb = document.getElementById('effect_thumb');
+    var elTrack = elThumb.parentNode;
+
+    var thumbH = elThumb.clientHeight;
+    var trackH = elTrack.clientHeight;
+    var travelH = trackH - thumbH;
+
+    elThumb.style.top = travelH * (1.0 - value) + 'px';
+}
+
+function setHorizontalThumbPosition(value) {
+    var elThumb = document.getElementById('swing_thumb');
+    var elTrack = elThumb.parentNode;
+
+    var thumbW = elThumb.clientWidth;
+    var trackW = elTrack.clientWidth;
+    var travelW = trackW - thumbW;
+
+    elThumb.style.left = travelW * value + 'px';
+}
+
+function getBeatByName(name) {
+    // return the first one if no name specified
+    if (!name && beatList.length > 0) {
+        return beatList[0]
+    }
+    for (i = 0; i < beatList.length; i++) {
+        if (beatList[i].name === name) {
+            return beatList[i]
+        }
+    } 
+}
+
+function getKitByName(name) {
+    // return the first one if no name specified
+    if (!name && kitList.length > 0) {
+        return kitList[0]
+    }
+    for (i = 0; i < kitList.length; i++) {
+        if (kitList[i].name === name) {
+            return kitList[i]
+        }
+    } 
+}
+
+function getEffectByName(name) {    
+    // return the first one if no name specified
+    if (!name && effectList.length > 0) {
+        return effectList[0]
+    }
+
+    for (i = 1; i < effectList.length; i++) {
+        if (effectList[i].name === name) {
+            return effectList[i]
+        }
+    } 
 }
 
 function startPlay() {
-    noteTime = 0.0;
-    startTime = context.currentTime + 0.005;
+    log('startPlay')
+
+    noteTime = 0.0
+    startTime = context.currentTime + 0.005
     schedule();
 
-    document.getElementById('play').classList.add('playing');
-    document.getElementById('stop').classList.add('playing');
+    document.getElementById('play').classList.add('playing')
+    document.getElementById('stop').classList.add('playing')
 }
 
 function stopPlay() {
+    log('stopPlay')
+
     if (timeoutId) {
-        clearTimeout(timeoutId);
+        clearTimeout(timeoutId)
     }        
 
-    tabIndex = 0;
+    // turn off the LED
+    var elOld = document.getElementById('LED_' + (tabIndex+NUM_LED-2) % NUM_LED)
+    if(elOld) {
+        elOld.src = 'images/LED_off.png'
+    }
 
-    document.getElementById('play').classList.remove('playing');
-    document.getElementById('stop').classList.remove('playing');
+    tabIndex = 0
+
+    document.getElementById('play').classList.remove('playing')
+    document.getElementById('stop').classList.remove('playing')
+}
+
+function drawPlayhead(xindex) {
+    var lastIndex = (xindex+NUM_LED-1) % NUM_LED
+
+    var elNew = document.getElementById('LED_' + xindex)
+    var elOld = document.getElementById('LED_' + lastIndex)
+    
+    elNew.src = 'images/LED_on.png'
+    elOld.src = 'images/LED_off.png'
 }
 
 function handleBodyMouseDown(event) {
-    var elBeatcombo = document.getElementById('beatcombo');
-    var elKitcombo = document.getElementById('kitcombo');
-    var elEffectcombo = document.getElementById('effectcombo');
+    var elBeatcombo = document.getElementById('beatcombo')
+    var elKitcombo = document.getElementById('kitcombo')
+    var elEffectcombo = document.getElementById('effectcombo')
 
     if (elBeatcombo.classList.contains('active') && !isDescendantOfId(event.target, 'beatcombo_container')) {
-        elBeatcombo.classList.remove('active');
+        elBeatcombo.classList.remove('active')
         if ( !isDescendantOfId(event.target, 'effectcombo_container') 
             && !isDescendantOfId(event.target, 'kitcombo_container') ) {
-            event.stopPropagation();
+            event.stopPropagation()
         }
     }
 
     if (elKitcombo.classList.contains('active') && !isDescendantOfId(event.target, 'kitcombo_container')) {
-        elKitcombo.classList.remove('active');
+        elKitcombo.classList.remove('active')
         if ( !isDescendantOfId(event.target, 'effectcombo_container') 
             && !isDescendantOfId(event.target, 'beatcombo_container') ) {
-            event.stopPropagation();
+            event.stopPropagation()
         }
     }
     
     if (elEffectcombo.classList.contains('active') && !isDescendantOfId(event.target, 'effectcombo_container')) {
-        elEffectcombo.classList.remove('active');
+        elEffectcombo.classList.remove('active')
         if ( !isDescendantOfId(event.target, 'kitcombo_container') 
             && !isDescendantOfId(event.target, 'beatcombo_container') ) {
-            event.stopPropagation();
+            event.stopPropagation()
         }
     }    
 }
@@ -690,56 +809,140 @@ function handleBodyMouseDown(event) {
 function isDescendantOfId(el, id) {
     if (el.parentElement) {
         if (el.parentElement.id == id) {
-            return true;
+            return true
         } else {
-            return isDescendantOfId(el.parentElement, id);
+            return isDescendantOfId(el.parentElement, id)
         }
     } else {
-        return false;
+        return false
     }
 }
 
-function handleBeatComboMouseDown(event) {
-    document.getElementById('beatcombo').classList.toggle('active');
+function handleMouseMove(event) {
+    if (!mouseCapture) return;
+    
+    var elThumb = document.getElementById(mouseCapture);
+    var elTrack = elThumb.parentNode;
+
+    if (mouseCapture != 'horizontal_thumb') { // vertical slider
+        var thumbH = elThumb.clientHeight;
+        var trackH = elTrack.clientHeight;
+        var travelH = trackH - thumbH;
+
+        var trackY = 0;
+        var el = elTrack;
+        do {
+            trackY += el.offsetTop;
+        } while (el = el.offsetParent);
+
+        var offsetY = Math.max(0, Math.min(travelH, event.pageY - mouseCaptureOffset - trackY));
+        var value = 1.0 - offsetY / travelH;
+        elThumb.style.top = travelH * (1.0 - value) + 'px';
+    } else { // horizontal slider
+        var thumbW = elThumb.clientWidth;
+        var trackW = elTrack.clientWidth;
+        var travelW = trackW - thumbW;
+
+        var trackX = 0;
+        var el = elTrack;
+        do {
+            trackX += el.offsetLeft;
+        } while (el = el.offsetParent);
+
+        var offsetX = Math.max(0, Math.min(travelW, event.pageX - mouseCaptureOffset - trackX));
+        var value = offsetX / travelW;
+        elThumb.style.left = travelW * value + 'px';
+    }
+
+    if (mouseCapture == 'effect_thumb') {
+    
+        setEffectLevel(value);
+    
+    } else if (mouseCapture == 'swing_thumb') {
+    
+        setSwingLevel(value);    
+    }
+}
+
+function handleMouseUp() {
+    mouseCapture = null;
 }
 
 function handleBeatMouseDown(event) {
-    var index = beatName.indexOf(event.target.innerHTML);
-    selectBeat(index)
-}
-
-function handleKitComboMouseDown(event) {
-    document.getElementById('kitcombo').classList.toggle('active');
+    var name = event.target.innerHTML
+    selectBeat(name)
 }
 
 function handleKitMouseDown(event) {
-    var index = kitName.indexOf(event.target.innerHTML);
-    selectKit(index)
-}
-
-function handleEffectComboMouseDown(event) {
-    if (event.target.id != 'effectlist') {
-        document.getElementById('effectcombo').classList.toggle('active');
-    }
+    var name = event.target.innerHTML
+    selectKit(name)
 }
 
 function handleEffectMouseDown(event) {
-    var name = event.target.innerHTML;
-    selectEffect(name);
+    var name = event.target.innerHTML
+    selectEffect(name)
+}
+
+function handleBeatComboMouseDown(event) {
+    document.getElementById('beatcombo').classList.toggle('active')
+}
+
+function handleKitComboMouseDown(event) {
+    document.getElementById('kitcombo').classList.toggle('active')
+}
+
+function handleEffectComboMouseDown(event) {
+    document.getElementById('effectcombo').classList.toggle('active')
+}
+
+function handleSliderDoubleClick(event) {
+    var id = event.target.id;
+    if (id != 'swing_thumb' && id != 'effect_thumb') { 
+        mouseCapture = null;
+        sliderSetValue(event.target.id, 0.5);
+        updateControls();
+    }
+}
+
+function handleSliderMouseDown(event) {
+    mouseCapture = event.target.id;
+
+    // calculate offset of mousedown on slider
+    var el = event.target;
+    if (mouseCapture == 'swing_thumb') {
+        var thumbX = 0;    
+        do {
+            thumbX += el.offsetLeft;
+        } while (el = el.offsetParent);
+
+        mouseCaptureOffset = event.pageX - thumbX;
+    } else {
+        var thumbY = 0;    
+        do {
+            thumbY += el.offsetTop;
+        } while (el = el.offsetParent);
+
+        mouseCaptureOffset = event.pageY - thumbY;
+    }
 }
 
 function showPlayAvailable() {
-    var play = document.getElementById("play");
-    play.src = "images/btn_play.png";
-    document.getElementById('tempo').innerHTML = theBeat.tempo;
+    log('showPlayAvailable')
+
+    var play = document.getElementById('play')
+    play.src = 'images/btn_play.png'
 }
 
 function startDemo() {
-    showPlayAvailable();
+    log('startDemo')
+    
+    showPlayAvailable()
     //startPlay();
 }
 
 window.onload = function(){
+    log('onLoad')
+
     init()
 }
 
@@ -748,8 +951,19 @@ window.onload = function(){
 <body id='body'>
 
     <div id='title'>
-        WebAudio Mbira Machine <span id='version'>1.0</span>
+        Mbira Machine <span id='version'>1.0</span>
     </div>    
+    <section class='container active' id='pad'>
+    <div class='buttons_row' id='LED_row'>
+            <span class='label'></span>
+            <img id='LED_0' src='images/LED_off.png'>
+            <img id='LED_1' src='images/LED_off.png'>
+            <img id='LED_2' src='images/LED_off.png'>
+            <img id='LED_3' src='images/LED_off.png'>
+            <img id='LED_4' src='images/LED_off.png'>
+            <img id='LED_5' src='images/LED_off.png'>
+        </div>
+    </section>
     <section class='container active' id='params'>
         <div id='paramsleft_container'>
             <div id='beatcombo_container'>
@@ -782,10 +996,30 @@ window.onload = function(){
             <div id='tempo_container'>
                 <span class='label' id='tempolabel'>Tempo</span>
                 <div id='tempodisplay'>
-                <span id='tempo'></span>&nbsp;<span id='bpm'>bpm</span>
+                    <span id='tempo'></span>&nbsp;<span id='bpm'>bpm</span>
                 </div>
                 <img id='tempodec' src='images/tempo_dec.png'>
                 <img id='tempoinc' src='images/tempo_inc.png'>
+            </div>            
+        </div>
+        <div class='vrule'></div>
+        <div class='slider_container' id='effect_container'>
+            <div class='slider_groove'>
+                <img class='slider_track' src='images/slider_track.png'>
+                <img class='slider_thumb' id='effect_thumb' src='images/slider_thumb.png'>
+            </div>
+            <div class='slider_label'>
+                Effect Level
+            </div>
+        </div>
+        <div class='vrule'></div>
+        <div class='slider_container' id='swing_container'>
+            <div class='slider_groove'>
+                <img class='slider_track' src='images/slider_track.png'>
+                <img class='slider_thumb' id='swing_thumb' src='images/slider_thumb.png'>
+            </div>
+            <div class='slider_label'>
+                Swing Level
             </div>
         </div>
     </section>
