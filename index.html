@@ -456,14 +456,8 @@ function initControls() {
     // sliders
     document.getElementById('effect_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
     document.getElementById('swing_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    document.getElementById('leftkeypan_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    document.getElementById('rightkeypan_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    document.getElementById('hoshokeypan_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
     document.getElementById('effect_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
     document.getElementById('swing_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    document.getElementById('leftkeypan_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    document.getElementById('rightkeypan_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    document.getElementById('hoshokeypan_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
 
     // tool buttons
     document.getElementById('play').addEventListener('mousedown', startPlay, true)
@@ -669,21 +663,6 @@ function selectEffectLevel(value) {
     setEffectLevel(value);
 }
 
-function selectLeftkeyPanLevel(value) {
-    setVerticalThumbPosition('leftkeypan_thumb', value);
-    setLeftkeyPanLevel(value);
-}
-
-function selectRightkeyPanLevel(value) {
-    setVerticalThumbPosition('rightkeypan_thumb', value);
-    setRightkeyPanLevel(value);
-}
-
-function selectHoshokeyPanLevel(value) {
-    setVerticalThumbPosition('hoshokeypan_thumb', value);
-    setHoshokeyPanLevel(value);
-}
-
 function setEffectLevel(value) {
     if (!theBeat) { log('No beat'); return }
 
@@ -697,12 +676,6 @@ function setThumbValue(id, value) {
         selectSwingLevel(value)
     } else if (id == 'effect_thumb') {
         selectEffectLevel(value)
-    } else if (id == 'leftkeypan_thumb') {
-        selectLeftkeyPanLevel(value)
-    } else if (id == 'rightkeypan_thumb') {
-        selectRightkeyPanLevel(value)
-    } else if (id == 'hoshokeypan_thumb') {
-        selectHoshokeyPanLevel(value)
     } 
 }
 
@@ -715,24 +688,6 @@ function setSwingLevel(value) {
     if (!theBeat) { log('No beat'); return }
 
     theBeat.swingFactor = value;
-}
-
-function setLeftkeyPanLevel(value) {
-    if (!theBeat) { log('No beat'); return }
-
-    theBeat.leftkeyPan = value;
-}
-
-function setRightkeyPanLevel(value) {
-    if (!theBeat) { log('No beat'); return }
-
-    theBeat.rightkeyPan = value;
-}
-
-function setHoshokeyPanLevel(value) {
-    if (!theBeat) { log('No beat'); return }
-
-    theBeat.hoshokeyPan = value;
 }
 
 function getBeatByName(name) {
@@ -930,15 +885,6 @@ function readThumbValue(id) {
     } else if (id == 'swing_thumb') {  
         value = getVerticalThumbValue(id, event.pageY)  
         setSwingLevel(value);    
-    } else if (id == 'leftkeypan_thumb') {  
-        value = getVerticalThumbValue(id, event.pageY)  
-        setLeftkeyPanLevel(value);    
-    } else if (id == 'rightkeypan_thumb') {  
-        value = getVerticalThumbValue(id, event.pageY)  
-        setRightkeyPanLevel(value);    
-    } else if (id == 'hoshokeypan_thumb') {  
-        value = getVerticalThumbValue(id, event.pageY)  
-        setHoshokeyPanLevel(value);    
     }
 }
 
@@ -1097,36 +1043,6 @@ window.onload = function(){
             </div>
             <div class='slider_label'>
                 Swing Level
-            </div>
-        </div>
-        <div class='vrule'></div>
-        <div class='slider_container' id='leftkeypan_container'>
-            <div class='slider_groove'>
-                <img class='slider_track' src='images/slider_track.png'>
-                <img class='slider_thumb' id='leftkeypan_thumb' src='images/slider_thumb.png'>
-            </div>
-            <div class='slider_label'>
-                Leftkey Pan
-            </div>
-        </div>
-        <div class='vrule'></div>
-        <div class='slider_container' id='rightkeypan_container'>
-            <div class='slider_groove'>
-                <img class='slider_track' src='images/slider_track.png'>
-                <img class='slider_thumb' id='rightkeypan_thumb' src='images/slider_thumb.png'>
-            </div>
-            <div class='slider_label'>
-                Rightkey Pan
-            </div>
-        </div>
-        <div class='vrule'></div>
-        <div class='slider_container' id='hoshokeypan_container'>
-            <div class='slider_groove'>
-                <img class='slider_track' src='images/slider_track.png'>
-                <img class='slider_thumb' id='hoshokeypan_thumb' src='images/slider_thumb.png'>
-            </div>
-            <div class='slider_label'>
-                Hoshokey Pan
             </div>
         </div>
     </section>
