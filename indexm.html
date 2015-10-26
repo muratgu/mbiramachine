@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Mbira Machine</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="images/android-desktop.png">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Mbira Machine">
+    <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png">
+
+    <!-- Tile icon for Win8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+    <meta name="msapplication-TileColor" content="#3372DF">
+
+    <link rel="shortcut icon" href="images/favicon.png">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link rel='stylesheet' type='text/css' href = 'style/mbiramachinem.css' />
+</head>
+<body>
+<!-- The drawer is always open in large screens. The header is always shown,
+  even in small screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer
+            mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+      <div class="mdl-layout-spacer"></div>
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                  mdl-textfield--floating-label mdl-textfield--align-right">
+        <!--
+        <label class="mdl-button mdl-js-button mdl-button--icon"
+               for="fixed-header-drawer-exp">
+          <i class="material-icons">search</i>
+        </label>
+        -->
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" name="sample"
+                 id="fixed-header-drawer-exp" />
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">Mbira Machine</span>
+    <nav class="mdl-navigation">
+      <!--
+      <a class="mdl-navigation__link" href="">Link</a>
+      -->
+    </nav>
+  </div>
+  <main class="mdl-layout__content">
+    <div class="page-content">
+        <section class='container active' id='pad'>
+            <div class='buttons_row' id='LED_row'>
+                <img id='LED_0' src='images/LED_off.png'>
+                <img id='LED_1' src='images/LED_off.png'>
+                <img id='LED_2' src='images/LED_off.png'>
+                <img id='LED_3' src='images/LED_off.png'>
+                <img id='LED_4' src='images/LED_off.png'>
+                <img id='LED_5' src='images/LED_off.png'>
+            </div>
+        </section>
+        <section class='container active' id='params'>
+            <div id='paramsleft_container'>
+                <div id='beatcombo_container'>
+                    <span class='label' id='beatlabel'>Beat</span>
+                    <div class='combo' id='beatcombo'>
+                        <span id='beatname'></span>
+                        <img src='images/drop_arrow.png'>
+                        <ul class='combolist' id='beatlist'>
+                        </ul>
+                    </div>
+                </div>
+                <div id='kitcombo_container'>
+                    <span class='label' id='kitlabel'>Kit</span>
+                    <div class='combo' id='kitcombo'>
+                        <span id='kitname'></span>
+                        <img src='images/drop_arrow.png'>
+                        <ul class='combolist' id='kitlist'>
+                        </ul>
+                    </div>
+                </div>
+                <div id='effectcombo_container'>
+                    <span class='label' id='effectlabel'>Effect</span>
+                    <div class='combo' id='effectcombo'>
+                        <span id='effectname'></span>
+                        <img src='images/drop_arrow.png'>
+                        <ul class='combolist' id='effectlist'>
+                        </ul>
+                    </div>
+                </div>
+                <div id='effectslider_container'>
+                    <span class='label' id='effectlabel'>Level</span>
+                    <div class='combo' id='effectslider'>
+                        <input id="effect_slider" class="mdl-slider mdl-js-slider" type="range" 
+                            min="0" max="100" value="0" tabindex="0"/>  
+                    </div>     
+                </div>
+                <div id='tempo_container'>
+                    <span class='label' id='tempolabel'>Tempo</span>
+                    <img id='tempodec' src='images/tempo_dec.png'>       
+                    <div id='tempodisplay'>
+                        <span id='tempo'></span>&nbsp;<span id='bpm'>bpm</span>
+                    </div>
+                    <img id='tempoinc' src='images/tempo_inc.png'>                                 
+                </div>     
+            </div>
+        </section>
+        <section class='container active' id='tools'>
+            <span class='label' id='control'></span>
+            <button id='play' class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Play</button>
+            <button id='stop' class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Stop</button>
+        </section>
+    </div>
+  </main>
+</div>
+<script type="text/javascript" src="mbiramachine.js"></script>
+</body>
+</html>
