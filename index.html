@@ -453,33 +453,14 @@ function init() {
 }
 
 function initControls() {
-    // sliders
-    document.getElementById('effect_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    document.getElementById('swing_thumb').addEventListener('mousedown', handleSliderMouseDown, true);
-    document.getElementById('effect_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-    document.getElementById('swing_thumb').addEventListener('dblclick', handleSliderDoubleClick, true);
-
     // tool buttons
     document.getElementById('play').addEventListener('mousedown', startPlay, true)
     document.getElementById('stop').addEventListener('mousedown', stopPlay, true)
-    //document.getElementById('save').addEventListener('mousedown', handleSave, true);
-    //document.getElementById('save_ok').addEventListener('mousedown', handleSaveOk, true);
-    //document.getElementById('load').addEventListener('mousedown', handleLoad, true);
-    //document.getElementById('load_ok').addEventListener('mousedown', handleLoadOk, true);
-    //document.getElementById('load_cancel').addEventListener('mousedown', handleLoadCancel, true);
-    //document.getElementById('reset').addEventListener('mousedown', handleReset, true);
-
-    var elBody = document.getElementById('body');
-    elBody.addEventListener("mousedown", handleBodyMouseDown, true);
-    elBody.addEventListener('mousemove', handleMouseMove, true);
-    elBody.addEventListener('mouseup', handleMouseUp, true);
-
     document.getElementById('beatcombo').addEventListener('mousedown', handleBeatComboMouseDown, true)
     document.getElementById('kitcombo').addEventListener('mousedown', handleKitComboMouseDown, true)
     document.getElementById('effectcombo').addEventListener('mousedown', handleEffectComboMouseDown, true)
     document.getElementById('tempoinc').addEventListener('mousedown', increaseTempo, true)
     document.getElementById('tempodec').addEventListener('mousedown', decreaseTempo, true)
-    
     document.body.addEventListener('mousedown', handleBodyMouseDown, true)
 }
 
@@ -545,9 +526,10 @@ function schedule() {
                     if(keyCode > '') {
                         var pan = false
                         var x = 0.0
-                        if (keyCode[0] == 'L' || c == 'B') { pan = true; x = -4.0; }
-                        if (keyCode[0] == 'R') { pan = true; x = 4.0; }
-                        if (keyCode[0] == 'X') { pan = true; x = 0.0; }
+                        if (keyCode[0] == 'L') { pan = true; x = -50.0; }
+                        if (keyCode[0] == 'B') { pan = true; x = -50.0; }
+                        if (keyCode[0] == 'R') { pan = true; x = 50.0; }
+                        if (keyCode[0] == 'X') { pan = true; x = 50.0; }
                         var currentBuffer = currentKit.buffer[keyCode]
                         if(currentBuffer) {
                             playNote(currentBuffer, 1.0, theBeat.volume, theBeat.pitch, contextPlayTime, 
@@ -600,7 +582,6 @@ function selectBeat(name) {
     selectKit(theBeat.defaultKitName)
     selectEffect(theBeat.defaultEffectName)
     selectEffectLevel(theBeat.effectMix)  
-    selectSwingLevel(theBeat.swingFactor)
     selectTempo(theBeat.tempo)
 
     showPlayAvailable()
@@ -659,7 +640,6 @@ function selectEffect(name) {
 }
 
 function selectEffectLevel(value) {
-    setVerticalThumbPosition('effect_thumb', value);
     setEffectLevel(value);
 }
 
@@ -669,25 +649,6 @@ function setEffectLevel(value) {
     theBeat.effectMix = value;
     // Factor in both the preset's effect level and the blending level (effectWetMix) stored in the effect itself.
     effectLevelNode.gain.value = theBeat.effectMix * effectWetMix;  
-}
-
-function setThumbValue(id, value) {
-    if (id == 'swing_thumb') {
-        selectSwingLevel(value)
-    } else if (id == 'effect_thumb') {
-        selectEffectLevel(value)
-    } 
-}
-
-function selectSwingLevel(value) {
-    setVerticalThumbPosition('swing_thumb', value);
-    setSwingLevel(value);
-}
-
-function setSwingLevel(value) {
-    if (!theBeat) { log('No beat'); return }
-
-    theBeat.swingFactor = value;
 }
 
 function getBeatByName(name) {
@@ -803,95 +764,6 @@ function isDescendantOfId(el, id) {
     return isDescendantOfId(el.parentElement, id)
 }
 
-function getVerticalThumbValue(id, pos) {
-    var elThumb = document.getElementById(id);
-    var elTrack = elThumb.parentNode;
-
-    var thumbH = elThumb.clientHeight;
-    var trackH = elTrack.clientHeight;
-    var travelH = trackH - thumbH;
-
-    var trackY = 0;
-    var el = elTrack;
-    do {
-        trackY += el.offsetTop;
-    } while (el = el.offsetParent);
-
-    var offsetY = Math.max(0, Math.min(travelH, pos - mouseCaptureOffset - trackY));
-    var value = 1.0 - offsetY / travelH;
-    
-    elThumb.style.top = travelH * (1.0 - value) + 'px';
-
-    return value
-}
-
-function setVerticalThumbPosition(id, value) {
-    var elThumb = document.getElementById(id);
-    var elTrack = elThumb.parentNode;
-
-    var thumbH = elThumb.clientHeight;
-    var trackH = elTrack.clientHeight;
-    var travelH = trackH - thumbH;
-
-    elThumb.style.top = travelH * (1.0 - value) + 'px';
-}
-
-function getHorizontalThumbValue(id, pos) {
-    var elThumb = document.getElementById(id);
-    var elTrack = elThumb.parentNode;
-
-    var thumbW = elThumb.clientWidth;
-    var trackW = elTrack.clientWidth;
-    var travelW = trackW - thumbW;
-
-    var trackX = 0;
-    var el = elTrack;
-    do {
-        trackX += el.offsetLeft;
-    } while (el = el.offsetParent);
-
-    var offsetX = Math.max(0, Math.min(travelW, pos - mouseCaptureOffset - trackX));
-    var value = offsetX / travelW;
-
-    elThumb.style.left = travelW * value + 'px';
-
-    return value
-}
-
-function setHorizontalThumbPosition(id, value) {
-    var elThumb = document.getElementById(id);
-    var elTrack = elThumb.parentNode;
-
-    var thumbW = elThumb.clientWidth;
-    var trackW = elTrack.clientWidth;
-    var travelW = trackW - thumbW;
-
-    elThumb.style.left = travelW * value + 'px';
-}
-
-function handleMouseMove(event) {
-    if (!mouseCapture) { return }
-    
-    var elThumb = document.getElementById(mouseCapture);
-    var elTrack = elThumb.parentNode;
-
-    readThumbValue(mouseCapture)
-}
-
-function readThumbValue(id) {
-    if (id == 'effect_thumb') {  
-        value = getVerticalThumbValue(id, event.pageY)  
-        setEffectLevel(value);    
-    } else if (id == 'swing_thumb') {  
-        value = getVerticalThumbValue(id, event.pageY)  
-        setSwingLevel(value);    
-    }
-}
-
-function handleMouseUp() {
-    mouseCapture = null;
-}
-
 function handleBeatMouseDown(event) {
     var name = event.target.innerHTML
     selectBeat(name)
@@ -917,34 +789,6 @@ function handleKitComboMouseDown(event) {
 
 function handleEffectComboMouseDown(event) {
     document.getElementById('effectcombo').classList.toggle('active')
-}
-
-function handleSliderDoubleClick(event) {
-    var id = event.target.id;    
-    mouseCapture = null;
-    setThumbValue(event.target.id, 0.5)
-}
-
-function handleSliderMouseDown(event) {
-    mouseCapture = event.target.id;
-
-    // calculate offset of mousedown on slider
-    var el = event.target;
-    if (mouseCapture == 'horizontal_thumb') {
-        var thumbX = 0;    
-        do {
-            thumbX += el.offsetLeft;
-        } while (el = el.offsetParent);
-
-        mouseCaptureOffset = event.pageX - thumbX;
-    } else {
-        var thumbY = 0;    
-        do {
-            thumbY += el.offsetTop;
-        } while (el = el.offsetParent);
-
-        mouseCaptureOffset = event.pageY - thumbY;
-    }
 }
 
 function showPlayAvailable() {
@@ -1024,26 +868,6 @@ window.onload = function(){
                 <img id='tempodec' src='images/tempo_dec.png'>
                 <img id='tempoinc' src='images/tempo_inc.png'>
             </div>            
-        </div>
-        <div class='vrule'></div>
-        <div class='slider_container' id='effect_container'>
-            <div class='slider_groove'>
-                <img class='slider_track' src='images/slider_track.png'>
-                <img class='slider_thumb' id='effect_thumb' src='images/slider_thumb.png'>
-            </div>
-            <div class='slider_label'>
-                Effect Level
-            </div>
-        </div>
-        <div class='vrule'></div>
-        <div class='slider_container' id='swing_container'>
-            <div class='slider_groove'>
-                <img class='slider_track' src='images/slider_track.png'>
-                <img class='slider_thumb' id='swing_thumb' src='images/slider_thumb.png'>
-            </div>
-            <div class='slider_label'>
-                Swing Level
-            </div>
         </div>
     </section>
     <section class='container active' id='tools'>
