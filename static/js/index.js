@@ -42,9 +42,9 @@ var effectOptions = [
 ]
 
 var kitOptions = [ 
-    { name: 'nyamaropa_b' }, 
-    { name: 'gandanga_b' }, 
-    { name: 'dambatsoko_e' },
+    { name: 'Nyamaropa_B' }, 
+    { name: 'Gandanga_B' }, 
+    { name: 'Dambatsoko_E' },
 ]
 
 var timeoutId
@@ -272,7 +272,7 @@ function initBeatList() {
     beatList.name = 'beatList'
     beatList.items = [
     new Beat({ 
-        name: 'nhemamusasa kushaura', 
+        name: 'Nhemamusasa Kushaura', 
         tab: [
         'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L4 X2','R3 X3','B7 X','R5 X2',
         'L3 X3','R2 X','B3 X2','R5 X3','L5 X','R3 X2','B6 X3','R5 X','L4 X2','R3 X3','B7 X','R6 X2',
@@ -280,7 +280,7 @@ function initBeatList() {
         'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L2 X2','R2 X3','L1 X','R5 X2'
         ]}),
     new Beat({ 
-        name: 'karigamombe kushaura',
+        name: 'Karigamombe Kushaura',
         tab: [
         'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R1 L4','R4','R1 L4','R4',
         'R2 L1','R6','R2 L2','R6','R2 L3','R5','R2 L3','R5','R1 L4','R4','R1 L4','R4',
@@ -288,7 +288,7 @@ function initBeatList() {
         'R2 L1','R6','R2 L2','R6','R1 L5','R4','R1 L5','R4','R3 L2','R6','R3 L2','R6'
         ]}),
     new Beat({ 
-        name: 'karigamombe kutsinhira',
+        name: 'Karigamombe Kutsinhira',
         tab: [
         'R2','L1','R6 B1','','R4 R1 B6','L2','R4 R1','L1','R7 B5'   ,'','R7 L1','L5',
         'R2','L1','R6 B4','','R5 B6'   ,'B5','R5'   ,'L1','R4 R1 B2','','R4 R1','B2',
@@ -296,7 +296,7 @@ function initBeatList() {
         'R2','B4','R2 B1','','R4 R1 B6','B2','R4 R1','B6','R3 B4'   ,'','R3 B7','B4'
         ]}),
     new Beat({ 
-        name: 'kuzanga variation 5',
+        name: 'Kuzanga 5',
         tab: [
         'R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1','',
         'R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1','',
@@ -304,7 +304,7 @@ function initBeatList() {
         'R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1',''
         ]}),
     new Beat({ 
-        name: 'kuzanga variation 5 kutsinhira',
+        name: 'Kuzanga 5 Kutsinhira',
         tab: [
         '','R5 L3','B3','R5','L4','R2 B5','R4','L4','R3 B1',
         '','R5 L3','B3','R5','L5','R3 B6','R5','L4','R3 B1',
@@ -312,7 +312,7 @@ function initBeatList() {
         '','R4 L2','B4','R4','L4','R2 B5','R4','L2','R2 B1'
         ]}),
     new Beat({ 
-        name: 'nyamaropa kushaura',
+        name: 'Nyamaropa Kushaura',
         tab: [
         'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', '',
         'R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', '',
@@ -320,7 +320,7 @@ function initBeatList() {
         'R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5', ''
         ]}),
     new Beat({ 
-        name: 'nyamaropa kutsinhira',
+        name: 'Nyamaropa Kutsinhira',
         tab: [
         '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R4','L2','R3 B4', 
         '','R2 L1','B1','R2','L1','R2 B1','','R4 L5','B2','R2','L4','R4 B5', 
@@ -328,7 +328,7 @@ function initBeatList() {
         '','R3 L4','B7','R3','L4','R3 B7','','R5 L3','B3','R5','L4','R4 B5' 
         ]}),
     new Beat({ 
-        name: 'mahororo kushaura',
+        name: 'Mahororo Kushaura',
         tab: [
         'L2','X','R2','','R1 R4 X','','L4','X','R2','','R1 R4 X','', 
         'L2','X','R2','','L3 R5 X','','L4','X','R2','','R1 R4 X','', 
@@ -336,7 +336,7 @@ function initBeatList() {
         'L2','X','R2','','R1 R4 X','','L2','X','R3','','R1 R4 X','', 
         ]}),
     new Beat({ 
-        name: 'shumba kushaura 1',
+        name: 'Shumba Kushaura 1',
         tab: [
         'B5','X R4 R1 L2','','R4 R1 B5','X L2','R4 R1','B2','X R3 L4','','R2 B2','X B1','R2', 
         'B5','X R4 R1 L2','','R4 R1 B5','X L2','R4 R1','B4','X R4 L5','','R2 B2','X B1','R2', 
@@ -344,13 +344,49 @@ function initBeatList() {
         'B3','X    R2 L3','','R9    B3','X L3','R9'   ,'B5','X R8 B5','','R7 B4','X B3','R5', 
         ]}),
     new Beat({ 
-        name: 'chamunika basic',
+        name: 'Chamunika',
         tab: [
         'R6 R2 L2','X L1','R6 R2','L2','X R6 R2 B4','','R5 R2 L3','X R5 R2 B3','','R4 R1 L4','X B5','', 
         'R3 L4'   ,'X B7','R3'   ,'L4','X R3 B5'   ,'','R2 L3'   ,'X R2 B3'   ,'','R4 R1 L4','X B5','', 
         'R6 R2 L2','X L1','R6 R2','L2','X R6 R2 B4','','R4 R1 L5','X B6'      ,'','R3 L2'   ,'X B4','', 
         'R2 L2'   ,'X L1','R2'   ,'L2','X R2 B4'   ,'','R4 R1 L5','X L6'      ,'','R4 R1 L4','X B5','', 
-        ]})
+        ]}),
+    new Beat({ 
+        name: 'Bukatiende Kushaura 1',
+        tab: [
+        'X R3 B7', 'L4', 'R7', 'X R3 B7', 'L3', 'R5', 
+        'X B3'   , 'R9', 'L5', 'X R8 B6', 'L5', 'R5',
+        'X R3 B7', 'L4', 'R7', 'X R3 B7', 'L3', 'R5', 
+        'X B3'   , 'R9', 'L4', 'X R7 B5', 'L4', 'R4',
+        'X R2 L1', 'L2', 'R6', 'X R2 L1', ''  , 'R4 R1',
+        'X B6'   , 'R9', 'L4', 'X R7 B5', 'L4', 'R4',
+        'X R2 L1', 'L2', 'R6', 'X R2 L1', 'L3', 'R5', 
+        'X B3'   , 'R9', 'L4', 'X R7 B5', 'L4', 'R4',
+        ]}),
+    new Beat({ 
+        name: 'Bukatiende Kushaura 2',
+        tab: [
+        'X R7 L4', '', 'R3', 'X R7 L4', ''  , 'R2', 
+        'X R5 L3', '', 'L5', 'X R5'   , 'L5', ''  , 
+        'X R7 L4', '', 'R3', 'X R7 L4', ''  , 'R2', 
+        'X R5 L3', '', 'L4', 'X R4 R1', 'R4', ''  , 
+        'X R6 L2', '', 'R2', 'X R6 L2', ''  , 'R2', 
+        'X R6 L2', '', 'L5', 'X R4 R1', 'L4', ''  , 
+        'X R6 L2', '', 'R2', 'X R6 L2', ''  , 'R2', 
+        'X R5 L3', '', 'L4', 'X R4 R1', 'L4', ''  , 
+        ]}),
+    new Beat({ 
+        name: 'Bukatiende Kutsinhira 1',
+        tab: [
+        'X L4', 'R3 B7', 'B5', 'X R3'   , 'L3', 'R5 L1', 
+        'X B3', 'R2'   , 'L5', 'X R8 B6', 'B3', 'R8'   , 
+        'X L4', 'R7 B7', 'B5', 'X R7'   , 'L3', 'R6 L1', 
+        'X B3', 'R5'   , 'L4', 'X R4 B5', 'B2', 'R3'   ,
+        'X L2', 'R2 L1', 'B1', 'X R2'   , 'L5', 'R9 B6', 
+        'X B2', 'R8'   , 'L4', 'X R7 B5', 'B2', 'R7'   ,
+        'X L2', 'R6 L1', 'B1', 'X R6'   , 'L3', 'R5 L1', 
+        'X B3', 'R5'   , 'L4', 'X R4 B5', 'B2', 'R4'   ,
+        ]}),
     ]
 }
 
@@ -381,6 +417,8 @@ function initKitList(){
 function startLoadingBeats(){
     log('startLoadingBeats')
 
+    show('loading beats')
+
     for (var i in beatList.items) {
         beatList.items[i].load()
     } 
@@ -388,6 +426,8 @@ function startLoadingBeats(){
 
 function startLoadingKits(){
     log('startLoadingKits')
+
+    show('loading kits')
     
     for (var i in kitList.items) {
         kitList.items[i].load()
@@ -397,6 +437,8 @@ function startLoadingKits(){
 function startLoadingEffects(){
     log('startLoadingEffects')
 
+    show('loading effects')
+
     for (var i in effectList.items) {
         effectList.items[i].load()
     } 
@@ -405,12 +447,12 @@ function startLoadingEffects(){
 function startLoadingAssets(){
     log('startLoadingAssets')
 
-    initBeatList()
     initKitList()
+    initBeatList()
     initEffectList()    
     
-    startLoadingBeats()
     startLoadingKits()
+    startLoadingBeats()
     startLoadingEffects()
 }
 
@@ -685,6 +727,8 @@ function startPlay() {
 
     document.getElementById('play').classList.add('playing')
     document.getElementById('stop').classList.add('playing')
+
+    show('Playing')
 }
 
 function stopPlay() {
@@ -704,6 +748,8 @@ function stopPlay() {
 
     document.getElementById('play').classList.remove('playing')
     document.getElementById('stop').classList.remove('playing')
+
+    show('Stopped')
 }
 
 function drawPlayhead(xindex) {
@@ -723,6 +769,8 @@ function showPlayAvailable() {
 
     var play = document.getElementById('play')
     play.src = 'images/btn_play.png'
+
+    show('Ready')
 }
 
 function startDemo() {
@@ -772,6 +820,10 @@ showEffects = function(data){
     var context = data
     var html    = template(context)
     $('#effect-list').html(html)
+}
+
+show = function(message) {
+    $('#caption-message').text(message)
 }
 
 routes = [
