@@ -1,6 +1,6 @@
 (function(window, undefined){     
 
-var DEBUG = true
+var DEBUG = false
 var debugWarning = false
 
 function log(msg) {
