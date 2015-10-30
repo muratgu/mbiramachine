@@ -107,7 +107,7 @@ function idealize(name) {
 }
 
 function onBeatLoaded(beat) {
-    log('onBeatLoaded: name=' +beat.name)
+    log('onBeatLoaded: id=' +beat.id)
 
     beat.isLoaded = true     
     if (areAllLoaded(beatList)) {
@@ -147,7 +147,7 @@ function Kit(options) {
     }
 
     Kit.prototype.loadKey = function(keyCode, mixToMono) {
-        var url = this.pathName + this.name + '_' + keyCode + '.mp3'    
+        var url = this.pathName + this.id + '_' + keyCode + '.mp3'    
         if (keyCode[0] == 'X') { // hosho beats are shared
             url = this.pathName + 'hosho_' + keyCode + '.mp3';
         }
@@ -183,7 +183,7 @@ function onKitKeyLoaded(kit, keyCode) {
 }
 
 function onKitLoaded(kit) {
-    log('onKitLoaded: name=' +kit.name)
+    log('onKitLoaded: id=' +kit.id)
 
     kit.isLoaded = true
     if (areAllLoaded(kitList)) {     
@@ -208,7 +208,7 @@ function Effect(options) {
 }
 
 Effect.prototype.load = function() {
-    log('Effect.load: name=' +this.name)
+    log('Effect.load: id=' +this.id)
     
     if (this.isLoaded) return;
 
@@ -240,7 +240,7 @@ Effect.prototype.load = function() {
 }
 
 function onEffectLoaded(effect) {
-    log('onEffectLoaded: name=' +effect.name)
+    log('onEffectLoaded: id=' +effect.id)
 
     effect.isLoaded = true
     if (areAllLoaded(effectList)) {
@@ -250,9 +250,9 @@ function onEffectLoaded(effect) {
 }
 
 function onEffectLoadFailed(effect) {
-    log('onEffectLoadFailed: name=' +effect.name) 
+    log('onEffectLoadFailed: id=' +effect.id) 
 
-    throw Error('onEffectLoadFailed: name=' +effect.name)        
+    throw Error('onEffectLoadFailed: id=' +effect.id)        
 }
 
 function onAssetLoaded() {
