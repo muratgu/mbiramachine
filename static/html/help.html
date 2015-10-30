@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Knowledge Network</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+  </head>
+  <body>
+    <div class="container-fixed">
+      <div id="kn-list" class="list-group">        
+      </div>
+    </div>
+    </div>
+    <script id="apidoc-template" type="text/x-handlebars-template">
+      <h4 id='caption'>{{api_name}}</h4>
+      <p>version {{api_ver}}</p>
+      <p>{{api_doc}}</p>    
+      <dl>
+        {{#each urls}}
+        <dt><a href="{{rule}}">{{rule}}</a></dt>
+        <dd><pre>{{doc}}</pre></dd>        
+        {{/each}}
+      </dl>
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.js"></script>   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>    
+    <script src="/static/js/handlebars.js"></script>
+    <script src="/static/js/help.js"></script>   
+    <script src="/static/js/google.js"></script> 
+  </body>
+</html>

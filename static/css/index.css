@@ -1,0 +1,112 @@
+body {
+  background-color: rgb(245, 245, 245);
+  color: rgb(121, 121, 121);
+  font-family: 'Droid Sans', Arial, sans-serif;
+  font-size: 13px;
+}
+
+#title {
+  font-family: 'Michroma', 'Droid Sans', Arial, sans-serif;
+  font-size: 25px;
+  font-weight: bold;
+  display: block;
+  margin: 20px 0 15px 0;
+}
+
+.list-title {
+  font-family: 'Michroma', 'Droid Sans', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  display: block;
+  margin: 20px 0 15px 0;
+}
+
+.current-selection {
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  display: block;
+  margin: 5px;
+}
+
+.list-group-item {
+  padding: 10px 10px;
+}
+
+.col-xs-1 {
+  width: 90px;
+}
+
+.h4, .h5, .h6, h4, h5, h6 {
+  margin-top: 9px;
+  margin-bottom: 9px;
+}
+
+#tempo {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+a {
+  outline: 0;
+}
+
+a:hover, a:active, a:focus {
+  background-color: #efefef;
+}
+
+#tempo_container {
+  height: 40px;
+  margin-bottom: 10px;
+}
+
+#tempodisplay {
+  background-image: url('../images/tempo_bg.png');
+  width: 57px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: top;
+  padding: 10px 20px;
+  text-align: right;
+  color: rgb(76, 76 ,76);
+}
+
+#tempo {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+#bpm {
+  font-size: 14px;
+}
+
+#tempoinc, #tempodec {
+  position: relative;
+  top: 3px;
+  left: 1px;
+}
+
+.vrule {
+  width: 1px;
+  height: 160px;
+  background-color: rgb(229, 229, 229);
+  margin: 0 8px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+#play, #stop {
+  margin-right: 12px;
+}
+
+#stop {
+  display: none;
+}
+
+#play.playing {
+  display: none;
+}
+
+#stop.playing {
+  display: inline;
+}
