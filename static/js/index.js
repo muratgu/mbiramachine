@@ -728,7 +728,7 @@ function startPlay() {
     document.getElementById('play').classList.add('playing')
     document.getElementById('stop').classList.add('playing')
 
-    show('Playing')
+    show('')
 }
 
 function stopPlay() {
@@ -749,7 +749,7 @@ function stopPlay() {
     document.getElementById('play').classList.remove('playing')
     document.getElementById('stop').classList.remove('playing')
 
-    show('Stopped')
+    show('')
 }
 
 function drawPlayhead(xindex) {
@@ -770,7 +770,7 @@ function showPlayAvailable() {
     var play = document.getElementById('play')
     play.src = 'images/btn_play.png'
 
-    show('Ready')
+    show('')
 }
 
 function startDemo() {

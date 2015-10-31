@@ -22,7 +22,8 @@ body {
 }
 
 .current-selection {
-  font-family: Arial, sans-serif;
+  font-family: 'Droid Sans', Arial, sans-serif;
+  color: #286090;
   font-size: 20px;
   font-weight: bold;
   display: block;
@@ -76,14 +77,14 @@ a:hover, a:active, a:focus {
   font-size: 18px;
 }
 
-#bpm {
-  font-size: 14px;
-}
-
 #tempoinc, #tempodec {
   position: relative;
   top: 3px;
   left: 1px;
+}
+
+#LED_row {
+  margin: 10px;
 }
 
 .vrule {
@@ -96,7 +97,10 @@ a:hover, a:active, a:focus {
 }
 
 #play, #stop {
-  margin-right: 12px;
+  margin-left: 30px;
+  position: relative;
+  top: 3px;
+  left: 1px;
 }
 
 #stop {
