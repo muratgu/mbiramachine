@@ -346,47 +346,67 @@ function initBeatList() {
     new Beat({ 
         name: 'Chamunika',
         tab: [
-        'R6 R2 L2','X L1','R6 R2','L2','X R6 R2 B4','','R5 R2 L3','X R5 R2 B3','','R4 R1 L4','X B5','', 
-        'R3 L4'   ,'X B7','R3'   ,'L4','X R3 B5'   ,'','R2 L3'   ,'X R2 B3'   ,'','R4 R1 L4','X B5','', 
-        'R6 R2 L2','X L1','R6 R2','L2','X R6 R2 B4','','R4 R1 L5','X B6'      ,'','R3 L2'   ,'X B4','', 
-        'R2 L2'   ,'X L1','R2'   ,'L2','X R2 B4'   ,'','R4 R1 L5','X L6'      ,'','R4 R1 L4','X B5','', 
+        'R6 R2 L2', 'X L1', 'R6 R2', 'L2', 'X R6 R2 B4', '', 'R5 R2 L3', 'X R5 R2 B3', '', 'R4 R1 L4', 'X B5', '', 
+        'R3    L4', 'X B7', 'R3'   , 'L4', 'X R3    B5', '', 'R2    L3', 'X R2    B3', '', 'R4 R1 L4', 'X B5', '', 
+        'R6 R2 L2', 'X L1', 'R6 R2', 'L2', 'X R6 R2 B4', '', 'R4 R1 L5', 'X       B6', '', 'R3    L2', 'X B4', '', 
+        'R2    L2', 'X L1', 'R2'   , 'L2', 'X R2    B4', '', 'R4 R1 L5', 'X       L6', '', 'R4 R1 L4', 'X B5', '', 
         ]}),
     new Beat({ 
         name: 'Bukatiende Kushaura 1',
         tab: [
-        'X R3 B7', 'L4', 'R7', 'X R3 B7', 'L3', 'R5', 
-        'X B3'   , 'R9', 'L5', 'X R8 B6', 'L5', 'R5',
-        'X R3 B7', 'L4', 'R7', 'X R3 B7', 'L3', 'R5', 
-        'X B3'   , 'R9', 'L4', 'X R7 B5', 'L4', 'R4',
-        'X R2 L1', 'L2', 'R6', 'X R2 L1', ''  , 'R4 R1',
-        'X B6'   , 'R9', 'L4', 'X R7 B5', 'L4', 'R4',
-        'X R2 L1', 'L2', 'R6', 'X R2 L1', 'L3', 'R5', 
-        'X B3'   , 'R9', 'L4', 'X R7 B5', 'L4', 'R4',
+        'X R3 B7', 'L4', 'R7', 'X R3 B7', 'L3', 'R5   ', 'X B3', 'R9', 'L5', 'X R8 B6', 'L5', 'R5',
+        'X R3 B7', 'L4', 'R7', 'X R3 B7', 'L3', 'R5   ', 'X B3', 'R9', 'L4', 'X R7 B5', 'L4', 'R4',
+        'X R2 L1', 'L2', 'R6', 'X R2 L1', '  ', 'R4 R1', 'X B6', 'R9', 'L4', 'X R7 B5', 'L4', 'R4', 
+        'X R2 L1', 'L2', 'R6', 'X R2 L1', 'L3', 'R5   ', 'X B3', 'R9', 'L4', 'X R7 B5', 'L4', 'R4',
         ]}),
     new Beat({ 
         name: 'Bukatiende Kushaura 2',
         tab: [
-        'X R7 L4', '', 'R3', 'X R7 L4', ''  , 'R2', 
-        'X R5 L3', '', 'L5', 'X R5'   , 'L5', ''  , 
-        'X R7 L4', '', 'R3', 'X R7 L4', ''  , 'R2', 
-        'X R5 L3', '', 'L4', 'X R4 R1', 'R4', ''  , 
-        'X R6 L2', '', 'R2', 'X R6 L2', ''  , 'R2', 
-        'X R6 L2', '', 'L5', 'X R4 R1', 'L4', ''  , 
-        'X R6 L2', '', 'R2', 'X R6 L2', ''  , 'R2', 
-        'X R5 L3', '', 'L4', 'X R4 R1', 'L4', ''  , 
+        'X R7 L4', '', 'R3', 'X R7 L4', '', 'R2', 'X R5 L3', '', 'L5', 'X R5   ', 'L5', '', 
+        'X R7 L4', '', 'R3', 'X R7 L4', '', 'R2', 'X R5 L3', '', 'L4', 'X R4 R1', 'R4', '', 
+        'X R6 L2', '', 'R2', 'X R6 L2', '', 'R2', 'X R6 L2', '', 'L5', 'X R4 R1', 'L4', '', 
+        'X R6 L2', '', 'R2', 'X R6 L2', '', 'R2', 'X R5 L3', '', 'L4', 'X R4 R1', 'L4', '', 
         ]}),
     new Beat({ 
         name: 'Bukatiende Kutsinhira 1',
         tab: [
-        'X L4', 'R3 B7', 'B5', 'X R3'   , 'L3', 'R5 L1', 
-        'X B3', 'R2'   , 'L5', 'X R8 B6', 'B3', 'R8'   , 
-        'X L4', 'R7 B7', 'B5', 'X R7'   , 'L3', 'R6 L1', 
-        'X B3', 'R5'   , 'L4', 'X R4 B5', 'B2', 'R3'   ,
-        'X L2', 'R2 L1', 'B1', 'X R2'   , 'L5', 'R9 B6', 
-        'X B2', 'R8'   , 'L4', 'X R7 B5', 'B2', 'R7'   ,
-        'X L2', 'R6 L1', 'B1', 'X R6'   , 'L3', 'R5 L1', 
-        'X B3', 'R5'   , 'L4', 'X R4 B5', 'B2', 'R4'   ,
+        'X L4', 'R3 B7', 'B5', 'X R3', 'L3', 'R5 L1', 'X B3', 'R2', 'L5', 'X R8 B6', 'B3', 'R8', 
+        'X L4', 'R7 B7', 'B5', 'X R7', 'L3', 'R6 L1', 'X B3', 'R5', 'L4', 'X R4 B5', 'B2', 'R3',
+        'X L2', 'R2 L1', 'B1', 'X R2', 'L5', 'R9 B6', 'X B2', 'R8', 'L4', 'X R7 B5', 'B2', 'R7',
+        'X L2', 'R6 L1', 'B1', 'X R6', 'L3', 'R5 L1', 'X B3', 'R5', 'L4', 'X R4 B5', 'B2', 'R4',
         ]}),
+    new Beat({ 
+        name: 'Bukatiende Kushaura Solo 3',
+        tab: [
+        'X R2 L1', 'L2', 'R2', 'X L1', 'R4 R1   ', 'L5', 'X R4', 'L5', 'R4 R1', 'X L4', 'R4', 'L4', 
+        'X R2 L1', 'L2', 'R2', 'X L1', 'R5 R2 L3', 'L6', 'X R5', 'L6', 'R4 R1', 'X L4', 'R4', 'L4', 
+        'X R3 B7', 'L4', 'R3', 'X B7', 'R5 R2 L3', 'L6', 'X R5', 'L6', 'R5 R2', 'X L5', 'R5', 'L5', 
+        'X R3 B7', 'L4', 'R3', 'X B7', 'R5 R2 L3', 'L6', 'X R5', 'L6', 'R4 R1', 'X L4', 'R4', 'L4', 
+        ]}),
+    new Beat({ 
+        name: 'Bukatiende Kushaura Solo 4',
+        tab: [
+        'X R2 L1', 'L2', 'R2', 'X L1', 'R4 R1   ', 'L5', 'X R9', 'L5', 'R8   ', 'X L4', 'R7', 'L4', 
+        'X R6 L1', 'L2', 'R6', 'X L1', 'R5 R2 L3', 'L6', 'X R5', 'L6', 'R4 R1', 'X L4', 'R4', 'L4', 
+        'X R3 B7', 'L4', 'R3', 'X B7', 'R5 R2 L3', 'L6', 'X R9', 'L6', 'R9   ', 'X L5', 'R8', 'L5', 
+        'X R7 B7', 'L4', 'R7', 'X B7', 'R6 L3   ', 'L6', 'X R5', 'L6', 'R4 R1', 'X L4', 'R4', 'L4', 
+        ]}),
+    new Beat({ 
+        name: 'Bukatiende Kushaura Solo 5',
+        tab: [
+        'X R2 L1', 'L2', 'R6', 'X L1', 'R4 R1',    'L5', 'X R8', 'L5', 'R4 R1', 'X L4', 'R7', 'L4', 
+        'X R2 L1', 'L2', 'R6', 'X L1', 'R5 R2 L3', 'L6', 'X R9', 'L6', 'R4 R1', 'X L4', 'R7', 'L4', 
+        'X R3 B7', 'L4', 'R7', 'X B7', 'R5 R2 L3', 'L6', 'X R9', 'L6', 'R5 R2', 'X L5', 'R8', 'L5', 
+        'X R3 B7', 'L4', 'R7', 'X B7', 'R5 R2 L3', 'L6', 'X R9', 'L6', 'R4 R1', 'X L4', 'R7', 'L4', 
+        ]}), 
+    new Beat({ 
+        name: 'Bukatiende Kushaura Solo 6',
+        tab: [
+        'X L2', 'R2 L1', 'L1', 'X R2', 'L5', 'R4 R1 B6', 'X B6', 'R4 R1', 'L4', 'X R4 R1 B5', 'B5', 'R4 R1', 
+        'X L2', 'R2 B4', 'B4', 'X R2', 'L3', 'R5 R2 B3', 'X B3', 'R5 R2', 'L4', 'X R4 R1 B5', 'B5', 'R4 R1', 
+        'X L4', 'R3 B1', 'B1', 'X R3', 'L3', 'R5 R2 B3', 'X B3', 'R5 R2', 'L5', 'X R5    B6', 'B3', 'R5   ', 
+        'X L4', 'R3 B1', 'B1', 'X R3', 'L3', 'R5 R2 B3', 'X B3', 'R5 R2', 'L4', 'X R4 R1 B5', 'B2', 'R4 R1', 
+        ]}),        
     ]
 }
 
