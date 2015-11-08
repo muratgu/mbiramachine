@@ -61,6 +61,14 @@ a:hover, a:active, a:focus {
   margin-bottom: 10px;
 }
 
+#options_container {
+  xheight: 40px;
+  margin-bottom: 10px;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
 #tempodisplay {
   background-image: url('../images/tempo_bg.png');
   width: 57px;
@@ -86,6 +94,59 @@ a:hover, a:active, a:focus {
 #LED_row {
   margin: 10px;
 }
+
+/*-- on off switch --*/
+.onoffswitch {
+    position: relative; width: 143px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 20px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    font-size: 14px;
+    font-weight: normal;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    padding-left: 10px;
+    background-color: #A6C5F3; color: #FFFFFF;
+}
+.onoffswitch-inner:after {
+    padding-right: 10px;
+    background-color: #EEEEEE; color: #999999;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; width: 22px; margin: 6px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 109px;
+    border: 2px solid #999999; border-radius: 20px;
+    transition: all 0.3s ease-in 0s; 
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px; 
+}
+.autoplayswitch-inner:after {
+    content: "Auto-play OFF";
+}
+.autoplayswitch-inner:before {
+    content: "Auto-play ON";
+}
+/* ---- */
 
 .vrule {
   width: 1px;

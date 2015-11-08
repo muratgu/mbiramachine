@@ -1,6 +1,6 @@
 (function(window, undefined){     
 
-var DEBUG = false
+var DEBUG = true
 var debugWarning = false
 
 function log(msg) {
@@ -47,23 +47,26 @@ var kitOptions = [
     { name: 'Dambatsoko_E' },
 ]
 
-var timeoutId
+var timeoutId // note scheduler
 
 var effectList
 var kitList
 var beatList
 
-var theBeat
+var currentBeat
 var currentKit
+var currentEffect
 
 var NUM_LED = 6
-var kMinTempo = 30
-var kMaxTempo = 120
+var kMinTempo = 30   // bpm
+var kMaxTempo = 120  // bpm
 var kMaxSwing = .08
 var noteTime = 0.0
 var tabIndex = 0
 var effectDryMix = 1.0
 var effectWetMix = 1.0
+var autoPlay = false
+var autoPlayDelay = 600 // msec
 
 var convolver
 var compressor
@@ -513,25 +516,31 @@ function init() {
 
 function initControls() {
     // tool buttons
+
     document.getElementById('play').addEventListener('mousedown', startPlay, true)
     document.getElementById('stop').addEventListener('mousedown', stopPlay, true)
     document.getElementById('tempoinc').addEventListener('mousedown', increaseTempo, true)
     document.getElementById('tempodec').addEventListener('mousedown', decreaseTempo, true)
+    $('#autoplayswitch').prop('checked', autoPlay)
+    $('#autoplayswitch').change(
+        function(){
+            setAutoPlay(($(this).is(':checked')))
+    });
 }
 
 function advanceNote() {
-    var secondsPerBeat = 60.0 / theBeat.tempo
+    var secondsPerBeat = 60.0 / currentBeat.tempo
 
     tabIndex++;
-    if (tabIndex == theBeat.tab.length) {
+    if (tabIndex == currentBeat.tab.length) {
         tabIndex = 0
     }
 
     // apply swing    
     if (tabIndex % 3) {
-        noteTime += (0.25 + kMaxSwing * theBeat.swingFactor) * secondsPerBeat
+        noteTime += (0.25 + kMaxSwing * currentBeat.swingFactor) * secondsPerBeat
     } else {
-        noteTime += (0.25 - kMaxSwing * theBeat.swingFactor) * secondsPerBeat
+        noteTime += (0.25 - kMaxSwing * currentBeat.swingFactor) * secondsPerBeat
     }
 }
 
@@ -574,8 +583,8 @@ function schedule() {
     while (noteTime < currentTime + 0.200) {
         // Convert noteTime to context time.
         var contextPlayTime = noteTime + startTime
-            if(theBeat && theBeat.tab[tabIndex]) {
-                var currentBufferCode = theBeat.tab[tabIndex].split(' ')
+            if(currentBeat && currentBeat.tab[tabIndex]) {
+                var currentBufferCode = currentBeat.tab[tabIndex].split(' ')
                 for(var c in currentBufferCode) {
                     var keyCode = currentBufferCode[c]
                     if(keyCode > '') {
@@ -587,7 +596,7 @@ function schedule() {
                         if (keyCode[0] == 'X') { pan = true; x = 50.0; }
                         var currentBuffer = currentKit.buffer[keyCode]
                         if(currentBuffer) {
-                            playNote(currentBuffer, 1.0, theBeat.volume, theBeat.pitch, contextPlayTime, 
+                            playNote(currentBuffer, 1.0, currentBeat.volume, currentBeat.pitch, contextPlayTime, 
                                 pan, x, 0.0, 0.0)
                         }
                     }
@@ -611,16 +620,20 @@ function schedule() {
 function selectTempo(value) {
     log('selectTempo: value= ' +value)
 
-    theBeat.tempo = Math.min(kMaxTempo, Math.max(kMinTempo, value));
-    document.getElementById('tempo').innerHTML = theBeat.tempo
+    currentBeat.tempo = Math.min(kMaxTempo, Math.max(kMinTempo, value));
+    document.getElementById('tempo').innerHTML = currentBeat.tempo
 }
 
 function increaseTempo() {
-    selectTempo(theBeat.tempo + 1)
+    selectTempo(currentBeat.tempo + 1)
 }
 
 function decreaseTempo() {
-    selectTempo(theBeat.tempo - 1)
+    selectTempo(currentBeat.tempo - 1)
+}
+
+function setAutoPlay(isChecked) {
+    autoPlay = isChecked
 }
 
 function selectBeat(id) {
@@ -634,16 +647,25 @@ function selectBeat(id) {
 
     log('selected beat: ' +beat.id)
 
-    theBeat = beat
+    currentBeat = beat
 
-    selectKit(theBeat.defaultKitName)
-    selectEffect(theBeat.defaultEffectName)
-    selectEffectLevel(theBeat.effectMix)  
-    selectTempo(theBeat.tempo)
+    if (!currentKit) {
+        selectKit(currentBeat.defaultKitName)
+    }
+    if (!currentEffect) { 
+        selectEffect(currentBeat.defaultEffectName)
+    }
+    selectEffectLevel(currentBeat.effectMix)  
+    selectTempo(currentBeat.tempo)
 
     showPlayAvailable()
 
-    $("#current-beat").text(theBeat.name)
+    // auto play after 3 seconds
+    if (autoPlay) setTimeout(function() {
+        startPlay()
+    }, autoPlayDelay)    
+
+    $("#current-beat").text(currentBeat.name)
 }
 
 function selectKit(id) {
@@ -669,31 +691,32 @@ function selectEffect(id) {
     
     if (!effect.isLoaded) { alert('Effect ' +id+ ' still loading'); return }
 
-    log('selected effect: ' +effect.id)
+    currentEffect = effect
+ 
+    log('selected effect: ' +currentEffect.id)
 
     // the 'no effect' has no buffer
-    if (effect.buffer) {        
-        convolver.buffer = effect.buffer
+    if (currentEffect.buffer) {        
+        convolver.buffer = currentEffect.buffer
     }
 
-    effectDryMix = effect.dryMix
-    effectWetMix = effect.wetMix
+    effectDryMix = currentEffect.dryMix
+    effectWetMix = currentEffect.wetMix
 
-    if (theBeat) {
-        theBeat.effect = effect
+    if (currentBeat) {
         // since they just explicitly chose an effect from the list.
-        if (theBeat.effectMix == 0) 
-            theBeat.effectMix = 0.5
+        if (currentBeat.effectMix == 0) 
+            currentBeat.effectMix = 0.5
 
         // Hack - if the effect is meant to be entirely wet (not unprocessed signal)
         // then put the effect level all the way up.
         if (effectDryMix == 0) 
-            theBeat.effectMix = 1
+            currentBeat.effectMix = 1
 
-        selectEffectLevel(theBeat.effectMix)
+        selectEffectLevel(currentBeat.effectMix)
     }
 
-    $("#current-effect").text(effect.name)
+    $("#current-effect").text(currentEffect.name)
 }
 
 function selectEffectLevel(value) {
@@ -701,11 +724,11 @@ function selectEffectLevel(value) {
 }
 
 function setEffectLevel(value) {
-    if (!theBeat) { log('No beat'); return }
+    if (!currentBeat) { log('No beat'); return }
 
-    theBeat.effectMix = value;
+    currentBeat.effectMix = value;
     // Factor in both the preset's effect level and the blending level (effectWetMix) stored in the effect itself.
-    effectLevelNode.gain.value = theBeat.effectMix * effectWetMix;  
+    effectLevelNode.gain.value = currentBeat.effectMix * effectWetMix;  
 }
 
 function getItemById(list, id) {
@@ -785,7 +808,7 @@ function drawPlayhead(xindex) {
 function showPlayAvailable() {
     log('showPlayAvailable')
 
-    if (!theBeat) { return }
+    if (!currentBeat) { return }
 
     var play = document.getElementById('play')
     play.src = 'images/btn_play.png'
@@ -797,12 +820,12 @@ function startDemo() {
     log('startDemo')
     
     selectBeat()
-
     showPlayAvailable()
 }
 
 respondToHash = function(hash){
     log("respondToHash("+hash+")");
+    
     for(var i in routes){
       var r = routes[i];
       if (hash.indexOf(r.hash)==0 && r.handler){
@@ -814,6 +837,7 @@ respondToHash = function(hash){
 
 showBeats = function(data){
     log("showBeats("+data.items.length+")")
+    
     $("#caption-beats").text("Beats")
     var source   = $("#beats-template").html()
     var template = Handlebars.compile(source)
@@ -824,6 +848,7 @@ showBeats = function(data){
 
 showKits = function(data){
     log("showKits("+data.items.length+")")
+    
     $("#caption-kits").text("Kits")
     var source   = $("#kits-template").html()
     var template = Handlebars.compile(source)
@@ -834,6 +859,7 @@ showKits = function(data){
 
 showEffects = function(data){
     log("showEffects("+data.items.length+")")
+
     $("#caption-effects").text("Effects")
     var source   = $("#effects-template").html()
     var template = Handlebars.compile(source)
