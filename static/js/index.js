@@ -264,6 +264,7 @@ function onAssetLoaded() {
         && areAllLoaded(beatList)
         && areAllLoaded(kitList)) {
         showPlayAvailable()
+        selectBeat()
     }
 }
 
@@ -629,7 +630,9 @@ function decreaseTempo() {
 function selectBeat(id) {
     log('selectBeat: ' + id)
 
-    stopPlay() // the beat has changed
+    var wasPlaying = timeoutId
+
+    stopPlay() // the beat has changed or it's the first time
 
     var beat = getItemById(beatList, id)
 
@@ -650,11 +653,13 @@ function selectBeat(id) {
 
     showPlayAvailable()
 
-    // auto play after 3 seconds
-    setTimeout(function() {
-        startPlay()
-    }, autoPlayDelay)    
-
+    if (wasPlaying) {
+        // just continue playing
+        setTimeout(function() {
+            startPlay()
+        }, autoPlayDelay)    
+    }    
+    
     $("#current-beat").text(currentBeat.name)
 }
 
