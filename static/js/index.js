@@ -65,8 +65,7 @@ var noteTime = 0.0
 var tabIndex = 0
 var effectDryMix = 1.0
 var effectWetMix = 1.0
-var autoPlay = false
-var autoPlayDelay = 600 // msec
+var autoPlayDelay = 500 // msec
 
 var convolver
 var compressor
@@ -264,7 +263,7 @@ function onAssetLoaded() {
     if (areAllLoaded(effectList)
         && areAllLoaded(beatList)
         && areAllLoaded(kitList)) {
-        startDemo()
+        showPlayAvailable()
     }
 }
 
@@ -521,11 +520,6 @@ function initControls() {
     document.getElementById('stop').addEventListener('mousedown', stopPlay, true)
     document.getElementById('tempoinc').addEventListener('mousedown', increaseTempo, true)
     document.getElementById('tempodec').addEventListener('mousedown', decreaseTempo, true)
-    $('#autoplayswitch').prop('checked', autoPlay)
-    $('#autoplayswitch').change(
-        function(){
-            setAutoPlay(($(this).is(':checked')))
-    });
 }
 
 function advanceNote() {
@@ -632,10 +626,6 @@ function decreaseTempo() {
     selectTempo(currentBeat.tempo - 1)
 }
 
-function setAutoPlay(isChecked) {
-    autoPlay = isChecked
-}
-
 function selectBeat(id) {
     log('selectBeat: ' + id)
 
@@ -661,7 +651,7 @@ function selectBeat(id) {
     showPlayAvailable()
 
     // auto play after 3 seconds
-    if (autoPlay) setTimeout(function() {
+    setTimeout(function() {
         startPlay()
     }, autoPlayDelay)    
 
@@ -814,13 +804,6 @@ function showPlayAvailable() {
     play.src = 'images/btn_play.png'
 
     show('')
-}
-
-function startDemo() {
-    log('startDemo')
-    
-    selectBeat()
-    showPlayAvailable()
 }
 
 respondToHash = function(hash){
