@@ -409,7 +409,15 @@ function initBeatList() {
         'X L2', 'R2 B4', 'B4', 'X R2', 'L3', 'R5 R2 B3', 'X B3', 'R5 R2', 'L4', 'X R4 R1 B5', 'B5', 'R4 R1', 
         'X L4', 'R3 B1', 'B1', 'X R3', 'L3', 'R5 R2 B3', 'X B3', 'R5 R2', 'L5', 'X R5    B6', 'B3', 'R5   ', 
         'X L4', 'R3 B1', 'B1', 'X R3', 'L3', 'R5 R2 B3', 'X B3', 'R5 R2', 'L4', 'X R4 R1 B5', 'B2', 'R4 R1', 
-        ]}),        
+        ]}), 
+    new Beat({ 
+        name: 'Bukatiende Kushaura 2a',
+        tab: [
+        'X R2 L1', 'L2', 'R2', 'X L1', 'R1'   , 'L5', 'X R4', 'L5', 'R1'   , 'X L4', 'R4', 'L4', 
+        'X R2 L1', 'L2', 'R2', 'X L1', 'R2 L3', 'L6', 'X R2', 'L6', 'R1'   , 'X L4', 'R4', 'L4', 
+        'X R3 B7', 'L4', 'R3', 'X L7', 'R2 L3', 'L6', 'X R2', 'L6', 'R2 L3', 'X L5', 'R5', 'L5', 
+        'X R3 B7', 'L4', 'R3', 'X L7', 'R2 L3', 'L6', 'X R2', 'L6', 'R1'   , 'X L4', 'R4', 'L4', 
+        ]}),       
     ]
 }
 
