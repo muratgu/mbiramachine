@@ -47,6 +47,7 @@ var kitOptions = [
     { name: 'Dambatsoko_E' },
 ]
 
+var isPlaying // are we playing or not
 var timeoutId // note scheduler
 
 var effectList
@@ -264,7 +265,7 @@ function onAssetLoaded() {
         && areAllLoaded(beatList)
         && areAllLoaded(kitList)) {
         showPlayAvailable()
-        selectBeat()
+        respondToHash(window.location.hash);
     }
 }
 
@@ -623,6 +624,8 @@ function schedule() {
         advanceNote()
     }
 
+    if (!isPlaying) return;
+
     timeoutId = setTimeout(function() {
         schedule()
     }, 0)
@@ -646,6 +649,8 @@ function decreaseTempo() {
 function selectBeat(id) {
     log('selectBeat: ' + id)
 
+    if (!id) { log('no id, will select the first avalable beat') }
+
     var wasPlaying = timeoutId
 
     stopPlay() // the beat has changed or it's the first time
@@ -658,18 +663,12 @@ function selectBeat(id) {
 
     currentBeat = beat
 
-    if (!currentKit) {
-        selectKit(currentBeat.defaultKitName)
-    }
-    if (!currentEffect) { 
-        selectEffect(currentBeat.defaultEffectName)
-    }
     selectEffectLevel(currentBeat.effectMix)  
     selectTempo(currentBeat.tempo)
 
     showPlayAvailable()
 
-    if (wasPlaying) {
+    if (wasPlaying || !wasPlaying) { // always keep playing
         // just continue playing
         setTimeout(function() {
             startPlay()
@@ -775,8 +774,19 @@ function areAllLoaded(list) {
 function startPlay() {
     log('startPlay')
 
+    if (!currentBeat) {
+        selectBeat()
+    }
+    if (!currentKit) {
+        selectKit(currentBeat.defaultKitName)
+    }
+    if (!currentEffect) { 
+        selectEffect(currentBeat.defaultEffectName)
+    }
+    
+    isPlaying = true
     noteTime = 0.0
-    startTime = context.currentTime + 0.005
+    startTime = context.currentTime + 0.3
     schedule();
 
     document.getElementById('play').classList.add('playing')
@@ -787,6 +797,8 @@ function startPlay() {
 
 function stopPlay() {
     log('stopPlay')
+
+    isPlaying = false
 
     if (timeoutId) {
         clearTimeout(timeoutId)
@@ -819,8 +831,6 @@ function drawPlayhead(xindex) {
 function showPlayAvailable() {
     log('showPlayAvailable')
 
-    if (!currentBeat) { return }
-
     var play = document.getElementById('play')
     play.src = 'images/btn_play.png'
 
@@ -830,6 +840,8 @@ function showPlayAvailable() {
 respondToHash = function(hash){
     log("respondToHash("+hash+")");
     
+    if (!hash) { log('no hash to respond to'); return }
+
     for(var i in routes){
       var r = routes[i];
       if (hash.indexOf(r.hash)==0 && r.handler){
