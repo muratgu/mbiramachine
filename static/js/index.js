@@ -278,10 +278,10 @@ function initBeatList() {
     new Beat({ 
         name: 'Nhemamusasa Kushaura', 
         tab: [
-        'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L4 X2','R3 X3','B7 X','R5 X2',
-        'L3 X3','R2 X','B3 X2','R5 X3','L5 X','R3 X2','B6 X3','R5 X','L4 X2','R3 X3','B7 X','R6 X2',
-        'L2 X3','R3 X','B4 X2','R6 X3','L5 X','R3 X2','B6 X3','R5 X','L4 X2','R3 X3','B7 X','R5 X2',
-        'L3 X3','R2 X','B3 X2','R5 X3','L4 X','R2 X2','B5 X3','R4 X','L2 X2','R2 X3','L1 X','R5 X2'
+        'L3','R2 X','B3','R5','L4 X','R2','B5','R4 X','L4','R3','B7 X','R5',
+        'L3','R2 X','B3','R5','L5 X','R3','B6','R5 X','L4','R3','B7 X','R6',
+        'L2','R3 X','B4','R6','L5 X','R3','B6','R5 X','L4','R3','B7 X','R5',
+        'L3','R2 X','B3','R5','L4 X','R2','B5','R4 X','L2','R2','L1 X','R5'
         ]}),
     new Beat({ 
         name: 'Karigamombe Kushaura',
@@ -334,10 +334,10 @@ function initBeatList() {
     new Beat({ 
         name: 'Mahororo Kushaura',
         tab: [
-        'L2','X','R2','','R1 R4 X','','L4','X','R2','','R1 R4 X','', 
-        'L2','X','R2','','L3 R5 X','','L4','X','R2','','R1 R4 X','', 
-        'L4','X','R3','','L3 R5 X','','L4','X','R2','','R1 R4 X','', 
-        'L2','X','R2','','R1 R4 X','','L2','X','R3','','R1 R4 X','', 
+        'L2','X','R2','','X R1 R4','','L4','X','R2','','X R1 R4','', 
+        'L2','X','R2','','X L3 R5','','L4','X','R2','','X R1 R4','', 
+        'L4','X','R3','','X L3 R5','','L4','X','R2','','X R1 R4','', 
+        'L2','X','R2','','X R1 R4','','L2','X','R3','','X R1 R4','', 
         ]}),
     new Beat({ 
         name: 'Shumba Kushaura 1',
@@ -420,7 +420,7 @@ function initBeatList() {
         'X R3 B7', 'L4', 'R3', 'X L7', 'R2 L3', 'L6', 'X R2', 'L6', 'R1'   , 'X L4', 'R4', 'L4', 
         ]}),
     new Beat({ 
-        name: 'Bukatiende Kushaura 2c',
+        name: 'Bukatiende Kushaura 2b',
         tab: [
         'X R2 L1', 'L2', 'R2', 'X L1', 'R4 R1'   , 'L5', 'X R4', 'L5', 'R7'   , 'X L4', 'R7', 'L4', 
         'X R6 L1', 'L2', 'R6', 'X L1', 'R7 L3'   , 'L6', 'X R5', 'L6', 'R4 R1', 'X L4', 'R4', 'L4', 
@@ -595,30 +595,33 @@ function schedule() {
     while (noteTime < currentTime + 0.200) {
         // Convert noteTime to context time.
         var contextPlayTime = noteTime + startTime
-            if(currentBeat && currentBeat.tab[tabIndex]) {
-                var currentBufferCode = currentBeat.tab[tabIndex].split(' ')
-                for(var c in currentBufferCode) {
-                    var keyCode = currentBufferCode[c]
-                    if(keyCode > '') {
-                        var pan = false
-                        var x = 0.0
-                        if (keyCode[0] == 'L') { pan = true; x = -50.0; }
-                        if (keyCode[0] == 'B') { pan = true; x = -50.0; }
-                        if (keyCode[0] == 'R') { pan = true; x = 50.0; }
-                        if (keyCode[0] == 'X') { pan = true; x = 50.0; }
-                        var currentBuffer = currentKit.buffer[keyCode]
-                        if(currentBuffer) {
-                            playNote(currentBuffer, 1.0, currentBeat.volume, currentBeat.pitch, contextPlayTime, 
-                                pan, x, 0.0, 0.0)
-                        }
+        if(currentBeat && currentBeat.tab[tabIndex]) {
+            $("#current-keys").text(currentBeat.tab[tabIndex])
+            var currentBufferCode = currentBeat.tab[tabIndex].split(' ')
+            for(var c in currentBufferCode) {
+                var keyCode = currentBufferCode[c]
+                if(keyCode > '') {
+                    var pan = false
+                    var x = 0.0
+                    if (keyCode[0] == 'L') { pan = true; x = -50.0; }
+                    if (keyCode[0] == 'B') { pan = true; x = -50.0; }
+                    if (keyCode[0] == 'R') { pan = true; x = 50.0; }
+                    if (keyCode[0] == 'X') { pan = true; x = 50.0; }
+                    var currentBuffer = currentKit.buffer[keyCode]
+                    if(currentBuffer) {
+                        playNote(currentBuffer, 1.0, currentBeat.volume, currentBeat.pitch, contextPlayTime, 
+                            pan, x, 0.0, 0.0)
                     }
                 }
             }
+        } else {
+            $("#current-keys").text('')
+        }
 
         // Attempt to synchronize drawing time with sound
         if (noteTime != lastDrawTime) {
             lastDrawTime = noteTime;
-            drawPlayhead((tabIndex+NUM_LED-1) % NUM_LED)
+            drawPlayhead((tabIndex+NUM_LED-1) % NUM_LED)            
         }
 
         advanceNote()
