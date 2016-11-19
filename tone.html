@@ -7,8 +7,13 @@
 $(function () {
     var TAG = 'Page'
     DEBUG = true
+
+    var log = function (s) { if(DEBUG && console && console.log) console.log(s) }
+    var error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }   
     
     var mbiraTone = null    
+    var canvas = $('#mbira-instrument')[0]
+    var ctx = canvas.getContext('2d');
     
     var onMbiraStartClicked = function () {
         log(TAG+': onMbiraStartClicked')
@@ -53,10 +58,59 @@ $(function () {
         $('#mbira-load').on('click', function(ev){ onMbiraLoadClicked() })
         $('#mbira-start').on('click', function(ev){ onMbiraStartClicked() })
         $('#mbira-stop').on('click', function(ev){ onMbiraStopClicked() })
+        showKit()
     }
     var onKeysPlayed = function(keys) {
         log(TAG+': onKeysPlayed: keys='+keys)
-        $('#mbira-now-playing').text(keys)
+        //$('#mbira-now-playing').text(keys)
+        showKeys(keys)
+    }
+
+    var img = null
+    var showKit  = function(name) {
+        name = name || '622px-Mbira_dzavadzimu'
+        log(TAG+': showInstrument')
+        if (!img) {
+            img = new Image()
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0)
+            }
+            img.src = './images/'+name+'.jpg'
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0)
+        }
+    }
+    var showKeys = function(keys) {
+        log(TAG+': showKeys: keys='+keys)
+        showKit()
+        keys.forEach(x=> {
+            showKey(x)
+        })
+    }
+    var showKey  =function(key) {
+        log(TAG+': showKey: key='+key)
+        var p = getPathForKey(key)
+        log(p)
+        if (p) ctx.fill('M70 248 96 252 93 285 77 290 61 284 70 248 Z')
+    }
+    var getPathForKey = function(key) {
+        var paths = {
+            L6: 'M70 248 96 252 93 285 77 290 61 284 70 248 Z',
+            L5: 'M107 267 135 278 131 304 113 308 99 298 Z',
+            L4: 'M154 279 181 281 176 315 162 316 146 306 Z',
+            L3: 'M197 296 223 301 220 330 206 337 191 328 Z',
+            L2: 'M241 300 269 305 269 336 252 343 236 336 Z',
+            L1: 'M284 319 315 325 315 353 299 361 281 352 Z',
+            B1: 'M305 415 342 417 341 450 321 459 302 448 Z', 
+            B2: 'M258 385 292 387 291 420 272 427 254 416 Z',
+            B3: 'M210 381 246 383 244 418 224 427 207 415 Z',
+            B4: 'M167 365 202 366 199 399 177 406 163 394 Z',
+            B5: 'M119 349 148 350 147 386 127 394 113 382 Z',
+            B6: 'M77 339 109 341 105 374 85 380 71 372 Z',
+            B7: 'M41 313 73 316 68 353 51 361 35 351 Z',
+        }
+        return paths[key]
     }
     onPageLoad()
 })
@@ -67,5 +121,24 @@ $(function () {
     <input id='mbira-start' type='submit' value='Start' disabled='disabled'/>
     <input id='mbira-stop' type='submit' value='Stop' disabled='disabled'/>
     <div id='mbira-now-playing'></div>
+    <canvas id='mbira-instrument' width='800' height='600'>
+    </canvas>
+    <script>
+      function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+      var canvas = document.getElementById('mbira-instrument');
+      var context = canvas.getContext('2d');
+
+      canvas.addEventListener('mouseup', function(evt) {
+        var mousePos = getMousePos(canvas, evt);
+        var message = mousePos.x + ' ' + mousePos.y;
+        console.log(message);
+      }, false);
+    </script>
 </body>
 </html>

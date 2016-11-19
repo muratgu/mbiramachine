@@ -3,27 +3,21 @@
  * requires jquery.js
  * requires tone.js
  */
-var MbiraTone = function(parent){
+var MbiraTone = function(){
     var TAG = 'MbiraTone'
-    var DEBUG = parent && parent.DEBUG 
-    var module = {}
+    var DEBUG = true
+    
     var soundFilePath = './sounds'
     var soundFileExt = '.mp3'
     var hoshoKitName = 'hosho'
     var hoshoKey = 'X'
 
-
-    var log = function (s) { 
-        if(DEBUG && console && console.log) console.log(s) 
-    }
-    var error = function (s, e) { 
-        if (console && console.log) console.log(s); console.log(e) 
-    }
-
-    parent.log = log
-    parent.error = error
-
+    var log = function (s) { if(DEBUG && console && console.log) console.log(s) }
+    var error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }   
+    
     log(TAG+': module initializing')
+
+    var module = {}
 
     var tabTexts = {
         'nyamaropa_kushaura' : `
@@ -65,9 +59,9 @@ var MbiraTone = function(parent){
         log(TAG+': loadKit: kitName='+kitName)
         if (!kits[kitName]) {
             var keys = [
-                'X','R1','R2','R3','R4','R5','R6','R7','R8',
-                   ,'L1','L2','L3','L4','L5','L6','L7','L8',
-               'B0','B1','B2','B3','B4','B5','B6','B7','B8',                
+                'X','R1','R2','R3','R4','R5','R6','R7','R8','R9'
+                   ,'L1','L2','L3','L4','L5','L6','L7',
+               'B0','B1','B2','B3','B4','B5','B6','B7',                
             ]
             var urls = {}
             keys.forEach(x => { 
