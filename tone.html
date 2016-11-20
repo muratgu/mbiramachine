@@ -12,8 +12,15 @@ $(function () {
     var error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }   
     
     var mbiraTone = null    
+    var _kitName = null
+    var _tabName = null
+    var _kitImageName
+    var _kitKeyPaths
+    var tempo = '8n'
+    
     var canvas = $('#mbira-instrument')[0]
     var ctx = canvas.getContext('2d');
+    var _img = null //mbira image
     
     var onMbiraStartClicked = function () {
         log(TAG+': onMbiraStartClicked')
@@ -24,63 +31,106 @@ $(function () {
     var onMbiraStopClicked = function () {
         log(TAG+': onMbiraStopClicked')
         if (mbiraTone) mbiraTone.stop()
+        showKit()
         $('#mbira-start').prop('disabled', false);
         $('#mbira-stop').prop('disabled', true);
     }
     var onMbiraLoadClicked = function () {
         log(TAG+': onMbiraLoadClicked')
+        if (!_kitName || !_tabName) 
+            return
         onMbiraStopClicked()
         onMbiraLoading()
-        if (mbiraTone) mbiraTone.load({
-            kit: 'dambatsoko_e', 
-            tab:'nyamaropa_kushaura',
-            tempo: '8n',
-            onKeysPlayed: onKeysPlayed
-        }, function(){
+        if (mbiraTone) {
+            mbiraTone.load({
+                kit: _kitName, 
+                tab: _tabName,
+                tempo: tempo,
+                onKeysPlayed: onKeysPlayed
+            })  
             onMbiraLoaded()
-        })
+        }
     }
     var onMbiraLoading = function () {
         log(TAG+': onMbiraLoading')
         $('#mbira-start').prop('disabled', true);
         $('#mbira-stop').prop('disabled', true);
-        $('#mbira-load').prop('disabled', true);
+        $('#mbira-kits').prop('disabled', true);
+        $('#mbira-tabs').prop('disabled', true);
     }
     var onMbiraLoaded = function () {
         log(TAG+': onMbiraLoaded')
         $('#mbira-start').prop('disabled', false);
-        $('#mbira-load').prop('disabled', true);
-    }
-    var onPageLoad = function () {
-        mbiraTone = MbiraTone(window) // load this first
-        log(TAG+': onPageLoad')
-        $('#mbira-load').prop('disabled', false);     
-        $('#mbira-load').on('click', function(ev){ onMbiraLoadClicked() })
-        $('#mbira-start').on('click', function(ev){ onMbiraStartClicked() })
-        $('#mbira-stop').on('click', function(ev){ onMbiraStopClicked() })
+        $('#mbira-stop').prop('disabled', true);
+        $('#mbira-kits').prop('disabled', false);
+        $('#mbira-tabs').prop('disabled', false);
         showKit()
     }
+    var onPageLoad = function () {
+        log(TAG+': onPageLoad')
+        mbiraTone = MbiraTone(function(){
+            loadOptions()
+            bindEvents()
+            log(TAG+': mbiraTone: ready')
+        }) 
+    }
+    var bindEvents = function() {
+        $('#mbira-start').prop('disabled', true);     
+        $('#mbira-stop').prop('disabled', true);     
+        $('#mbira-kits').prop('disabled', false);
+        $('#mbira-tabs').prop('disabled', false);
+        $('#mbira-start').on('click', function(ev){ onMbiraStartClicked() })
+        $('#mbira-stop').on('click', function(ev){ onMbiraStopClicked() })
+        $('#mbira-tabs').change(function(ev) { onMbiraTabSelected($(this).val()) });
+        $('#mbira-kits').change(function(ev) { onMbiraKitSelected($(this).val()) });
+    }
+
+    var onMbiraKitSelected = function(kitName) {
+        log(TAG+': onMbiraKitSelected: kitName='+kitName)
+        _kitName = kitName
+        _img = null // otherwise it won't refresh
+        showKit()
+        onMbiraLoadClicked()
+    }
+
+    var onMbiraTabSelected = function(tabName) {
+        log(TAG+': onMbiraTabSelected: tabName='+tabName)
+        _tabName = tabName
+        onMbiraLoadClicked()
+    }
+
+    var loadOptions = function(){
+        var kitNames = mbiraTone.getKitNames()
+        kitNames.forEach(x=> {
+            $('#mbira-kits').append($("<option />").val(x).text(x));
+        })
+        var tabNames = mbiraTone.getTabNames()
+        tabNames.forEach(x=> {
+            $('#mbira-tabs').append($("<option />").val(x).text(x));
+        })
+    }
+
     var onKeysPlayed = function(keys) {
         log(TAG+': onKeysPlayed: keys='+keys)
-        //$('#mbira-now-playing').text(keys)
         showKeys(keys)
     }
 
-    var img = null
-    var showKit  = function(name) {
-        name = name || '622px-Mbira_dzavadzimu'
-        log(TAG+': showInstrument')
-        if (!img) {
-            img = new Image()
-            img.onload = function() {
-                ctx.drawImage(img, 0, 0)
+    var showKit  = function() {
+        log(TAG+': showKit')
+        if (!_img) {
+            _kitImageName = mbiraTone.getInstrumentImageFileName(_kitName)
+            _kitKeyPaths = mbiraTone.getInstrumentPathsForKeys(_kitName)
+            _img = new Image()
+            _img.onload = function() {
+                ctx.drawImage(_img, 0, 0)
             }
-            img.src = './images/'+name+'.jpg'
+            _img.src = './images/'+_kitImageName
         } else {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0)
+            ctx.drawImage(_img, 0, 0)
         }
     }
+
     var showKeys = function(keys) {
         log(TAG+': showKeys: keys='+keys)
         showKit()
@@ -90,37 +140,44 @@ $(function () {
     }
     var showKey  =function(key) {
         log(TAG+': showKey: key='+key)
-        var p = getPathForKey(key)
-        log(p)
-        if (p) ctx.fill('M70 248 96 252 93 285 77 290 61 284 70 248 Z')
-    }
-    var getPathForKey = function(key) {
-        var paths = {
-            L6: 'M70 248 96 252 93 285 77 290 61 284 70 248 Z',
-            L5: 'M107 267 135 278 131 304 113 308 99 298 Z',
-            L4: 'M154 279 181 281 176 315 162 316 146 306 Z',
-            L3: 'M197 296 223 301 220 330 206 337 191 328 Z',
-            L2: 'M241 300 269 305 269 336 252 343 236 336 Z',
-            L1: 'M284 319 315 325 315 353 299 361 281 352 Z',
-            B1: 'M305 415 342 417 341 450 321 459 302 448 Z', 
-            B2: 'M258 385 292 387 291 420 272 427 254 416 Z',
-            B3: 'M210 381 246 383 244 418 224 427 207 415 Z',
-            B4: 'M167 365 202 366 199 399 177 406 163 394 Z',
-            B5: 'M119 349 148 350 147 386 127 394 113 382 Z',
-            B6: 'M77 339 109 341 105 374 85 380 71 372 Z',
-            B7: 'M41 313 73 316 68 353 51 361 35 351 Z',
+        var p = _kitKeyPaths[key]
+        if (p) {
+            ctx.fillStyle = 'rgb(50, 50, 50)'
+            ctx.fill(p)
+            fadeOutPath(ctx, p, 50, 50, 50)
         }
-        return paths[key]
+    }    
+
+    var fadeOutPath = function(ctx, p, r, g, b) {
+        var steps = 5,
+            dr = (200 - r) / steps,
+            dg = (200 - g) / steps,
+            db = (200 - b) / steps,
+            i = 0,
+            interval = setInterval(function() {
+                ctx.fillStyle = 'rgb(' + Math.round(r + dr * i) + ','
+                                       + Math.round(g + dg * i) + ','
+                                       + Math.round(b + db * i) + ')';
+                ctx.fill(p);
+                if(i++ > steps) {
+                    clearInterval(interval);
+                }
+            }, 30);
     }
+
     onPageLoad()
 })
 </script>
 </head>
 <body>
-    <input id='mbira-load' type='submit' value='Load' disabled='disabled'/>
     <input id='mbira-start' type='submit' value='Start' disabled='disabled'/>
     <input id='mbira-stop' type='submit' value='Stop' disabled='disabled'/>
-    <div id='mbira-now-playing'></div>
+    <select id='mbira-kits' disabled='disabled'/>
+        <option name='select'>Select</option>
+    </select>
+    <select id='mbira-tabs' disabled='disabled'/>
+        <option name='select'>Select</option>
+    </select>
     <canvas id='mbira-instrument' width='800' height='600'>
     </canvas>
     <script>
@@ -136,7 +193,7 @@ $(function () {
 
       canvas.addEventListener('mouseup', function(evt) {
         var mousePos = getMousePos(canvas, evt);
-        var message = mousePos.x + ' ' + mousePos.y;
+        var message = Math.trunc(mousePos.x) + ' ' + Math.trunc(mousePos.y);
         console.log(message);
       }, false);
     </script>
