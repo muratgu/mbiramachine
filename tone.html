@@ -6,166 +6,95 @@
 <script> 
 $(function () {
     var TAG = 'Page'
-    DEBUG = true
+    var DEBUG = true
 
     var log = function (s) { if(DEBUG && console && console.log) console.log(s) }
     var error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }   
     
     var mbiraTone = null    
-    var _kitName = null
-    var _tabName = null
-    var _kitImageName
-    var _kitKeyPaths
-    var tempo = '8n'
+    var selectedKitName
+    var selectedTabName
+    var selectedTempo = '8n'
     
-    var canvas = $('#mbira-instrument')[0]
-    var ctx = canvas.getContext('2d');
-    var _img = null //mbira image
-    
+    /* EVENT HANDLERS */
+    var onMbiraKitSelected = function(name) {
+        selectedKitName = name
+        onMbiraLoadClicked()
+    }
+    var onMbiraTabSelected = function(name) {
+        selectedTabName = name
+        onMbiraLoadClicked()
+    }
     var onMbiraStartClicked = function () {
-        log(TAG+': onMbiraStartClicked')
         if (mbiraTone) mbiraTone.start()
         $('#mbira-start').prop('disabled', true);
         $('#mbira-stop').prop('disabled', false);
     }
     var onMbiraStopClicked = function () {
-        log(TAG+': onMbiraStopClicked')
-        if (mbiraTone) mbiraTone.stop()
-        showKit()
+        if (mbiraTone) mbiraTone.stop()        
         $('#mbira-start').prop('disabled', false);
         $('#mbira-stop').prop('disabled', true);
     }
     var onMbiraLoadClicked = function () {
-        log(TAG+': onMbiraLoadClicked')
-        if (!_kitName || !_tabName) 
-            return
         onMbiraStopClicked()
         onMbiraLoading()
         if (mbiraTone) {
             mbiraTone.load({
-                kit: _kitName, 
-                tab: _tabName,
-                tempo: tempo,
+                kitName: selectedKitName, 
+                tabName: selectedTabName,
+                tempo: selectedTempo,
                 onKeysPlayed: onKeysPlayed
+            }, function(){
+                // ready to play
+                onMbiraLoaded()
             })  
-            onMbiraLoaded()
         }
     }
     var onMbiraLoading = function () {
-        log(TAG+': onMbiraLoading')
-        $('#mbira-start').prop('disabled', true);
-        $('#mbira-stop').prop('disabled', true);
-        $('#mbira-kits').prop('disabled', true);
-        $('#mbira-tabs').prop('disabled', true);
+        showLoading()
     }
     var onMbiraLoaded = function () {
-        log(TAG+': onMbiraLoaded')
         $('#mbira-start').prop('disabled', false);
-        $('#mbira-stop').prop('disabled', true);
         $('#mbira-kits').prop('disabled', false);
         $('#mbira-tabs').prop('disabled', false);
-        showKit()
     }
-    var onPageLoad = function () {
-        log(TAG+': onPageLoad')
-        mbiraTone = MbiraTone(function(){
+    var onKeysPlayed = function(keys) {
+        log(keys)
+    }
+    
+    /* SETUP */
+    var bindEvents = function() {        
+        $('#mbira-start').on('click', function(ev){ onMbiraStartClicked() })
+        $('#mbira-stop').on('click', function(ev){ onMbiraStopClicked() })
+        $('#mbira-tabs').change(function(ev) { onMbiraTabSelected($(this).val()) });
+        $('#mbira-kits').change(function(ev) { onMbiraKitSelected($(this).val()) });
+        $('#mbira-tabs').prop('disabled', false)
+        $('#mbira-kits').prop('disabled', false)
+    }
+    var loadOptions = function(){
+        mbiraTone.getKitNames().forEach(x=> {
+            $('#mbira-kits').append($("<option />").val(x).text(x));
+        })
+        mbiraTone.getTabNames().forEach(x=> {
+            $('#mbira-tabs').append($("<option />").val(x).text(x));
+        })
+    }
+    var showLoading = function() {
+        $('#mbira-start').prop('disabled', true);
+        $('#mbira-stop').prop('disabled', true);
+        //$('#mbira-kits').prop('disabled', true);
+        //$('#mbira-tabs').prop('disabled', true);
+    }
+    var initalize = function () {
+        showLoading()
+        mbiraTone = MbiraTone(function() {
             loadOptions()
             bindEvents()
             log(TAG+': mbiraTone: ready')
         }) 
     }
-    var bindEvents = function() {
-        $('#mbira-start').prop('disabled', true);     
-        $('#mbira-stop').prop('disabled', true);     
-        $('#mbira-kits').prop('disabled', false);
-        $('#mbira-tabs').prop('disabled', false);
-        $('#mbira-start').on('click', function(ev){ onMbiraStartClicked() })
-        $('#mbira-stop').on('click', function(ev){ onMbiraStopClicked() })
-        $('#mbira-tabs').change(function(ev) { onMbiraTabSelected($(this).val()) });
-        $('#mbira-kits').change(function(ev) { onMbiraKitSelected($(this).val()) });
-    }
 
-    var onMbiraKitSelected = function(kitName) {
-        log(TAG+': onMbiraKitSelected: kitName='+kitName)
-        _kitName = kitName
-        _img = null // otherwise it won't refresh
-        showKit()
-        onMbiraLoadClicked()
-    }
-
-    var onMbiraTabSelected = function(tabName) {
-        log(TAG+': onMbiraTabSelected: tabName='+tabName)
-        _tabName = tabName
-        onMbiraLoadClicked()
-    }
-
-    var loadOptions = function(){
-        var kitNames = mbiraTone.getKitNames()
-        kitNames.forEach(x=> {
-            $('#mbira-kits').append($("<option />").val(x).text(x));
-        })
-        var tabNames = mbiraTone.getTabNames()
-        tabNames.forEach(x=> {
-            $('#mbira-tabs').append($("<option />").val(x).text(x));
-        })
-    }
-
-    var onKeysPlayed = function(keys) {
-        log(TAG+': onKeysPlayed: keys='+keys)
-        showKeys(keys)
-    }
-
-    var showKit  = function() {
-        log(TAG+': showKit')
-        if (!_img) {
-            _kitImageName = mbiraTone.getInstrumentImageFileName(_kitName)
-            _kitKeyPaths = mbiraTone.getInstrumentPathsForKeys(_kitName)
-            _img = new Image()
-            _img.onload = function() {
-                ctx.drawImage(_img, 0, 0)
-            }
-            _img.src = './images/'+_kitImageName
-        } else {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(_img, 0, 0)
-        }
-    }
-
-    var showKeys = function(keys) {
-        log(TAG+': showKeys: keys='+keys)
-        showKit()
-        keys.forEach(x=> {
-            showKey(x)
-        })
-    }
-    var showKey  =function(key) {
-        log(TAG+': showKey: key='+key)
-        var p = _kitKeyPaths[key]
-        if (p) {
-            ctx.fillStyle = 'rgb(50, 50, 50)'
-            ctx.fill(p)
-            fadeOutPath(ctx, p, 50, 50, 50)
-        }
-    }    
-
-    var fadeOutPath = function(ctx, p, r, g, b) {
-        var steps = 5,
-            dr = (200 - r) / steps,
-            dg = (200 - g) / steps,
-            db = (200 - b) / steps,
-            i = 0,
-            interval = setInterval(function() {
-                ctx.fillStyle = 'rgb(' + Math.round(r + dr * i) + ','
-                                       + Math.round(g + dg * i) + ','
-                                       + Math.round(b + db * i) + ')';
-                ctx.fill(p);
-                if(i++ > steps) {
-                    clearInterval(interval);
-                }
-            }, 30);
-    }
-
-    onPageLoad()
+    initalize()
 })
 </script>
 </head>

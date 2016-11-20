@@ -39,6 +39,12 @@ var MbiraTone = function(callback){
             `
     }
 
+    var _canvas = $('#mbira-instrument')[0]
+    var _ctx = _canvas && _canvas.getContext('2d');
+    var _kitName //current kit name
+    var _kitKeyPaths //current kits key paths
+    var _kitImage //current mbira image
+
     var getInstrumentImageFileName = function(name) {
         if (_instruments && _instruments[name] && _instruments[name].image)
             return _instruments[name].image
@@ -56,23 +62,28 @@ var MbiraTone = function(callback){
     }
     
     var loadTabs = function () {
-        getTabNames().forEach(tabName => {
-            _tabs[tabName] = _tabTexts[tabName].split('/').map(x => x.trim().split(' '))
-        })        
+        log(TAG+': loadTabs')
+        getTabNames().forEach(name => {
+            _tabs[name] = _tabTexts[name].split('/').map(x => x.trim().split(' '))
+            
+        })      
+        log(_tabs)  
     }
 
     var loadKits = function (callback) {
+        log(TAG+': loadKits')
         _onBufferLoadCallback = callback
-        getKitNames().forEach(kitName => {
-            var keys = Object.keys(_instruments[kitName].keys)
+        getKitNames().forEach(name => {
+            var keys = Object.keys(_instruments[name].keys)
             var urls = {}
             keys.forEach(x => { 
                 urls[x] = sound_file = soundFilePath +
-                   '/' + (x == hoshoKey ? hoshoKitName : kitName) +
+                   '/' + (x == hoshoKey ? hoshoKitName : name) +
                    '_' + x + soundFileExt 
             })
-            _kits[kitName] = new Tone.MultiPlayer({ urls : urls }).toMaster()
+            _kits[name] = new Tone.MultiPlayer({ urls : urls }).toMaster()
         })
+        log(_kits) 
     }
     
     var getKitNames = function() {
@@ -87,17 +98,75 @@ var MbiraTone = function(callback){
         }
     }
 
-    var schedulePlayer = function(kit, tab, tempo, start, onKeysPlayed) {
-        log(TAG+': schedulePlayer, tempo='+tempo+', start='+start)
+    var showKit  = function(name) {
+        if (!_ctx) return
+        if (name) {
+            if (_kitImage && name == _kitName) {
+                _ctx.drawImage(_kitImage, 0, 0)
+            } else {
+                _kitName = name
+                _kitKeyPaths = getInstrumentPathsForKeys(_kitName)
+                _kitImage = new Image()
+                _kitImage.onload = function() {
+                    _ctx.clearRect(0, 0, _canvas.width, _canvas.height)
+                    _ctx.drawImage(_kitImage, 0, 0)
+                }
+                _kitImage.src = './images/'+getInstrumentImageFileName(_kitName)
+            }
+        } else {
+            _ctx.clearRect(0, 0, _canvas.width, _canvas.height)
+        }
+    }
+
+    var showKeys = function(keys) {
+        keys.forEach(x=> {
+            showKey(x)
+        })
+    }
+    var showKey  =function(key) {
+        var p = _kitKeyPaths[key]
+        if (p) {
+            _ctx.fillStyle = 'rgb(50, 50, 50)'
+            _ctx.fill(p)
+            fadeOutPath(p, 50, 50, 50)
+        }
+    }    
+
+    var fadeOutPath = function(p, r, g, b) {
+        var steps = 5,
+            dr = (200 - r) / steps,
+            dg = (200 - g) / steps,
+            db = (200 - b) / steps,
+            i = 0,
+            interval = setInterval(function() {
+                _ctx.fillStyle = 'rgb(' + Math.round(r + dr * i) + ','
+                                       + Math.round(g + dg * i) + ','
+                                       + Math.round(b + db * i) + ')';
+                _ctx.fill(p);
+                if(i++ > steps) {
+                    clearInterval(interval);
+                }
+            }, 30);
+    }
+
+    var schedulePlayer = function(options) {
+        log(TAG+': schedulePlayer')
+        log(options)
+        var kit = options.kit
+        var tab = options.tab
+        var tempo = options.tempo
+        var start = options.start
+        var onKeysPlayed = options.callback
         var tab_index = 0
         if (_schedule != null) {
-            log(TAG+': schedulePlayer: clear='+_schedule)
             Tone.Transport.clear(_schedule)
         }
         _schedule = Tone.Transport.scheduleRepeat(function(time){
             if (tab_index == tab.length) tab_index = 0
+            showKit() 
             var keys = tab[tab_index]
             if (onKeysPlayed) onKeysPlayed(keys)
+            showKeys(keys)
             tab[tab_index++]
                 .filter(x => x > ' ')
                 .forEach(x => {
@@ -109,24 +178,36 @@ var MbiraTone = function(callback){
                     }
                 })            
         }, tempo, start)
-        log(TAG+': schedulePlayer: _schedule='+_schedule)
     }
 
-    var load = function(options) { 
+    var load = function(options, callbackReady) { 
         log(TAG+': load: options=' + options)
         log(options)
         options = options || {}
-        var tabName = options.tabName 
-        var kitName = options.kitName 
-        var tempo = options.tempo || "8n" // 8th of a note
-        var start = options.start || "1m" // one measure        
-        var tab = _tabs[tabName]
-        var kit = _kits[kitName]
-        schedulePlayer(kit, tab, tempo, start, options.onKeysPlayed)
+        if (options.kitName) {
+            showKit(options.kitName)
+        }
+        if (options.tabName) {
+            schedulePlayer({
+                kit: _kits[options.kitName],
+                tab: _tabs[options.tabName], 
+                tempo: options.tempo || "8n", // 8th of a note
+                start: options.start || "1m", // one measure 
+                callback: options.onKeysPlayed
+            })
+            // ready to play
+            if (callbackReady) callbackReady();
+        }
     }
 
-    var start = function() { Tone.Transport.start() }
-    var stop = function() { Tone.Transport.stop() }
+    var start = function() { 
+        Tone.Transport.start() 
+    }
+
+    var stop = function() { 
+        Tone.Transport.stop(); 
+        showKit() 
+    }
     
     Tone.Buffer.on('load', function(){
         log(TAG+': Tone.Buffer.onload')
