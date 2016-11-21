@@ -40,29 +40,23 @@ var MbiraTone = function(callback){
     }
 
     var _canvas = $('#mbira-instrument')[0]
-    var _ctx = _canvas && _canvas.getContext('2d');
+    var _ctx = _canvas && _canvas.getContext('2d')
     var _kitName //current kit name
     var _kitKeyPaths //current kits key paths
     var _kitImage //current mbira image
 
     var getInstrumentImageFileName = function(name) {
-        if (_instruments && _instruments[name] && _instruments[name].image)
+        if (_instruments && _instruments[name])
             return _instruments[name].image
     }
 
     var getInstrumentPathsForKeys = function(name) {
-        log(TAG+': getInstrumentPathsForKeys: name='+name)
         if (_instruments && _instruments[name]) {
-            var keys = _instruments[name].keys
-            Object.keys(keys).forEach(x=> {
-                keys[x] = new Path2D(keys[x])
-            })
-            return keys
+            return _instruments[name].keys
         }
     }
     
     var loadTabs = function () {
-        log(TAG+': loadTabs')
         getTabNames().forEach(name => {
             _tabs[name] = _tabTexts[name].split('/').map(x => x.trim().split(' '))
             
@@ -71,7 +65,6 @@ var MbiraTone = function(callback){
     }
 
     var loadKits = function (callback) {
-        log(TAG+': loadKits')
         _onBufferLoadCallback = callback
         getKitNames().forEach(name => {
             var keys = Object.keys(_instruments[name].keys)
@@ -100,6 +93,7 @@ var MbiraTone = function(callback){
 
     var showKit  = function(name) {
         if (!_ctx) return
+        name = name || _kitName
         if (name) {
             if (_kitImage && name == _kitName) {
                 _ctx.drawImage(_kitImage, 0, 0)
@@ -123,12 +117,21 @@ var MbiraTone = function(callback){
             showKey(x)
         })
     }
-    var showKey  =function(key) {
-        var p = _kitKeyPaths[key]
+    var showKey = function(key) {
+        if (!key) return
+        var p = _kitKeyPaths[key].split(' ')
         if (p) {
-            _ctx.fillStyle = 'rgb(50, 50, 50)'
-            _ctx.fill(p)
-            fadeOutPath(p, 50, 50, 50)
+            var x = p[0]
+            var y = p[1]
+            var r = p[2] || 10
+            var fillStyle = p[3] || (key[0]=='R' ? '#ff000088' : '#00ff0088')
+            var strokeStyle = '#00ffff88'
+            _ctx.beginPath()
+            _ctx.strokeStyle = strokeStyle
+            _ctx.arc(x, y, r, 0, 2*Math.PI)
+            _ctx.stroke()
+            _ctx.fillStyle = fillStyle
+            _ctx.fill()
         }
     }    
 
@@ -223,11 +226,11 @@ var MbiraTone = function(callback){
     module.stop = stop
  
     $.getJSON(instrumentFilePath, function(result) {
+        log(TAG+': initializing')
         _instruments = result
         loadTabs()
         loadKits(function(){
-            log(TAG+': instruments loaded')
-            log(Object.keys(_instruments))
+            log(TAG+': ready')
             if (callback) callback() // ready
         })
     })

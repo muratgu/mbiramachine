@@ -51,12 +51,12 @@ $(function () {
         }
     }
     var onMbiraLoading = function () {
-        showLoading()
+        $('#mbira-start').prop('disabled', true);
+        $('#mbira-stop').prop('disabled', true);
     }
     var onMbiraLoaded = function () {
         $('#mbira-start').prop('disabled', false);
-        $('#mbira-kits').prop('disabled', false);
-        $('#mbira-tabs').prop('disabled', false);
+        $('#mbira-stop').prop('disabled', true);
     }
     var onKeysPlayed = function(keys) {
         log(keys)
@@ -80,35 +80,82 @@ $(function () {
         })
     }
     var showLoading = function() {
-        $('#mbira-start').prop('disabled', true);
-        $('#mbira-stop').prop('disabled', true);
-        //$('#mbira-kits').prop('disabled', true);
-        //$('#mbira-tabs').prop('disabled', true);
+        $('.content').hide()
+        $('.preloader').show()
     }
-    var initalize = function () {
-        showLoading()
+    var hideLoading = function() {
+        $('.preloader').fadeOut("slow")
+        $('.content').show()
+    }
+    var initalize = function () { 
+        showLoading()       
         mbiraTone = MbiraTone(function() {
             loadOptions()
             bindEvents()
             log(TAG+': mbiraTone: ready')
+            hideLoading()
         }) 
     }
 
     initalize()
 })
 </script>
+<style>
+body, option, select {
+    font-family: Roboto, Arial;
+    font-size: 14pt;
+}
+div#content {
+    margin: auto;
+    width: 100%;
+}
+div.selector,
+div#mbira-controls {
+    width: 20%;
+}
+canvas,
+div.selector,
+div#mbira-controls {
+    margin: auto;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+.preloader {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: url(images/preloader.gif) center no-repeat #fff;
+}
+</style>
 </head>
 <body>
-    <input id='mbira-start' type='submit' value='Start' disabled='disabled'/>
-    <input id='mbira-stop' type='submit' value='Stop' disabled='disabled'/>
-    <select id='mbira-kits' disabled='disabled'/>
-        <option name='select'>Select</option>
-    </select>
-    <select id='mbira-tabs' disabled='disabled'/>
-        <option name='select'>Select</option>
-    </select>
-    <canvas id='mbira-instrument' width='800' height='600'>
-    </canvas>
+    <div class='preloader'></div>
+    <div id='content'>
+        <div class='selector'>
+            <span>Tuning</span>
+            <select id='mbira-kits' disabled='disabled'/>
+                <option name='select'>Select</option>
+            </select>
+        </div>
+        <div class='selector'>
+            <span>Piece</span>
+            <select id='mbira-tabs' disabled='disabled'/>
+                <option name='select'>Select</option>
+            </select>
+        </div>
+        <canvas id='mbira-instrument' width='800' height='600'>
+        </canvas>
+        <div id='mbira-controls'>
+            <input id='mbira-start' type='submit' value='Start' disabled='disabled'/>
+            <input id='mbira-stop' type='submit' value='Stop' disabled='disabled'/>
+        </div>
+    <div>
     <script>
       function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
