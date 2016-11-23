@@ -1,21 +1,21 @@
 <html>
 <head>
-<script src="static/js/jquery.min.js"></script> 
-<script src="tone.js"></script> 
+<script src="static/js/jquery.min.js"></script>
+<script src="tone.js"></script>
 <script src="mbira-tone.js"></script>
-<script> 
+<script>
 $(function () {
     var TAG = 'Page'
     var DEBUG = true
 
     var log = function (s) { if(DEBUG && console && console.log) console.log(s) }
-    var error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }   
-    
-    var mbiraTone = null    
+    var error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }
+
+    var mbiraTone
     var selectedKitName
     var selectedTabName
     var selectedTempo = '8n'
-    
+
     /* EVENT HANDLERS */
     var onMbiraKitSelected = function(name) {
         selectedKitName = name
@@ -31,7 +31,7 @@ $(function () {
         $('#mbira-stop').prop('disabled', false);
     }
     var onMbiraStopClicked = function () {
-        if (mbiraTone) mbiraTone.stop()        
+        if (mbiraTone) mbiraTone.stop()
         $('#mbira-start').prop('disabled', false);
         $('#mbira-stop').prop('disabled', true);
     }
@@ -40,14 +40,14 @@ $(function () {
         onMbiraLoading()
         if (mbiraTone) {
             mbiraTone.load({
-                kitName: selectedKitName, 
+                kitName: selectedKitName,
                 tabName: selectedTabName,
                 tempo: selectedTempo,
                 onKeysPlayed: onKeysPlayed
             }, function(){
                 // ready to play
                 onMbiraLoaded()
-            })  
+            })
         }
     }
     var onMbiraLoading = function () {
@@ -61,9 +61,9 @@ $(function () {
     var onKeysPlayed = function(keys) {
         log(keys)
     }
-    
+
     /* SETUP */
-    var bindEvents = function() {        
+    var bindEvents = function() {
         $('#mbira-start').on('click', function(ev){ onMbiraStartClicked() })
         $('#mbira-stop').on('click', function(ev){ onMbiraStopClicked() })
         $('#mbira-tabs').change(function(ev) { onMbiraTabSelected($(this).val()) });
@@ -87,52 +87,20 @@ $(function () {
         $('.preloader').fadeOut("slow")
         $('.content').show()
     }
-    var initalize = function () { 
-        showLoading()       
+    var initalize = function () {
+        showLoading()
         mbiraTone = MbiraTone(function() {
             loadOptions()
             bindEvents()
             log(TAG+': mbiraTone: ready')
             hideLoading()
-        }) 
+        })
     }
 
     initalize()
 })
 </script>
-<style>
-body, option, select {
-    font-family: Roboto, Arial;
-    font-size: 14pt;
-}
-div#content {
-    margin: auto;
-    width: 100%;
-}
-div.selector,
-div#mbira-controls {
-    width: 20%;
-}
-canvas,
-div.selector,
-div#mbira-controls {
-    margin: auto;
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-}
-.preloader {
-    position: fixed;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    background: url(images/preloader.gif) center no-repeat #fff;
-}
-</style>
+<link href="style/tone.css" rel="stylesheet">
 </head>
 <body>
     <div class='preloader'></div>
@@ -149,12 +117,12 @@ div#mbira-controls {
                 <option name='select'>Select</option>
             </select>
         </div>
-        <canvas id='mbira-instrument' width='800' height='600'>
-        </canvas>
         <div id='mbira-controls'>
             <input id='mbira-start' type='submit' value='Start' disabled='disabled'/>
             <input id='mbira-stop' type='submit' value='Stop' disabled='disabled'/>
         </div>
+        <canvas id='mbira-instrument' width='800' height='600'>
+        </canvas>
     <div>
     <script>
       function getMousePos(canvas, evt) {

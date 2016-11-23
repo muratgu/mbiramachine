@@ -1,32 +1,30 @@
-/* mbira-tone.js 
+/* mbira-tone.js
  * (C) Murat Gungoraydinoglu
  * requires jquery.js
  * requires tone.js
  */
-var MbiraTone = function(callback){
+var MbiraTone = function(onReadyCallback){
     const TAG = 'MbiraTone'
     const DEBUG = true
-    
-    const instrumentFilePath = './instruments.json'
-    const soundFilePath = './sounds'
-    const soundFileExt = '.mp3'
-    const hoshoKitName = 'hosho'
-    const hoshoKey = 'X'
+
+    const INSTRUMENT_FILE_PATH = './instruments.json'
+    const SOUND_FILE_DIR = './sounds'
+    const SOUND_FILE_EXT = '.mp3'
+    const HOSHO_KIT_NAME = 'hosho'
+    const HOSHO_KEY_CODE = 'X'
 
     const log = function (s) { if(DEBUG && console && console.log) console.log(s) }
-    const error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }   
-
-    log(TAG+': module initializing')
+    const error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }
 
     if (!Array.prototype.flatMap) {
-        Array.prototype.flatMap = function(lambda) { 
-        return Array.prototype.concat.apply([], this.map(lambda)); 
+        Array.prototype.flatMap = function(lambda) {
+        return Array.prototype.concat.apply([], this.map(lambda));
         }
     }
 
-    var module = {}    
+    var module = {}
     var _schedule = null
-    var _instruments = null    
+    var _instruments = null
     var _kits = {}
     var _tabs = {}
     var _onBufferLoadCallback = null
@@ -35,8 +33,14 @@ var MbiraTone = function(callback){
             R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R4 / L2 / R3 B4 / /
             R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R2 / L4 / R4 B5 / /
             R2 L1 / B1 / R2 / L1 / R2 B1 / / R5 L3 / B3 / R5 / L4 / R4 B5 / /
-            R3 L4 / B7 / R3 / L4 / R3 B7 / / R5 L3 / B3 / R5 / L4 / R4 B5 / 
-            `
+            R3 L4 / B7 / R3 / L4 / R3 B7 / / R5 L3 / B3 / R5 / L4 / R4 B5 /
+        `,
+        'shumba kushaura 1':`
+            B5 / X R4 R1 L2 / / R4 R1 B5 / X L2 / R4 R1 / B2 / X R3 L4 / / R2 B2 / X B1 / R2 /
+            B5 / X R4 R1 L2 / / R4 R1 B5 / X L2 / R4 R1 / B4 / X R4 L5 / / R2 B2 / X B1 / R2 /
+            B3 / X R5 R2 L3 / / R5 R2 B3 / X L3 / R5 R2 / B4 / X R4 L5 / / R3 B4 / X L7 / R3 /
+            B3 / X    R2 L3 / / R9    B3 / X L3 / R9    / B5 / X R8 B5 / / R7 B4 / X B3 / R5
+        `
     }
 
     var _canvas = $('#mbira-instrument')[0]
@@ -55,30 +59,27 @@ var MbiraTone = function(callback){
             return _instruments[name].keys
         }
     }
-    
+
     var loadTabs = function () {
         getTabNames().forEach(name => {
             _tabs[name] = _tabTexts[name].split('/').map(x => x.trim().split(' '))
-            
-        })      
-        log(_tabs)  
+        })
     }
 
-    var loadKits = function (callback) {
-        _onBufferLoadCallback = callback
+    var loadKitSamples = function (onLoadedCallback) {
+        _onBufferLoadCallback = onLoadedCallback
         getKitNames().forEach(name => {
             var keys = Object.keys(_instruments[name].keys)
             var urls = {}
-            keys.forEach(x => { 
-                urls[x] = sound_file = soundFilePath +
-                   '/' + (x == hoshoKey ? hoshoKitName : name) +
-                   '_' + x + soundFileExt 
+            keys.forEach(x => {
+                urls[x] = SOUND_FILE_DIR +
+                   '/' + (x == HOSHO_KEY_CODE ? HOSHO_KIT_NAME : name) +
+                   '_' + x + SOUND_FILE_EXT
             })
             _kits[name] = new Tone.MultiPlayer({ urls : urls }).toMaster()
         })
-        log(_kits) 
     }
-    
+
     var getKitNames = function() {
         if (_instruments) {
             return Object.keys(_instruments)
@@ -119,12 +120,17 @@ var MbiraTone = function(callback){
     }
     var showKey = function(key) {
         if (!key) return
-        var p = _kitKeyPaths[key].split(' ')
-        if (p) {
+        if (key == HOSHO_KEY_CODE) return
+        var kp = _kitKeyPaths[key]
+        if (kp) {
+            var p = kp.split(' ')
             var x = p[0]
             var y = p[1]
             var r = p[2] || 10
-            var fillStyle = p[3] || (key[0]=='R' ? '#ff000088' : '#00ff0088')
+            var fillStyle = p[3] ||
+                ( key[0]=='R' ? '#ff000088'
+                : key[0]=='L' ? '#00ff0088'
+                : '#0000ff88')
             var strokeStyle = '#00ffff88'
             _ctx.beginPath()
             _ctx.strokeStyle = strokeStyle
@@ -133,7 +139,7 @@ var MbiraTone = function(callback){
             _ctx.fillStyle = fillStyle
             _ctx.fill()
         }
-    }    
+    }
 
     var fadeOutPath = function(p, r, g, b) {
         var steps = 5,
@@ -152,23 +158,26 @@ var MbiraTone = function(callback){
             }, 30);
     }
 
+    Tone.Buffer.on('load', function(){
+        if (_onBufferLoadCallback) _onBufferLoadCallback()
+    })
+
     var schedulePlayer = function(options) {
-        log(TAG+': schedulePlayer')
         log(options)
         var kit = options.kit
         var tab = options.tab
         var tempo = options.tempo
         var start = options.start
-        var onKeysPlayed = options.callback
+        var onKeysPlayedCallback = options.onKeysPlayedCallback
         var tab_index = 0
         if (_schedule != null) {
             Tone.Transport.clear(_schedule)
         }
         _schedule = Tone.Transport.scheduleRepeat(function(time){
             if (tab_index == tab.length) tab_index = 0
-            showKit() 
+            showKit()
             var keys = tab[tab_index]
-            if (onKeysPlayed) onKeysPlayed(keys)
+            if (onKeysPlayedCallback) onKeysPlayedCallback(keys)
             showKeys(keys)
             tab[tab_index++]
                 .filter(x => x > ' ')
@@ -179,43 +188,46 @@ var MbiraTone = function(callback){
                         error('cannot play key', ex)
                         Tone.Transport.stop()
                     }
-                })            
+                })
         }, tempo, start)
     }
 
-    var load = function(options, callbackReady) { 
-        log(TAG+': load: options=' + options)
-        log(options)
+    var load = function(options, onReadyToPlayCallback) {
         options = options || {}
         if (options.kitName) {
             showKit(options.kitName)
         }
-        if (options.tabName) {
+        if (options.kitName && options.tabName) {
             schedulePlayer({
                 kit: _kits[options.kitName],
-                tab: _tabs[options.tabName], 
+                tab: _tabs[options.tabName],
                 tempo: options.tempo || "8n", // 8th of a note
-                start: options.start || "1m", // one measure 
-                callback: options.onKeysPlayed
+                start: options.start || "1m", // one measure
+                onKeysPlayedCallback: options.onKeysPlayedCallback
             })
-            // ready to play
-            if (callbackReady) callbackReady();
+            if (onReadyToPlayCallback) onReadyToPlayCallback();
         }
     }
 
-    var start = function() { 
-        Tone.Transport.start() 
+    var start = function() {
+        Tone.Transport.start()
     }
 
-    var stop = function() { 
-        Tone.Transport.stop(); 
-        showKit() 
+    var stop = function() {
+        Tone.Transport.stop();
+        showKit()
     }
-    
-    Tone.Buffer.on('load', function(){
-        log(TAG+': Tone.Buffer.onload')
-        if (_onBufferLoadCallback) _onBufferLoadCallback() // finally ready
-    })
+
+    var initialize = function() {
+      $.getJSON(INSTRUMENT_FILE_PATH, function(result) {
+          _instruments = result
+          loadTabs()
+          loadKitSamples(function(){
+              module.initialized = true
+              if (onReadyCallback) onReadyCallback()
+          })
+      })
+    }
 
     module.getKitNames = getKitNames
     module.getTabNames = getTabNames
@@ -224,16 +236,9 @@ var MbiraTone = function(callback){
     module.load = load
     module.start = start
     module.stop = stop
- 
-    $.getJSON(instrumentFilePath, function(result) {
-        log(TAG+': initializing')
-        _instruments = result
-        loadTabs()
-        loadKits(function(){
-            log(TAG+': ready')
-            if (callback) callback() // ready
-        })
-    })
+    module.initialized = false
+
+    initialize()
 
     return module
 }
