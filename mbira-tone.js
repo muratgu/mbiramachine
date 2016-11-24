@@ -126,12 +126,12 @@ var MbiraTone = function(onReadyCallback){
             var p = kp.split(' ')
             var x = p[0]
             var y = p[1]
-            var r = p[2] || 10
+            var r = p[2] || (key[0]=='R' ? 10 : key[0]=='L' ? 13 : 15)
             var fillStyle = p[3] ||
-                ( key[0]=='R' ? '#ff000088'
-                : key[0]=='L' ? '#00ff0088'
-                : '#0000ff88')
-            var strokeStyle = '#00ffff88'
+                ( key[0]=='R' ? '#cc001188'
+                : key[0]=='L' ? '#11cc0088'
+                              : '#ae1fb888')
+            var strokeStyle = '#eeeeee88'
             _ctx.beginPath()
             _ctx.strokeStyle = strokeStyle
             _ctx.arc(x, y, r, 0, 2*Math.PI)
