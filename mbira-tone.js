@@ -6,14 +6,23 @@
 var MbiraTone = function(onReadyCallback){
     const TAG = 'MbiraTone'
     const DEBUG = true
+    var debugWarned = false
 
     const INSTRUMENT_FILE_PATH = './instruments.json'
     const SOUND_FILE_DIR = './sounds'
     const SOUND_FILE_EXT = '.mp3'
-    const HOSHO_KIT_NAME = 'hosho'
+    const HOSHO_KIT_ID = 'hosho'
     const HOSHO_KEY_CODE = 'X'
+    const TEMPO_RELATIVE = "8n"
 
-    const log = function (s) { if(DEBUG && console && console.log) console.log(s) }
+    const log = function (s) {
+        if (!console || console.log) return 
+        if (!debugWarned) { 
+            console.log('DEBUG is ' + (DEBUG ? 'on' : 'off'))
+            debugWarned = true
+        }
+        if (DEBUG) console.log(s) 
+    }
     const error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }
 
     if (!Array.prototype.flatMap) {
@@ -29,84 +38,101 @@ var MbiraTone = function(onReadyCallback){
     var _tabs = {}
     var _onBufferLoadCallback = null
     var _tabTexts = {
-        'nyamaropa_kushaura' : `
+        'nyamaropa_kushaura': {
+            'name': 'Nyamaropa Kushaura',
+            'text': `
             R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R4 / L2 / R3 B4 / /
             R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R2 / L4 / R4 B5 / /
             R2 L1 / B1 / R2 / L1 / R2 B1 / / R5 L3 / B3 / R5 / L4 / R4 B5 / /
             R3 L4 / B7 / R3 / L4 / R3 B7 / / R5 L3 / B3 / R5 / L4 / R4 B5 /
-        `,
-        'shumba kushaura 1':`
+        `},
+        'shumba kushaura 1': {
+            'name': 'Shumba Kushaura 1',
+            'text': `
             B5 / X R4 R1 L2 / / R4 R1 B5 / X L2 / R4 R1 / B2 / X R3 L4 / / R2 B2 / X B1 / R2 /
             B5 / X R4 R1 L2 / / R4 R1 B5 / X L2 / R4 R1 / B4 / X R4 L5 / / R2 B2 / X B1 / R2 /
             B3 / X R5 R2 L3 / / R5 R2 B3 / X L3 / R5 R2 / B4 / X R4 L5 / / R3 B4 / X L7 / R3 /
             B3 / X    R2 L3 / / R9    B3 / X L3 / R9    / B5 / X R8 B5 / / R7 B4 / X B3 / R5
-        `
-    }
+        `}
+    }    
 
     var _canvas = $('#mbira-instrument')[0]
     var _ctx = _canvas && _canvas.getContext('2d')
-    var _kitName //current kit name
+    var _kitId //current kit id
     var _kitKeyPaths //current kits key paths
     var _kitImage //current mbira image
 
-    var getInstrumentImageFileName = function(name) {
-        if (_instruments && _instruments[name])
-            return _instruments[name].image
+    var getInstrumentImageFileName = function(id) {
+        if (_instruments && _instruments[id])
+            return _instruments[id].image
     }
 
-    var getInstrumentPathsForKeys = function(name) {
-        if (_instruments && _instruments[name]) {
-            return _instruments[name].keys
+    var getInstrumentPathsForKeys = function(id) {
+        if (_instruments && _instruments[id]) {
+            return _instruments[id].keys
         }
     }
 
     var loadTabs = function () {
-        getTabNames().forEach(name => {
-            _tabs[name] = _tabTexts[name].split('/').map(x => x.trim().split(' '))
+        getTabList().forEach(tab => {
+            var id = tab.id
+            _tabs[id] = _tabTexts[id].text.split('/').map(x => x.trim().split(' '))
         })
     }
 
     var loadKitSamples = function (onLoadedCallback) {
         _onBufferLoadCallback = onLoadedCallback
-        getKitNames().forEach(name => {
-            var keys = Object.keys(_instruments[name].keys)
+        getKitList().forEach(kit => {
+            var id = kit.id
+            var keys = Object.keys(_instruments[id].keys)
             var urls = {}
             keys.forEach(x => {
                 urls[x] = SOUND_FILE_DIR +
-                   '/' + (x == HOSHO_KEY_CODE ? HOSHO_KIT_NAME : name) +
+                   '/' + (x == HOSHO_KEY_CODE ? HOSHO_KIT_ID : id) +
                    '_' + x + SOUND_FILE_EXT
             })
-            _kits[name] = new Tone.MultiPlayer({ urls : urls }).toMaster()
+            _kits[id] = new Tone.MultiPlayer({ urls : urls }).toMaster()
         })
     }
 
-    var getKitNames = function() {
+    var getKitList = function() {
         if (_instruments) {
-            return Object.keys(_instruments)
+            return Object.keys(_instruments).map(x=> { 
+                return {'id': x, 'name': _instruments[x].name } 
+            })
         }
     }
 
-    var getTabNames = function() {
+    var getTabList = function() {
         if (_tabTexts) {
-            return Object.keys(_tabTexts)
+            return Object.keys(_tabTexts).map(x=> { 
+                return {'id': x, 'name': _tabTexts[x].name } 
+            })
         }
     }
 
-    var showKit  = function(name) {
+    var getBpmList = function() {
+        var bpms = [ 40, 50, 60, 80, 90, 100, 120 ]
+        return bpms.map(x => { 
+            return {'id': x, 'name': x+' bpm' } 
+        })
+    }
+
+    var showKit  = function(id) {
         if (!_ctx) return
-        name = name || _kitName
-        if (name) {
-            if (_kitImage && name == _kitName) {
+        id = id || _kitId
+        if (id) {
+            if (_kitImage && id == _kitId) {
                 _ctx.drawImage(_kitImage, 0, 0)
             } else {
-                _kitName = name
-                _kitKeyPaths = getInstrumentPathsForKeys(_kitName)
+                _kitId = id
+                _kitKeyPaths = getInstrumentPathsForKeys(_kitId)
                 _kitImage = new Image()
                 _kitImage.onload = function() {
                     _ctx.clearRect(0, 0, _canvas.width, _canvas.height)
                     _ctx.drawImage(_kitImage, 0, 0)
                 }
-                _kitImage.src = './images/'+getInstrumentImageFileName(_kitName)
+                _kitImage.src = './images/'+getInstrumentImageFileName(_kitId)
             }
         } else {
             _ctx.clearRect(0, 0, _canvas.width, _canvas.height)
@@ -166,13 +192,15 @@ var MbiraTone = function(onReadyCallback){
         log(options)
         var kit = options.kit
         var tab = options.tab
-        var tempo = options.tempo
+        var bpm = options.bpm  
+        var tempo = options.tempo // relative to bpm
         var start = options.start
         var onKeysPlayedCallback = options.onKeysPlayedCallback
         var tab_index = 0
         if (_schedule != null) {
             Tone.Transport.clear(_schedule)
         }
+        setBpm(bpm)
         _schedule = Tone.Transport.scheduleRepeat(function(time){
             if (tab_index == tab.length) tab_index = 0
             showKit()
@@ -194,14 +222,15 @@ var MbiraTone = function(onReadyCallback){
 
     var load = function(options, onReadyToPlayCallback) {
         options = options || {}
-        if (options.kitName) {
-            showKit(options.kitName)
+        if (options.kitId) {
+            showKit(options.kitId)
         }
-        if (options.kitName && options.tabName) {
+        if (options.kitId && options.tabId) {
             schedulePlayer({
-                kit: _kits[options.kitName],
-                tab: _tabs[options.tabName],
-                tempo: options.tempo || "8n", // 8th of a note
+                kit: _kits[options.kitId],
+                tab: _tabs[options.tabId],
+                bpm: options.bpm || 60,   
+                tempo: options.tempo || "8n", // relative to bpm
                 start: options.start || "1m", // one measure
                 onKeysPlayedCallback: options.onKeysPlayedCallback
             })
@@ -218,6 +247,11 @@ var MbiraTone = function(onReadyCallback){
         showKit()
     }
 
+    var setBpm = function(bpm) {
+        log('setBpm='+bpm)
+        Tone.Transport.bpm.rampTo(bpm, 4);
+    }
+
     var initialize = function() {
       $.getJSON(INSTRUMENT_FILE_PATH, function(result) {
           _instruments = result
@@ -229,13 +263,15 @@ var MbiraTone = function(onReadyCallback){
       })
     }
 
-    module.getKitNames = getKitNames
-    module.getTabNames = getTabNames
+    module.getKitList = getKitList
+    module.getTabList = getTabList
+    module.getBpmList = getBpmList
     module.getInstrumentImageFileName = getInstrumentImageFileName
     module.getInstrumentPathsForKeys = getInstrumentPathsForKeys
     module.load = load
     module.start = start
     module.stop = stop
+    module.setBpm = setBpm
     module.initialized = false
 
     initialize()

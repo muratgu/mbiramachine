@@ -6,77 +6,90 @@
 <script>
 $(function () {
     var TAG = 'Page'
-    var DEBUG = true
+    var DEBUG = false
 
     var log = function (s) { if(DEBUG && console && console.log) console.log(s) }
     var error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }
 
     var mbiraTone
-    var selectedKitName
-    var selectedTabName
+    var selectedKitId
+    var selectedTabId
+    var selectedBpm = 60
     var selectedTempo = '8n'
 
     /* EVENT HANDLERS */
-    var onMbiraKitSelected = function(name) {
-        selectedKitName = name
-        onMbiraLoadClicked()
+    var handleMbiraKitSelected = function(id) {
+        selectedKitId = id
+        handleMbiraLoad()
     }
-    var onMbiraTabSelected = function(name) {
-        selectedTabName = name
-        onMbiraLoadClicked()
+    var handleMbiraTabSelected = function(id) {
+        selectedTabId = id
+        handleMbiraLoad()
     }
-    var onMbiraStartClicked = function () {
+    var handleMbiraBpmSelected = function(id) {
+        selectedBpm = id
+        if (mbiraTone) {
+            mbiraTone.setBpm(selectedBpm)
+        }
+    }
+    var handleMbiraStartClicked = function () {
         if (mbiraTone) mbiraTone.start()
         $('#mbira-start').prop('disabled', true);
         $('#mbira-stop').prop('disabled', false);
     }
-    var onMbiraStopClicked = function () {
+    var handleMbiraStopClicked = function () {
         if (mbiraTone) mbiraTone.stop()
         $('#mbira-start').prop('disabled', false);
         $('#mbira-stop').prop('disabled', true);
     }
-    var onMbiraLoadClicked = function () {
-        onMbiraStopClicked()
-        onMbiraLoading()
+    var handleMbiraLoad = function () {
+        handleMbiraStopClicked()
+        handleMbiraLoading()
         if (mbiraTone) {
             mbiraTone.load({
-                kitName: selectedKitName,
-                tabName: selectedTabName,
+                kitId: selectedKitId,
+                tabId: selectedTabId,
+                bpm: selectedBpm,
                 tempo: selectedTempo,
-                onKeysPlayed: onKeysPlayed
+                onKeysPlayedCallback: handleKeysPlayed
             }, function(){
                 // ready to play
-                onMbiraLoaded()
+                handleMbiraLoaded()
             })
         }
     }
-    var onMbiraLoading = function () {
+    var handleMbiraLoading = function () {
         $('#mbira-start').prop('disabled', true);
         $('#mbira-stop').prop('disabled', true);
     }
-    var onMbiraLoaded = function () {
+    var handleMbiraLoaded = function () {
         $('#mbira-start').prop('disabled', false);
         $('#mbira-stop').prop('disabled', true);
     }
-    var onKeysPlayed = function(keys) {
+    var handleKeysPlayed = function(keys) {
         log(keys)
     }
 
     /* SETUP */
     var bindEvents = function() {
-        $('#mbira-start').on('click', function(ev){ onMbiraStartClicked() })
-        $('#mbira-stop').on('click', function(ev){ onMbiraStopClicked() })
-        $('#mbira-tabs').change(function(ev) { onMbiraTabSelected($(this).val()) });
-        $('#mbira-kits').change(function(ev) { onMbiraKitSelected($(this).val()) });
-        $('#mbira-tabs').prop('disabled', false)
+        $('#mbira-start').on('click', function(ev){ handleMbiraStartClicked() })
+        $('#mbira-stop').on('click', function(ev){ handleMbiraStopClicked() })
+        $('#mbira-kits').change(function(ev) { handleMbiraKitSelected($(this).val()) });
+        $('#mbira-tabs').change(function(ev) { handleMbiraTabSelected($(this).val()) });
+        $('#mbira-bpm').change(function(ev) { handleMbiraBpmSelected($(this).val()) });
         $('#mbira-kits').prop('disabled', false)
+        $('#mbira-tabs').prop('disabled', false)
+        $('#mbira-bpm').prop('disabled', false)
     }
     var loadOptions = function(){
-        mbiraTone.getKitNames().forEach(x=> {
-            $('#mbira-kits').append($("<option />").val(x).text(x));
+        mbiraTone.getKitList().forEach(x=> {
+            $('#mbira-kits').append($("<option />").val(x.id).text(x.name));
         })
-        mbiraTone.getTabNames().forEach(x=> {
-            $('#mbira-tabs').append($("<option />").val(x).text(x));
+        mbiraTone.getTabList().forEach(x=> {
+            $('#mbira-tabs').append($("<option />").val(x.id).text(x.name));
+        })
+        mbiraTone.getBpmList().forEach(x=> {            
+            $('#mbira-bpm').append($("<option />").val(x.id).text(x.name));
         })
     }
     var showLoading = function() {
@@ -114,6 +127,12 @@ $(function () {
         <div class='selector'>
             <span>Piece</span>
             <select id='mbira-tabs' disabled='disabled'/>
+                <option name='select'>Select</option>
+            </select>
+        </div>
+        <div class='selector'>
+            <span>Bpm</span>
+            <select id='mbira-bpm' disabled='disabled'/>
                 <option name='select'>Select</option>
             </select>
         </div>

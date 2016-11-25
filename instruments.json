@@ -1,5 +1,6 @@
 {
    "nyamaropa_b": {
+      "name": "Nyamaropa B",
       "image": "622px-Mbira_dzavadzimu.jpg",
       "keys": {
          "X": "",
@@ -28,6 +29,7 @@
       }
    },
    "dambatsoko_e": {
+      "name": "Dambatsoko E",
       "image": "dambatsoko_e.jpg",
       "keys": {
          "X": "",
