@@ -8,9 +8,8 @@ var MbiraTone = function(onReadyCallback){
     const DEBUG = true
     var debugWarned = false
 
-    const INSTRUMENT_FILE_PATH = './instruments.json'
-    const TABLATURE_FILE_PATH = './tablatures.json'
-    const SOUND_FILE_DIR = './sounds'
+    const INSTRUMENT_FILE_PATH = 'static/js/instruments.json'
+    const SOUND_FILE_DIR = '/sounds'
     const SOUND_FILE_EXT = '.mp3'
     const HOSHO_KIT_ID = 'hosho'
     const HOSHO_KEY_CODE = 'X'
@@ -271,7 +270,7 @@ var MbiraTone = function(onReadyCallback){
     var showKit  = function(id) {
         if (!_ctx) return
         if (id) {
-            if (_kitImage) {
+            if (id == 'same' && _kitImage) {
                 _ctx.drawImage(_kitImage, 0, 0)
             } else {
                 _kitKeyPaths = getInstrumentPathsForKeys(id)
@@ -305,7 +304,7 @@ var MbiraTone = function(onReadyCallback){
             var fillStyle = p[3] ||
                 ( key[0]=='R' ? '#cc001188'
                 : key[0]=='L' ? '#11cc0088'
-                              : '#ae1fb888')
+                              : '#01baef88')
             var strokeStyle = '#eeeeee88'
             _ctx.beginPath()
             _ctx.strokeStyle = strokeStyle
@@ -338,12 +337,8 @@ var MbiraTone = function(onReadyCallback){
     })
 
     var clearSchedule = function() {
-        if (_schedule != null) {
-            Tone.Transport.clear(_schedule)
-        }
-        if (_scheduleForMeasure != null) {
-            Tone.Transport.clear(_scheduleForMeasure)
-        }
+        Tone.Transport.clear(_schedule)
+        Tone.Transport.clear(_scheduleForMeasure)
     }
 
     var schedulePlayer = function(options) {
@@ -376,7 +371,6 @@ var MbiraTone = function(onReadyCallback){
                         kit.start(x, time)
                     } catch (ex) {
                         error('cannot play key', ex)
-                        Tone.Transport.stop()
                     }
                 })
             setTimeout(function(){
@@ -411,9 +405,9 @@ var MbiraTone = function(onReadyCallback){
     }
 
     var stop = function() {
-        Tone.Transport.stop()
         clearSchedule()
-        showKit()
+        Tone.Transport.stop()
+        showKit('same')
     }
 
     var setBpm = function(bpm) {

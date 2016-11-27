@@ -1,17 +1,35 @@
 body, option, select {
-    font-family: Roboto, Arial;
+    font-family: 'Droid Sans', Arial, sans-serif;
     font-size: 14pt;
+    background-color: rgb(245, 245, 245);
+    color: rgb(121, 121, 121);
 }
-div#content {
-}
-div.selector,
-div#mbira-controls {
-  padding: 5px;
-}
-canvas,
-div.selector,
-div#mbira-controls {
+canvas {
     display: block;
+}
+select {
+    border: 1px solid #111;
+    background: transparent;
+    width: 275px;
+    padding: 5px;
+    /*font-size: 16px;*/
+    border: 1px solid #ccc;
+    height: 34px;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   appearance: none;
+}
+#title {
+    padding: 10px;
+}
+#content {
+}
+#mbira-controls, 
+.selector {
+    padding: 10px;
+}
+#mbira-bpm {
+    width: auto;
 }
 .preloader {
     position: fixed;
@@ -21,21 +39,4 @@ div#mbira-controls {
     height: 100%;
     z-index: 9999;
     background: url(../images/preloader.gif) center no-repeat #fff;
-}
-input[type=submit] {
-    background-color: #aaa;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius:6px;
-    color: #eee;
-    font-family: 'Roboto';
-    font-size: 20px;
-    text-decoration: none;
-    cursor: pointer;
-    border:none;
-}
-input[type=submit]:hover {
-    border: none;
-    background:#bbb;
-    box-shadow: 0px 0px 2px #777;
 }
