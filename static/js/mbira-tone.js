@@ -9,7 +9,7 @@ var MbiraTone = function(onReadyCallback){
     var debugWarned = false
 
     const INSTRUMENT_FILE_PATH = 'static/js/instruments.json'
-    const SOUND_FILE_DIR = '/sounds'
+    const SOUND_FILE_DIR = 'sounds'
     const SOUND_FILE_EXT = '.mp3'
     const HOSHO_KIT_ID = 'hosho'
     const HOSHO_KEY_CODE = 'X'
