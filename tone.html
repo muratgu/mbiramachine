@@ -32,18 +32,21 @@ $(function () {
             mbiraTone.setBpm(selectedBpm)
         }
     }
-    var handleMbiraStartClicked = function () {
+    var handleMbiraStart = function () {
+        handleMbiraLoad()
+        measureCounter = 0
         if (mbiraTone) mbiraTone.start()
         $('#mbira-start').prop('disabled', true);
         $('#mbira-stop').prop('disabled', false);
     }
-    var handleMbiraStopClicked = function () {
+    var handleMbiraStop= function () {
         if (mbiraTone) mbiraTone.stop()
         $('#mbira-start').prop('disabled', false);
         $('#mbira-stop').prop('disabled', true);
+        $('#mbira-time').html('')
     }
     var handleMbiraLoad = function () {
-        handleMbiraStopClicked()
+        handleMbiraStop()
         handleMbiraLoading()
         if (mbiraTone) {
             mbiraTone.load({
@@ -51,7 +54,8 @@ $(function () {
                 tabId: selectedTabId,
                 bpm: selectedBpm,
                 tempo: selectedTempo,
-                onKeysPlayedCallback: handleKeysPlayed
+                onKeysPlayedCallback: handleKeysPlayed,
+                onMeasureCallback: handleMeasure,
             }, function(){
                 // ready to play
                 handleMbiraLoaded()
@@ -69,11 +73,22 @@ $(function () {
     var handleKeysPlayed = function(keys) {
         log(keys)
     }
+    var measureCounter = 0
+    var handleMeasure = function(time) {
+        if (measureCounter > 8) {
+            $('#mbira-time').html('')
+            return
+        }
+        var hoshoBeatCounter = measureCounter % 3 + 1
+        var s = $('#mbira-time').html()
+        $('#mbira-time').html(s+' '+hoshoBeatCounter)
+        measureCounter += 1
+    }
 
     /* SETUP */
     var bindEvents = function() {
-        $('#mbira-start').on('click', function(ev){ handleMbiraStartClicked() })
-        $('#mbira-stop').on('click', function(ev){ handleMbiraStopClicked() })
+        $('#mbira-start').on('click', function(ev){ handleMbiraStart() })
+        $('#mbira-stop').on('click', function(ev){ handleMbiraStop() })
         $('#mbira-kits').change(function(ev) { handleMbiraKitSelected($(this).val()) });
         $('#mbira-tabs').change(function(ev) { handleMbiraTabSelected($(this).val()) });
         $('#mbira-bpm').change(function(ev) { handleMbiraBpmSelected($(this).val()) });
@@ -134,11 +149,12 @@ $(function () {
             <span>Bpm</span>
             <select id='mbira-bpm' disabled='disabled'/>
                 <option name='select'>Select</option>
-            </select>
+            </select>            
         </div>
         <div id='mbira-controls'>
             <input id='mbira-start' type='submit' value='Start' disabled='disabled'/>
             <input id='mbira-stop' type='submit' value='Stop' disabled='disabled'/>
+            <span id='mbira-time'></span>
         </div>
         <canvas id='mbira-instrument' width='800' height='600'>
         </canvas>

@@ -9,6 +9,7 @@ var MbiraTone = function(onReadyCallback){
     var debugWarned = false
 
     const INSTRUMENT_FILE_PATH = './instruments.json'
+    const TABLATURE_FILE_PATH = './tablatures.json'
     const SOUND_FILE_DIR = './sounds'
     const SOUND_FILE_EXT = '.mp3'
     const HOSHO_KIT_ID = 'hosho'
@@ -16,7 +17,7 @@ var MbiraTone = function(onReadyCallback){
     const TEMPO_RELATIVE = "8n"
 
     const log = function (s) {
-        if (!console || console.log) return 
+        if (!console || !console.log) return 
         if (!debugWarned) { 
             console.log('DEBUG is ' + (DEBUG ? 'on' : 'off'))
             debugWarned = true
@@ -33,33 +34,178 @@ var MbiraTone = function(onReadyCallback){
 
     var module = {}
     var _schedule = null
+    var _scheduleForMeasure = null
     var _instruments = null
+    var _tablatures = {
+        "nhemamusasa_kushaura": { 
+            "name": "Nhemamusasa Kushaura",
+            "text": `
+             L3 / R2 X / B3 / R5 / L4 X / R2 / B5 / R4 X / L4 / R3 / B7 X / R5 /
+             L3 / R2 X / B3 / R5 / L5 X / R3 / B6 / R5 X / L4 / R3 / B7 X / R6 /
+             L2 / R3 X / B4 / R6 / L5 X / R3 / B6 / R5 X / L4 / R3 / B7 X / R5 /
+             L3 / R2 X / B3 / R5 / L4 X / R2 / B5 / R4 X / L2 / R2 / L1 X / R5 /
+        `},
+        "karigamombe_kushaura": { 
+            "name": "Karigamombe Kushaura",
+            "text": `
+             R2 L1 / R6 / R2 L2 / R6 / R1 L5 / R4 / R1 L5 / R4 / R1 L4 / R4 / R1 L4 / R4 /
+             R2 L1 / R6 / R2 L2 / R6 / R2 L3 / R5 / R2 L3 / R5 / R1 L4 / R4 / R1 L4 / R4 /
+             R3 L4 / R5 / R3 L4 / R5 / R2 L3 / R5 / R2 L3 / R5 / R1 L4 / R4 / R1 L4 / R4 /
+             R2 L1 / R6 / R2 L2 / R6 / R1 L5 / R4 / R1 L5 / R4 / R3 L2 / R6 / R3 L2 / R6 /
+        `},
+        "karigamombe_kutsinhira": { 
+            "name": "Karigamombe Kutsinhira",
+            "text": `
+             R2 / L1 / R6 B1 / / R4 R1 B6 / L2 / R4 R1 / L1 / R7 B5    / / R7 L1 / L5 /
+             R2 / L1 / R6 B4 / / R5 B6    / B5 / R5    / L1 / R4 R1 B2 / / R4 R1 / B2 /
+             R3 / B5 / R3 B1 / / R5 B6    / B5 / R5    / L1 / R4 R1 B2 / / R4 R1 / B2 /
+             R2 / B4 / R2 B1 / / R4 R1 B6 / B2 / R4 R1 / B6 / R3 B4    / / R3 B7 / B4 /
+        `},
+        "kuzanga_kushaura_5": { 
+            "name": "Kuzanga Kushaura 5",
+            "text": `
+             R5 L3 / B3 / R5 / L4 / R2 B5 / R4 / L4 / R3 B1 / /
+             R5 L3 / B3 / R5 / L5 / R3 B6 / R5 / L4 / R3 B1 / /
+             R6 L2 / B4 / R6 / L5 / R3 B6 / R6 / L2 / R2 B1 / /
+             R4 L2 / B4 / R4 / L4 / R2 B5 / R4 / L2 / R2 B1 / /
+        `},
+        "kuzanga_kutsinhira_5": { 
+            "name": "Kuzanga Kutsinhira 5",
+            "text": `
+             R5 L3 / B3 / R5 / L4 / R2 B5 / R4 / L4 / R3 B1 /
+             R5 L3 / B3 / R5 / L5 / R3 B6 / R5 / L4 / R3 B1 /
+             R6 L2 / B4 / R6 / L5 / R3 B6 / R6 / L2 / R2 B1 /
+             R4 L2 / B4 / R4 / L4 / R2 B5 / R4 / L2 / R2 B1 /
+        `},
+        "nyamaropa_kushaura": { 
+            "name": "Nyamaropa Kushaura",
+            "text": `
+             R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R4 / L2 / R3 B4 / /
+             R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R2 / L4 / R4 B5 / /
+             R2 L1 / B1 / R2 / L1 / R2 B1 / / R5 L3 / B3 / R5 / L4 / R4 B5 / /
+             R3 L4 / B7 / R3 / L4 / R3 B7 / / R5 L3 / B3 / R5 / L4 / R4 B5 / /
+        `},
+        "nyamaropa_kutsinhira": { 
+            "name": "Nyamaropa Kutsinhira",
+            "text": `
+             R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R4 / L2 / R3 B4 / 
+             R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R2 / L4 / R4 B5 / 
+             R2 L1 / B1 / R2 / L1 / R2 B1 / / R5 L3 / B3 / R5 / L4 / R4 B5 / 
+             R3 L4 / B7 / R3 / L4 / R3 B7 / / R5 L3 / B3 / R5 / L4 / R4 B5 /
+        `},
+        "mahororo_kushaura": { 
+            "name": "Mahororo Kushaura",
+            "text": `
+             L2 / X / R2 / / X R1 R4 / / L4 / X / R2 / / X R1 R4 / / 
+             L2 / X / R2 / / X L3 R5 / / L4 / X / R2 / / X R1 R4 / / 
+             L4 / X / R3 / / X L3 R5 / / L4 / X / R2 / / X R1 R4 / / 
+             L2 / X / R2 / / X R1 R4 / / L2 / X / R3 / / X R1 R4 / /
+        `},
+        "shumba_kushaura_1": { 
+            "name": "Shumba Kushaura 1",
+            "text": `
+             B5 / X R4 R1 L2 / / R4 R1 B5 / X L2 / R4 R1 / B2 / X R3 L4 / / R2 B2 / X B1 / R2 / 
+             B5 / X R4 R1 L2 / / R4 R1 B5 / X L2 / R4 R1 / B4 / X R4 L5 / / R2 B2 / X B1 / R2 / 
+             B3 / X R5 R2 L3 / / R5 R2 B3 / X L3 / R5 R2 / B4 / X R4 L5 / / R3 B4 / X L7 / R3 / 
+             B3 / X    R2 L3 / / R9    B3 / X L3 / R9    / B5 / X R8 B5 / / R7 B4 / X B3 / R5 /
+        `},
+        "chamunika": { 
+            "name": "Chamunika",
+            "text": `
+             R6 R2 L2 / X L1 / R6 R2 / L2 / X R6 R2 B4 / / R5 R2 L3 / X R5 R2 B3 / / R4 R1 L4 / X B5 / / 
+             R3 L4    / X B7 / R3    / L4 / X R3 B5    / / R2 L3    / X R2 B3    / / R4 R1 L4 / X B5 / / 
+             R6 R2 L2 / X L1 / R6 R2 / L2 / X R6 R2 B4 / / R4 R1 L5 / X B6       / / R3    L2 / X B4 / / 
+             R2 L2    / X L1 / R2    / L2 / X R2 B4    / / R4 R1 L5 / X L6       / / R4 R1 L4 / X B5 / /
+        `},
+        "bukatiende_kushaura_1": { 
+            "name": "Bukatiende Kushaura 1",
+            "text": `
+             X R3 B7 / L4 / R7 / X R3 B7 / L3 / R5 / X B3 / R9 / L5 / X R8 B6 / L5 / R5 /
+             X R3 B7 / L4 / R7 / X R3 B7 / L3 / R5 / X B3 / R9 / L4 / X R7 B5 / L4 / R4 /
+             X R2 L1 / L2 / R6 / X R2 L1 / / R4 R1 / X B6 / R9 / L4 / X R7 B5 / L4 / R4 /
+             X R2 L1 / L2 / R6 / X R2 L1 / L3 / R5 / X B3 / R9 / L4 / X R7 B5 / L4 / R4 /
+        `},
+        "bukatiende_kushaura_2": { 
+            "name": "Bukatiende Kushaura 2",
+            "text": `
+             X R7 L4 / / R3 / X R7 L4 / / R2 / X R5 L3 / / L5 / X R5    / L5 / / 
+             X R7 L4 / / R3 / X R7 L4 / / R2 / X R5 L3 / / L4 / X R4 R1 / R4 / / 
+             X R6 L2 / / R2 / X R6 L2 / / R2 / X R6 L2 / / L5 / X R4 R1 / L4 / / 
+             X R6 L2 / / R2 / X R6 L2 / / R2 / X R5 L3 / / L4 / X R4 R1 / L4 / / 
+        `},
+        "bukatiende_kutsinhira_1": { 
+            "name": "Bukatiende Kutsinhira 1",
+            "text": `
+             X L4 / R3 B7 / B5 / X R3 / L3 / R5 L1 / X B3 / R2 / L5 / X R8 B6 / B3 / R8 / 
+             X L4 / R7 B7 / B5 / X R7 / L3 / R6 L1 / X B3 / R5 / L4 / X R4 B5 / B2 / R3 /
+             X L2 / R2 L1 / B1 / X R2 / L5 / R9 B6 / X B2 / R8 / L4 / X R7 B5 / B2 / R7 /
+             X L2 / R6 L1 / B1 / X R6 / L3 / R5 L1 / X B3 / R5 / L4 / X R4 B5 / B2 / R4 /
+        `},
+        "bukatiende_kushaura_solo_3": { 
+            "name": "Bukatiende Kushaura Solo 3",
+            "text": `
+             X R2 L1 / L2 / R2 / X L1 / R4 R1    / L5 / X R4 / L5 / R4 R1 / X L4 / R4 / L4 / 
+             X R2 L1 / L2 / R2 / X L1 / R5 R2 L3 / L6 / X R5 / L6 / R4 R1 / X L4 / R4 / L4 / 
+             X R3 B7 / L4 / R3 / X B7 / R5 R2 L3 / L6 / X R5 / L6 / R5 R2 / X L5 / R5 / L5 / 
+             X R3 B7 / L4 / R3 / X B7 / R5 R2 L3 / L6 / X R5 / L6 / R4 R1 / X L4 / R4 / L4 / 
+        `},
+        "bukatiende_kushaura_solo_4": { 
+            "name": "Bukatiende Kushaura Solo 4",
+            "text": `
+             X R2 L1 / L2 / R2 / X L1 / R4 R1    / L5 / X R9 / L5 / R8    / X L4 / R7 / L4 / 
+             X R6 L1 / L2 / R6 / X L1 / R5 R2 L3 / L6 / X R5 / L6 / R4 R1 / X L4 / R4 / L4 / 
+             X R3 B7 / L4 / R3 / X B7 / R5 R2 L3 / L6 / X R9 / L6 / R9    / X L5 / R8 / L5 / 
+             X R7 B7 / L4 / R7 / X B7 / R6 L3    / L6 / X R5 / L6 / R4 R1 / X L4 / R4 / L4 / 
+        `},
+        "bukatiende_kushaura_solo_5": { 
+            "name": "Bukatiende Kushaura Solo 5",
+            "text": `
+             X R2 L1 / L2 / R6 / X L1 / R4 R1    / L5 / X R8 / L5 / R4 R1 / X L4 / R7 / L4 / 
+             X R2 L1 / L2 / R6 / X L1 / R5 R2 L3 / L6 / X R9 / L6 / R4 R1 / X L4 / R7 / L4 / 
+             X R3 B7 / L4 / R7 / X B7 / R5 R2 L3 / L6 / X R9 / L6 / R5 R2 / X L5 / R8 / L5 / 
+             X R3 B7 / L4 / R7 / X B7 / R5 R2 L3 / L6 / X R9 / L6 / R4 R1 / X L4 / R7 / L4 / 
+        `}, 
+        "bukatiende_kushaura_solo_6": { 
+            "name": "Bukatiende Kushaura Solo 6",
+            "text": `
+             X L2 / R2 L1 / L1 / X R2 / L5 / R4 R1 B6 / X B6 / R4 R1 / L4 / X R4 R1 B5 / B5 / R4 R1 / 
+             X L2 / R2 B4 / B4 / X R2 / L3 / R5 R2 B3 / X B3 / R5 R2 / L4 / X R4 R1 B5 / B5 / R4 R1 / 
+             X L4 / R3 B1 / B1 / X R3 / L3 / R5 R2 B3 / X B3 / R5 R2 / L5 / X R5    B6 / B3 / R5    / 
+             X L4 / R3 B1 / B1 / X R3 / L3 / R5 R2 B3 / X B3 / R5 R2 / L4 / X R4 R1 B5 / B2 / R4 R1 /
+        `}, 
+        "bukatiende_kushaura_2a": { 
+            "name": "Bukatiende Kushaura 2a",
+            "text": `
+             X R2 L1 / L2 / R2 / X L1 / R1    / L5 / X R4 / L5 / R1    / X L4 / R4 / L4 / 
+             X R2 L1 / L2 / R2 / X L1 / R2 L3 / L6 / X R2 / L6 / R1    / X L4 / R4 / L4 / 
+             X R3 B7 / L4 / R3 / X L7 / R2 L3 / L6 / X R2 / L6 / R2 L3 / X L5 / R5 / L5 / 
+             X R3 B7 / L4 / R3 / X L7 / R2 L3 / L6 / X R2 / L6 / R1    / X L4 / R4 / L4 / 
+        `},
+        "bukatiende_kushaura_2b": { 
+            "name": "Bukatiende Kushaura 2b",
+            "text": `
+             X R2 L1 / L2 / R2 / X L1 / R4 R1    / L5 / X R4 / L5 / R7    / X L4 / R7 / L4 / 
+             X R6 L1 / L2 / R6 / X L1 / R7 L3    / L6 / X R5 / L6 / R4 R1 / X L4 / R4 / L4 / 
+             X R3 B7 / L4 / R3 / X L7 / R5 R2 L3 / L6 / X R5 / L6 / R8 L3 / X L5 / R8 / L5 / 
+             X R7 B7 / L4 / R7 / X L7 / R6 L3    / L6 / X R5 / L6 / R4 R1 / X L4 / R4 / L4 / 
+        `},
+        "dande_kutsinhira_1": {
+            "name": "Dande Kutsinhira 1",
+            "text": `
+             R7 R3 / X L3 / R5 R2 B3 / / X R5 R2 L1 / B3 / R5 R2 / X L5 / R5    B6 / / X    R3 L4 / B1 /
+                R3 / X L3 /    R2 B3 / / X    R2 L1 / B3 /    R2 / X L4 / R4 R1 B5 / / X    R2 L1 / B0 /
+                R2 / X L5 / R4 R1 B2 / / X R4 R1 L5 / B2 / R4 R1 / X L4 / R7 R2 B5 / / X R7 R2 L1 / B1 /
+             R6 R2 / X L3 / R5 R2 B3 / / X R5 R2 L1 / B3 / R5 R2 / X L4 / R7 R3 B5 / / X R7 R3 L7 / B0 /
+            `
+        }
+    }
     var _kits = {}
     var _tabs = {}
     var _onBufferLoadCallback = null
-    var _tabTexts = {
-        'nyamaropa_kushaura': {
-            'name': 'Nyamaropa Kushaura',
-            'text': `
-            R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R4 / L2 / R3 B4 / /
-            R2 L1 / B1 / R2 / L1 / R2 B1 / / R4 L5 / B2 / R2 / L4 / R4 B5 / /
-            R2 L1 / B1 / R2 / L1 / R2 B1 / / R5 L3 / B3 / R5 / L4 / R4 B5 / /
-            R3 L4 / B7 / R3 / L4 / R3 B7 / / R5 L3 / B3 / R5 / L4 / R4 B5 /
-        `},
-        'shumba kushaura 1': {
-            'name': 'Shumba Kushaura 1',
-            'text': `
-            B5 / X R4 R1 L2 / / R4 R1 B5 / X L2 / R4 R1 / B2 / X R3 L4 / / R2 B2 / X B1 / R2 /
-            B5 / X R4 R1 L2 / / R4 R1 B5 / X L2 / R4 R1 / B4 / X R4 L5 / / R2 B2 / X B1 / R2 /
-            B3 / X R5 R2 L3 / / R5 R2 B3 / X L3 / R5 R2 / B4 / X R4 L5 / / R3 B4 / X L7 / R3 /
-            B3 / X    R2 L3 / / R9    B3 / X L3 / R9    / B5 / X R8 B5 / / R7 B4 / X B3 / R5
-        `}
-    }    
 
     var _canvas = $('#mbira-instrument')[0]
     var _ctx = _canvas && _canvas.getContext('2d')
-    var _kitId //current kit id
-    var _kitKeyPaths //current kits key paths
+    var _kitKeyPaths //current kit key paths
     var _kitImage //current mbira image
 
     var getInstrumentImageFileName = function(id) {
@@ -74,9 +220,11 @@ var MbiraTone = function(onReadyCallback){
     }
 
     var loadTabs = function () {
+        log('loadTabs')
         getTabList().forEach(tab => {
             var id = tab.id
-            _tabs[id] = _tabTexts[id].text.split('/').map(x => x.trim().split(' '))
+            _tabs[id] = _tablatures[id].text.split('/').map(x => x.trim().split(' '))
+            _tabs[id].pop() // remove the extraneous note
         })
     }
 
@@ -101,14 +249,16 @@ var MbiraTone = function(onReadyCallback){
                 return {'id': x, 'name': _instruments[x].name } 
             })
         }
+        return []
     }
 
     var getTabList = function() {
-        if (_tabTexts) {
-            return Object.keys(_tabTexts).map(x=> { 
-                return {'id': x, 'name': _tabTexts[x].name } 
+        if (_tablatures) {
+            return Object.keys(_tablatures).map(x=> { 
+                return {'id': x, 'name': _tablatures[x].name } 
             })
         }
+        return []
     }
 
     var getBpmList = function() {
@@ -120,22 +270,21 @@ var MbiraTone = function(onReadyCallback){
 
     var showKit  = function(id) {
         if (!_ctx) return
-        id = id || _kitId
         if (id) {
-            if (_kitImage && id == _kitId) {
+            if (_kitImage) {
                 _ctx.drawImage(_kitImage, 0, 0)
             } else {
-                _kitId = id
-                _kitKeyPaths = getInstrumentPathsForKeys(_kitId)
+                _kitKeyPaths = getInstrumentPathsForKeys(id)
                 _kitImage = new Image()
                 _kitImage.onload = function() {
                     _ctx.clearRect(0, 0, _canvas.width, _canvas.height)
                     _ctx.drawImage(_kitImage, 0, 0)
                 }
-                _kitImage.src = './images/'+getInstrumentImageFileName(_kitId)
+                _kitImage.src = './images/'+getInstrumentImageFileName(id)
             }
         } else {
             _ctx.clearRect(0, 0, _canvas.width, _canvas.height)
+            _kitImage = null
         }
     }
 
@@ -188,22 +337,35 @@ var MbiraTone = function(onReadyCallback){
         if (_onBufferLoadCallback) _onBufferLoadCallback()
     })
 
+    var clearSchedule = function() {
+        if (_schedule != null) {
+            Tone.Transport.clear(_schedule)
+        }
+        if (_scheduleForMeasure != null) {
+            Tone.Transport.clear(_scheduleForMeasure)
+        }
+    }
+
     var schedulePlayer = function(options) {
         log(options)
+        var kitId = options.kitId
         var kit = options.kit
         var tab = options.tab
         var bpm = options.bpm  
         var tempo = options.tempo // relative to bpm
         var start = options.start
         var onKeysPlayedCallback = options.onKeysPlayedCallback
+        var onMeasureCallback = options.onMeasureCallback
         var tab_index = 0
-        if (_schedule != null) {
-            Tone.Transport.clear(_schedule)
-        }
-        setBpm(bpm)
+
+        clearSchedule()
+
+        _scheduleForMeasure = Tone.Transport.scheduleRepeat(function(time){
+            if (onMeasureCallback) onMeasureCallback(time)
+        }, "8n", 0)
+
         _schedule = Tone.Transport.scheduleRepeat(function(time){
             if (tab_index == tab.length) tab_index = 0
-            showKit()
             var keys = tab[tab_index]
             if (onKeysPlayedCallback) onKeysPlayedCallback(keys)
             showKeys(keys)
@@ -217,7 +379,11 @@ var MbiraTone = function(onReadyCallback){
                         Tone.Transport.stop()
                     }
                 })
+            setTimeout(function(){
+                showKit(kitId)            
+            }, 300)
         }, tempo, start)
+        setBpm(bpm)
     }
 
     var load = function(options, onReadyToPlayCallback) {
@@ -227,12 +393,14 @@ var MbiraTone = function(onReadyCallback){
         }
         if (options.kitId && options.tabId) {
             schedulePlayer({
+                kitId: options.kitId,
                 kit: _kits[options.kitId],
                 tab: _tabs[options.tabId],
                 bpm: options.bpm || 60,   
                 tempo: options.tempo || "8n", // relative to bpm
                 start: options.start || "1m", // one measure
-                onKeysPlayedCallback: options.onKeysPlayedCallback
+                onKeysPlayedCallback: options.onKeysPlayedCallback,
+                onMeasureCallback: options.onMeasureCallback
             })
             if (onReadyToPlayCallback) onReadyToPlayCallback();
         }
@@ -243,7 +411,8 @@ var MbiraTone = function(onReadyCallback){
     }
 
     var stop = function() {
-        Tone.Transport.stop();
+        Tone.Transport.stop()
+        clearSchedule()
         showKit()
     }
 
@@ -253,14 +422,15 @@ var MbiraTone = function(onReadyCallback){
     }
 
     var initialize = function() {
-      $.getJSON(INSTRUMENT_FILE_PATH, function(result) {
+        log('initialize')
+        $.getJSON(INSTRUMENT_FILE_PATH, function(result) {
           _instruments = result
           loadTabs()
           loadKitSamples(function(){
               module.initialized = true
               if (onReadyCallback) onReadyCallback()
           })
-      })
+        }).error(function(x,s,e) { error(s, e) })
     }
 
     module.getKitList = getKitList
