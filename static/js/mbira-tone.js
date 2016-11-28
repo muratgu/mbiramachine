@@ -92,13 +92,21 @@ var MbiraTone = function(onReadyCallback){
              R2 L1 / B1 / R2 / L1 / R2 B1 / / R5 L3 / B3 / R5 / L4 / R4 B5 / 
              R3 L4 / B7 / R3 / L4 / R3 B7 / / R5 L3 / B3 / R5 / L4 / R4 B5 /
         `},
-        "mahororo_kushaura": { 
-            "name": "Mahororo Kushaura",
+        "mahororo_kushaura_1": { 
+            "name": "Mahororo Kushaura 1",
             "text": `
              L2 / X / R2 / / X R1 R4 / / L4 / X / R2 / / X R1 R4 / / 
              L2 / X / R2 / / X L3 R5 / / L4 / X / R2 / / X R1 R4 / / 
              L4 / X / R3 / / X L3 R5 / / L4 / X / R2 / / X R1 R4 / / 
              L2 / X / R2 / / X R1 R4 / / L2 / X / R3 / / X R1 R4 / /
+        `},
+        "mahororo_kushaura_2": { 
+            "name": "Mahororo Kushaura 2",
+            "text": `
+             L2 / X R2 / B1 / R4 R1 / X B2 / R4 / L4 / X R2 / B1 / R4 R1 / X B2 / R4 / 
+             L2 / X R2 / B1 / R5    / X L4 / R5 / L1 / X R2 / L6 / R4 R1 / X B2 / R4 / 
+             L4 / X R3 / B7 / R5    / X L4 / R5 / L1 / X R2 / L6 / R4 R1 / X L2 / R4 / 
+             L2 / X R2 / B1 / R4 R1 / X B2 / R4 / L2 / X R3 / B4 / R4 R1 / X B2 / R4 /
         `},
         "shumba_kushaura_1": { 
             "name": "Shumba Kushaura 1",
