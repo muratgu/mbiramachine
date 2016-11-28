@@ -1,120 +1,187 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mbira Machine 1.0</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">    
-    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Michroma">
-    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Droid Sans">
-    <link rel="stylesheet" href="static/css/index.css">
-  </head>
-  <body>
-    <div id='title'>Mbira Machine<span id='version'>1.0</span>
-    </div>    
-    <section>
-    <div class='buttons_row' id='LED_row'>
-            <span class='label'></span>
-            <img id='LED_0' src='images/LED_off.png'>
-            <img id='LED_1' src='images/LED_off.png'>
-            <img id='LED_2' src='images/LED_off.png'>
-            <img id='LED_3' src='images/LED_off.png'>
-            <img id='LED_4' src='images/LED_off.png'>
-            <img id='LED_5' src='images/LED_off.png'>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mbira Machine 1.0</title>
+<script src="static/js/jquery.min.js"></script>
+<script src="static/js/tone.js"></script>
+<script src="static/js/mbira-tone.js"></script>
+<script>
+$(function () {
+    var TAG = 'Page'
+    var DEBUG = false
+
+    var log = function (s) { if(DEBUG && console && console.log) console.log(s) }
+    var error = function (s, e) { if (console && console.log) console.log(s); console.log(e) }
+
+    var mbiraTone
+    var selectedKitId
+    var selectedTabId
+    var selectedBpm = 60
+    var selectedTempo = '8n'
+
+    /* EVENT HANDLERS */
+    var handleMbiraKitSelected = function(id) {
+        selectedKitId = id
+        handleMbiraLoad()
+    }
+    var handleMbiraTabSelected = function(id) {
+        selectedTabId = id
+        handleMbiraLoad()
+    }
+    var handleMbiraBpmSelected = function(id) {
+        selectedBpm = id
+        if (mbiraTone) {
+            mbiraTone.setBpm(selectedBpm)
+        }
+    }
+    var handleMbiraStart = function () {
+        mbiraTone.stop()
+        handleMbiraLoad()
+        if (mbiraTone) mbiraTone.start()
+        $('#mbira-start').prop('disabled', true);
+        $('#mbira-stop').prop('disabled', false);
+    }
+    var handleMbiraStop= function () {
+        if (mbiraTone) mbiraTone.stop()
+        $('#mbira-start').prop('disabled', false);
+        $('#mbira-stop').prop('disabled', true);
+        $('#mbira-time').html('')
+    }
+    var handleMbiraLoad = function () {
+        handleMbiraStop()
+        handleMbiraLoading()
+        if (mbiraTone) {
+            mbiraTone.load({
+                kitId: selectedKitId,
+                tabId: selectedTabId,
+                bpm: selectedBpm,
+                tempo: selectedTempo,
+                onKeysPlayedCallback: handleKeysPlayed,
+                onMeasureCallback: handleMeasure,
+            }, function(){
+                // ready to play
+                handleMbiraLoaded()
+            })
+        }
+    }
+    var handleMbiraLoading = function () {
+        $('img#mbira-start').attr('src', 'images/btn_play_loading.gif');
+        $('#mbira-start').prop('disabled', true);
+        $('#mbira-stop').prop('disabled', true);
+    }
+    var handleMbiraLoaded = function () {
+        $('img#mbira-start').attr('src', 'images/btn_play.png');
+        $('#mbira-start').prop('disabled', false);
+        $('#mbira-stop').prop('disabled', true);
+    }
+    var handleKeysPlayed = function(keys) {
+        log(keys)
+    }
+    var measureCounter = 0
+    var handleMeasure = function(time) {
+        if (measureCounter > 8) {
+            $('#mbira-time').html('')
+            return
+        }
+        var hoshoBeatCounter = measureCounter % 3 + 1
+        var s = $('#mbira-time').html()
+        $('#mbira-time').html(s+' '+hoshoBeatCounter)
+        measureCounter += 1
+    }
+
+    /* SETUP */
+    var bindEvents = function() {
+        $('#mbira-start').on('mousedown', function(ev){ handleMbiraStart() })
+        $('#mbira-stop').on('mousedown', function(ev){ handleMbiraStop() })
+        $('#mbira-kits').change(function(ev) { handleMbiraKitSelected($(this).val()) });
+        $('#mbira-tabs').change(function(ev) { handleMbiraTabSelected($(this).val()) });
+        $('#mbira-bpm').change(function(ev) { handleMbiraBpmSelected($(this).val()) });
+        $('#mbira-kits').prop('disabled', false)
+        $('#mbira-tabs').prop('disabled', false)
+        $('#mbira-bpm').prop('disabled', false)
+    }
+    var loadOptions = function(){
+        mbiraTone.getKitList().forEach(x=> {
+            $('#mbira-kits').append($("<option />").val(x.id).text(x.name));
+        })
+        mbiraTone.getTabList().forEach(x=> {
+            $('#mbira-tabs').append($("<option />").val(x.id).text(x.name));
+        })
+        mbiraTone.getBpmList().forEach(x=> {            
+            $('#mbira-bpm').append($("<option />").val(x.id).text(x.name));
+        })
+    }
+    var showLoading = function() {
+        $('.content').hide()
+        $('.preloader').show()
+    }
+    var hideLoading = function() {
+        $('.preloader').fadeOut("slow")
+        $('.content').show()
+    }
+    var initalize = function () {
+        showLoading()
+        mbiraTone = MbiraTone(function() {
+            loadOptions()
+            bindEvents()
+            $("#mbira-bpm").val(60);
+            log(TAG+': mbiraTone: ready')
+            hideLoading()
+        })
+    }
+
+    initalize()
+})
+</script>
+<link href="style/tone.css" rel="stylesheet">
+</head>
+<body>
+    <div class='preloader'></div>
+    <div id='content'>
+        <div id='title'>Mbira Machine 1.0</div>   
+        <div class='selector'>
+            <select id='mbira-kits' disabled='disabled'/>
+                <option name='select'>Select Tuning</option>
+            </select>
         </div>
-    </section>
-    <section>
-        <div>
-            <div id='tempo_container'>
-                <div id='tempodisplay'>
-                    <span id='tempo'></span>
-                </div>
-                <img id='tempodec' src='images/tempo_dec.png'>
-                <img id='tempoinc' src='images/tempo_inc.png'>
-                <img id='play' src='images/btn_play_loading.gif' width='80' height='33'>
-                <img id='stop' src='images/btn_stop.png'>
-            </div>         
+        <div class='selector'>
+            <select id='mbira-tabs' disabled='disabled'/>
+                <option name='select'>Select Piece</option>
+            </select>
         </div>
-    </section>
-    
-    <section>
-        <h4 id="caption-message"></h4>
-    </section>
+        <div class='selector'>
+            <select id='mbira-bpm' disabled='disabled'/>
+                <option name='select'>Select Tempo</option>
+            </select>          
+        </div>        
+        <div id='mbira-controls'>
+            <img id='mbira-start' src='images/btn_play.png' width='80' height='33' disabled='disabled'>
+            <img id='mbira-stop' src='images/btn_stop.png' disabled='disabled'>
+            <span id='mbira-time'></span>
+        </div>
+        <canvas id='mbira-instrument' width='800' height='600'>
+        </canvas>
+    <div>
+    <script>
+      function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+      var canvas = document.getElementById('mbira-instrument');
+      var context = canvas.getContext('2d');
 
-    <h4 id="current-keys" class="current-selection"></h4>
-
-    <h4 id="current-kit" class="current-selection"></h4>
-
-    <h4 id="current-beat" class="current-selection"></h4>
-
-    <h4 id="current-effect" class="current-selection"></h4>
-     
-    <div class="row">
-      <div class="col-xs-8"><h4 id="caption-kits" class='list-title'></h4></div>
-    </div>
-
-    <div class="container-fixed">
-      <div id="kit-list" class="list-group">        
-      </div>
-    </div>
-
-    <script id="kits-template" type="text/x-handlebars-template">
-      {{#if items}}
-        {{#each items}}
-          <a href="#kit/{{id}}" class="list-group-item active">
-             <h4 class="list-group-item-heading">{{name}}</h4>
-          </a>
-        {{/each}}
-      {{/if}}      
+      canvas.addEventListener('mouseup', function(evt) {
+        var mousePos = getMousePos(canvas, evt);
+        var message = Math.trunc(mousePos.x) + ' ' + Math.trunc(mousePos.y);
+        console.log(message);
+      }, false);
     </script>
-
-
-    <div class="row">
-      <div class="col-xs-8"><h4 id="caption-beats" class='list-title'></h4></div>
-    </div>
-
-    <div class="container-fixed">
-      <div id="beat-list" class="list-group">        
-      </div>
-    </div>
-
-    <script id="beats-template" type="text/x-handlebars-template">
-      {{#if items}}
-        {{#each items}}
-          <a href="#beat/{{id}}" class="list-group-item active">
-             <h4 class="list-group-item-heading">{{name}}</h4>
-          </a>
-        {{/each}}
-      {{/if}}      
-    </script>
-
-    <div class="row">
-      <div class="col-xs-8"><h4 id="caption-effects" class='list-title'></h4></div>
-    </div>
-
-    <div class="container-fixed">
-      <div id="effect-list" class="list-group">        
-      </div>
-    </div>
-
-    <script id="effects-template" type="text/x-handlebars-template">
-      {{#if items}}
-        {{#each items}}
-          <a href="#effect/{{id}}" class="list-group-item active">
-             <h4 class="list-group-item-heading">{{name}}</h4>
-          </a>
-        {{/each}}
-      {{/if}}      
-    </script>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.js"></script>   
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>    
-    <script src="static/js/spin.min.js"></script>
-    <script src="static/js/jquery.spin.js"></script>
-    <script src="static/js/handlebars.js"></script>
-    <script src="static/js/index.js"></script> 
-    <script src="static/js/google.js"></script>     
-  </body>
+</body>
 </html>

@@ -369,11 +369,10 @@ var MbiraTone = function(onReadyCallback){
 
         _schedule = Tone.Transport.scheduleRepeat(function(time){
             if (tab_index == tab.length) tab_index = 0
-            var keys = tab[tab_index]
+            var keys = tab[tab_index]            
             if (onKeysPlayedCallback) onKeysPlayedCallback(keys)
             showKeys(keys)
-            tab[tab_index++]
-                .filter(x => x > ' ')
+            keys.filter(x => x > ' ')
                 .forEach(x => {
                     try{
                         kit.start(x, time)
@@ -381,6 +380,7 @@ var MbiraTone = function(onReadyCallback){
                         error('cannot play key', ex)
                     }
                 })
+            tab_index++
             setTimeout(function(){
                 showKit(kitId)            
             }, 300)
