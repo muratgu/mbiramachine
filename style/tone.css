@@ -1,12 +1,17 @@
-body, option, select {
+* {
     font-family: 'Droid Sans', Arial, sans-serif;
-    font-size: 14pt;
+    xxfont-size: 14pt;
+}
+
+body, option, select {
     background-color: rgb(245, 245, 245);
     color: rgb(121, 121, 121);
 }
+
 canvas {
     display: block;
 }
+
 select {
     border: 1px solid #111;
     background: transparent;
@@ -19,18 +24,23 @@ select {
    -moz-appearance: none;
    appearance: none;
 }
+
 #title {
     padding: 10px;
 }
+
 #content {
 }
+
 #mbira-controls, 
 .selector {
     padding: 10px;
 }
+
 #mbira-bpm {
     width: auto;
 }
+
 .preloader {
     position: fixed;
     left: 0px;

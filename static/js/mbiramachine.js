@@ -44,6 +44,14 @@ var MbiraTone = function(onReadyCallback){
              L2 / R3 X / B4 / R6 / L5 X / R3 / B6 / R5 X / L4 / R3 / B7 X / R5 /
              L3 / R2 X / B3 / R5 / L4 X / R2 / B5 / R4 X / L2 / R2 / L1 X / R5 /
         `},
+        "nhemamusasa_kutsinhira": { 
+            "name": "Nhemamusasa Kutsinhira",             
+            "text": `
+             L3 R2 / B3 / R5 / L4 / B3 R5 / / L3 R3 / B3 / R5 / L4 / B3 R5 / / 
+             L3 R3 / B3 / R6 / L5 / B6 R5 / / L3 R3 / B3 / R5 / L4 / B5 R5 / /
+             L2 R2 / B4 / R5 / L5 / B6 R4 / / L2 R2 / B4 / R6 / L5 / B6 R6 / /
+             L3 R2 / B3 / R5 / L4 / B5 R4 / / L2 R2 / L1 / R4 / L2 / L1 R4 / / 
+        `},
         "karigamombe_kushaura": { 
             "name": "Karigamombe Kushaura",
             "text": `
