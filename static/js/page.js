@@ -10,7 +10,6 @@ $(function () {
     var selectedTabId
     var selectedBpm = 60
     var selectedTempo = '8n'
-    var measureCounter = 0
 
     /* EVENT HANDLERS */
     var handleMbiraKitSelected = function(id) {
@@ -39,7 +38,6 @@ $(function () {
         $('#mbira-start').prop('disabled', false);
         $('#mbira-stop').prop('disabled', true);
         $('#mbira-time').html('');
-        measureCounter = 0;
     }
     var handleMbiraLoad = function () {
         handleMbiraStop()
@@ -50,8 +48,8 @@ $(function () {
                 tabId: selectedTabId,
                 bpm: selectedBpm,
                 tempo: selectedTempo,
+                start: "0",
                 onKeysPlayedCallback: handleKeysPlayed,
-                onMeasureCallback: handleMeasure,
             }, function(){
                 // ready to play
                 handleMbiraLoaded()
@@ -70,16 +68,6 @@ $(function () {
     }
     var handleKeysPlayed = function(keys) {
         log(keys)
-    }
-    var handleMeasure = function(time) {
-        if (measureCounter > 8) {
-            $('#mbira-time').html('')
-            return
-        }
-        var hoshoBeatCounter = measureCounter % 3 + 1
-        var s = $('#mbira-time').html()
-        $('#mbira-time').html(s+' '+hoshoBeatCounter)
-        measureCounter += 1
     }
 
     /* SETUP */

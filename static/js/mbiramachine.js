@@ -14,6 +14,10 @@ var MbiraTone = function(onReadyCallback){
     const HOSHO_KIT_ID = 'hosho'
     const HOSHO_KEY_CODE = 'X'
     const TEMPO_RELATIVE = "8n"
+    const SHOW_KIT = false
+    const BPM_DEFAULT = 60
+    const TEMPO_DEFAULT = "8n"
+    const DELAY_DEFAULT = "1m"
 
     const log = function (s) {
         if (!console || !console.log) return 
@@ -284,6 +288,7 @@ var MbiraTone = function(onReadyCallback){
     }
 
     var showKit  = function(id) {
+        if (!SHOW_KIT) return;
         if (!_ctx) return
         if (id) {
             if (id == 'same' && _kitImage) {
@@ -304,6 +309,7 @@ var MbiraTone = function(onReadyCallback){
     }
 
     var showKeys = function(keys) {
+        if(!SHOW_KIT) return;
         keys.forEach(x=> {
             showKey(x)
         })
@@ -330,24 +336,7 @@ var MbiraTone = function(onReadyCallback){
             _ctx.fill()
         }
     }
-
-    var fadeOutPath = function(p, r, g, b) {
-        var steps = 5,
-            dr = (200 - r) / steps,
-            dg = (200 - g) / steps,
-            db = (200 - b) / steps,
-            i = 0,
-            interval = setInterval(function() {
-                _ctx.fillStyle = 'rgb(' + Math.round(r + dr * i) + ','
-                                       + Math.round(g + dg * i) + ','
-                                       + Math.round(b + db * i) + ')';
-                _ctx.fill(p);
-                if(i++ > steps) {
-                    clearInterval(interval);
-                }
-            }, 30);
-    }
-
+    
     Tone.Buffer.on('load', function(){
         if (_onBufferLoadCallback) _onBufferLoadCallback()
     })
@@ -406,9 +395,9 @@ var MbiraTone = function(onReadyCallback){
                 kitId: options.kitId,
                 kit: _kits[options.kitId],
                 tab: _tabs[options.tabId],
-                bpm: options.bpm || 60,   
-                tempo: options.tempo || "8n", // relative to bpm
-                start: options.start || "1m", // one measure
+                bpm: options.bpm || BPM_DEFAULT,   
+                tempo: options.tempo || TEMPO_DEFAULT, // relative to bpm
+                start: options.start || DELAY_DEFAULT, // one measure
                 onKeysPlayedCallback: options.onKeysPlayedCallback,
                 onMeasureCallback: options.onMeasureCallback
             })
