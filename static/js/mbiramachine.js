@@ -218,7 +218,7 @@ var MbiraTone = function(onReadyCallback){
             `
         },
         "chipembere_2": {
-            "name": "Chipembere 1",
+            "name": "Chipembere 2",
             "text": `
              R4 R1 L4 / B5 / R4 R1 / L1 / R2 B2 / R2 / R4 R1 L4 / B5 / R4 R1    / L1 / R2 B2 / R2 /
              R4 R1 L4 / B5 / R4 R1 / B7 / R3 B3 / R3 / R5    L4 / B5 / R3       / L1 / R2 B2 / R2 /
