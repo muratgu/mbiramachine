@@ -217,13 +217,13 @@ var MbiraTone = function(onReadyCallback){
              R6 R2 / X L3 / R5 R2 B3 / / X R5 R2 L1 / B3 / R5 R2 / X L4 / R7 R3 B5 / / X R7 R3 L7 / B0 /
             `
         },
-        "chipembere_2": {
-            "name": "Chipembere 2",
+        "chipembere_1": {
+            "name": "Chipembere 1",
             "text": `
-             R4 R1 L4 / B5 / R4 R1 / L1 / R2 B2 / R2 / R4 R1 L4 / B5 / R4 R1    / L1 / R2 B2 / R2 /
-             R4 R1 L4 / B5 / R4 R1 / B7 / R3 B3 / R3 / R5    L4 / B5 / R3       / L1 / R2 B2 / R2 /
-             R4 R1 L4 / B5 / R4 R1 / L1 / R2 B0 / R2 /    R1 B2 /    / R4    L5 /    / R4 B2 /    /
-             R3    B2 / B2 / R3    / B5 / R2 B0 / R2 /    R1 B2 /    / R4    L5 /    / R4 B2 /    /
+             R1 / R4 B5 / L4 / R2 L1 / L6 / R2 / R1 / R4 B5 / L4 / R2 L1 / L6 / R2 /
+             R1 / R4 B5 / L4 / R3 B7 / R3 / R5 / L3 / R3 B5 / L4 / R2 L1 / L6 / R2 /
+             R1 / R4 B5 / L4 / R2 L1 / L6 / R2 / R1 / R4 B2 / L2 / R4 B6 / L5 / R4 /
+             B7 / R3    / L2 / R2 L1 / L6 / R2 / R1 / R4 B2 / L2 / R4 B6 / L6 / R4 /
             `
         }
     }

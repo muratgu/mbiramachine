@@ -105,7 +105,7 @@ $(function () {
         mbiraTone = MbiraTone(function() {
             loadOptions()
             bindEvents()
-            $("#mbira-bpm").val(60);
+            $("#mbira-bpm").val(80);
             log(TAG+': mbiraTone: ready')
             hideLoading()
         })
