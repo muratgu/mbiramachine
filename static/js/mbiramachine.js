@@ -225,6 +225,24 @@ var MbiraTone = function(onReadyCallback){
              R1 / R4 B5 / L4 / R2 L1 / L6 / R2 / R1 / R4 B2 / L2 / R4 B6 / L5 / R4 /
              B7 / R3    / L2 / R2 L1 / L6 / R2 / R1 / R4 B2 / L2 / R4 B6 / L6 / R4 /
             `
+        },
+        "dangurangu_v1": {
+            "name": "Dangurangu 1",
+            "text": `
+             R5 L3 / X L5 / R8 / L3 / X R8 L5 / R3 / R8 L3 / X L5 / R8 / L3 / X R7 L4 / R3 /
+             R6 L2 / X L5 / R6 / L2 / X R6 L5 / R3 / R5 L3 / X L4 / R7 / R1 / X R6 L2 / R2 /
+             R5 L3 / X L4 / R4 / L6 / X R2    / L6 / R4 R1 / X L2 / R6 / R1 / X R6 L2 / R2 /
+             R5 L3 / X L4 / R4 / L6 / X R2    / L6 / R5 L3 / X L4 / R3 / L3 / X R2 L2 / R2 /
+            `
+        },
+        "dangurangu_v2": {
+            "name": "Dangurangu 2",
+            "text": `
+             R5 L3 / X L5 / R5 / L3 / X R5 L5 / R3 / R5 L3 / X L5 / R5 / L3 / X R7 L4 / R3 /
+             R6 L2 / X L5 / R6 / L2 / X R6 L5 / R3 / R5 L3 / X L4 / R4 / R1 / X R6 L2 / R2 /
+             R5 L3 / X L4 / R4 / L6 / X R2    / L6 / R4 R1 / X L2 / R6 / R1 / X R6 L2 / R2 /
+             R5 L3 / X L4 / R4 / L6 / X R2    / L6 / R5 L3 / X L4 / R3 / L3 / X R2 L2 / R2 /
+            `
         }
     }
     var _kits = {}
