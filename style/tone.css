@@ -50,3 +50,13 @@ select {
     z-index: 9999;
     background: url(../images/preloader.gif) center no-repeat #fff;
 }
+
+
+.button-group input{
+    display: none;
+  }
+  
+  .button-group input:checked + label,
+  .button-group input:checked + label:active {
+    background-color: salmon;
+  }

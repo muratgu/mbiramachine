@@ -57,12 +57,10 @@ $(function () {
         }
     }
     var handleMbiraLoading = function () {
-        $('img#mbira-start').attr('src', 'images/btn_play_loading.gif');
         $('#mbira-start').prop('disabled', true);
         $('#mbira-stop').prop('disabled', true);
     }
     var handleMbiraLoaded = function () {
-        $('img#mbira-start').attr('src', 'images/btn_play.png');
         $('#mbira-start').prop('disabled', false);
         $('#mbira-stop').prop('disabled', true);
     }
@@ -72,24 +70,26 @@ $(function () {
 
     /* SETUP */
     var bindEvents = function() {
-        $('#mbira-start').on('mousedown', function(ev){ handleMbiraStart() })
-        $('#mbira-stop').on('mousedown', function(ev){ handleMbiraStop() })
-        $('#mbira-kits').change(function(ev) { handleMbiraKitSelected($(this).val()) });
-        $('#mbira-tabs').change(function(ev) { handleMbiraTabSelected($(this).val()) });
-        $('#mbira-bpm').change(function(ev) { handleMbiraBpmSelected($(this).val()) });
+        $('#mbira-controls input:radio').change(function() { $(this).attr('id') == 'mbira-start' ? handleMbiraStart() : handleMbiraStop() });
+        $('#mbira-kits input:radio').change(function() { handleMbiraKitSelected($(this).attr('id')) });
+        $('#mbira-tabs input:radio').change(function() { handleMbiraTabSelected($(this).attr('id')) });
+        $('#mbira-bpm input:radio').change(function() { handleMbiraBpmSelected($(this).attr('id')) });
         $('#mbira-kits').prop('disabled', false)
         $('#mbira-tabs').prop('disabled', false)
         $('#mbira-bpm').prop('disabled', false)
     }
     var loadOptions = function(){
         mbiraTone.getKitList().forEach(x=> {
-            $('#mbira-kits').append($("<option />").val(x.id).text(x.name));
-        })
-        mbiraTone.getTabList().forEach(x=> {
-            $('#mbira-tabs').append($("<option />").val(x.id).text(x.name));
+            $('#mbira-kits').append($("<input type='radio' name='r-group-kit' />").attr('id', x.id));
+            $('#mbira-kits').append($("<label class='button' type='radio' name='r-group-kit' />").attr('for', x.id).text(x.name));
         })
         mbiraTone.getBpmList().forEach(x=> {            
-            $('#mbira-bpm').append($("<option />").val(x.id).text(x.name));
+            $('#mbira-bpm').append($("<input type='radio' name='r-group-bpm' />").attr('id', x.id));
+            $('#mbira-bpm').append($("<label class='button' type='radio' name='r-group-bpm' />").attr('for', x.id).text(x.name));
+        })
+        mbiraTone.getTabList().forEach(x=> {
+            $('#mbira-tabs').append($("<input type='radio' name='r-group-tab' />").attr('id', x.id));
+            $('#mbira-tabs').append($("<label class='button' type='radio' name='r-group-tab' />").attr('for', x.id).text(x.name));
         })
     }
     var showLoading = function() {
