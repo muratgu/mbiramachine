@@ -15,7 +15,7 @@ var MbiraTone = function(onReadyCallback){
     const HOSHO_KEY_CODE = 'X'
     const TEMPO_RELATIVE = "8n"
     const SHOW_KIT = false
-    const BPM_DEFAULT = 60
+    const BPM_DEFAULT = 100
     const TEMPO_DEFAULT = "8n"
     const DELAY_DEFAULT = "1m"
 
@@ -38,7 +38,12 @@ var MbiraTone = function(onReadyCallback){
     var module = {}
     var _schedule = null
     var _scheduleForMeasure = null
+    
     var _instruments = null
+    var setInstruments = value => {
+        _instruments = value
+    }
+
     var _tablatures = {
         "nhemamusasa_kushaura": { 
             "name": "Nhemamusasa Kushaura",
@@ -374,7 +379,6 @@ var MbiraTone = function(onReadyCallback){
     }
 
     var schedulePlayer = function(options) {
-        log(options)
         var kitId = options.kitId
         var kit = options.kit
         var tab = options.tab
@@ -449,14 +453,18 @@ var MbiraTone = function(onReadyCallback){
 
     var initialize = function() {
         log('initialize')
-        $.getJSON(INSTRUMENT_FILE_PATH, function(result) {
-          _instruments = result
-          loadTabs()
-          loadKitSamples(function(){
+        fetch(INSTRUMENT_FILE_PATH)
+          .then(res => res.json())
+          .then(data => {
+            setInstruments(data);
+            loadTabs()
+            loadKitSamples(() => {
               module.initialized = true
               if (onReadyCallback) onReadyCallback()
+            })
+          }).catch( e => { 
+            error('Falied to initialize', e) 
           })
-        }).error(function(x,s,e) { error(s, e) })
     }
 
     module.getKitList = getKitList

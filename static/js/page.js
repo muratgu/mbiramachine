@@ -8,40 +8,39 @@ $(function () {
     var mbiraTone
     var selectedKitId
     var selectedTabId
-    var selectedBpm = 60
+    var selectedBpm = 100
     var selectedTempo = '8n'
 
     /* EVENT HANDLERS */
-    var handleMbiraKitSelected = function(id) {
+    var mbiraSelectKit = (id) => {
         selectedKitId = id
-        handleMbiraLoad()
+        mbiraLoad()
     }
-    var handleMbiraTabSelected = function(id) {
+    var mbiraSelectTab = (id) => {
+        log('id='+id)
         selectedTabId = id
-        handleMbiraLoad()
+        mbiraLoad()
     }
-    var handleMbiraBpmSelected = function(id) {
+    var mbiraSelectBpm = (id) => {
         selectedBpm = id
-        if (mbiraTone) {
-            mbiraTone.setBpm(selectedBpm)
-        }
+        if (mbiraTone) { mbiraTone.setBpm(selectedBpm) }
     }
-    var handleMbiraStart = function () {
-        mbiraTone.stop()
-        handleMbiraLoad()
+    var mbiraStart = () => {
+        mbiraStop()
+        mbiraLoad()
         if (mbiraTone) mbiraTone.start()
-        $('#mbira-start').prop('disabled', true);
-        $('#mbira-stop').prop('disabled', false);
+        $('#mbira-start').prop('disabled', true).prop('checked', 'checked');
+        $('#mbira-stop').prop('disabled', false).prop('checked', '');
     }
-    var handleMbiraStop= function () {
+    var mbiraStop = () => {
         if (mbiraTone) mbiraTone.stop()
-        $('#mbira-start').prop('disabled', false);
-        $('#mbira-stop').prop('disabled', true);
+        $('#mbira-start').prop('disabled', false).prop('checked', '');
+        $('#mbira-stop').prop('disabled', true).prop('checked', 'checked');
         $('#mbira-time').html('');
     }
-    var handleMbiraLoad = function () {
-        handleMbiraStop()
-        handleMbiraLoading()
+    var mbiraLoad = () => {
+        mbiraStop()
+        mbiraLoading()
         if (mbiraTone) {
             mbiraTone.load({
                 kitId: selectedKitId,
@@ -52,46 +51,93 @@ $(function () {
                 onKeysPlayedCallback: handleKeysPlayed,
             }, function(){
                 // ready to play
-                handleMbiraLoaded()
+                mbiraLoaded()
             })
         }
     }
-    var handleMbiraLoading = function () {
-        $('#mbira-start').prop('disabled', true);
-        $('#mbira-stop').prop('disabled', true);
+    var mbiraLoading = () => {
+        $('#mbira-start').prop('disabled', true).prop('checked', '');
+        $('#mbira-stop').prop('disabled', true).prop('checked', '');
     }
-    var handleMbiraLoaded = function () {
-        $('#mbira-start').prop('disabled', false);
-        $('#mbira-stop').prop('disabled', true);
+    var mbiraLoaded = () => {
+        $('#mbira-start').prop('disabled', false).prop('checked', '');
+        $('#mbira-stop').prop('disabled', true).prop('checked', '');
     }
-    var handleKeysPlayed = function(keys) {
+    var handleKeysPlayed = (keys) => {
         log(keys)
     }
 
     /* SETUP */
     var bindEvents = function() {
-        $('#mbira-controls input:radio').change(function() { $(this).attr('id') == 'mbira-start' ? handleMbiraStart() : handleMbiraStop() });
-        $('#mbira-kits input:radio').change(function() { handleMbiraKitSelected($(this).attr('id')) });
-        $('#mbira-tabs input:radio').change(function() { handleMbiraTabSelected($(this).attr('id')) });
-        $('#mbira-bpm input:radio').change(function() { handleMbiraBpmSelected($(this).attr('id')) });
+        $('#mbira-controls input').change(function() { $(this).attr('id') == 'mbira-start' ? mbiraStart() : mbiraStop() });
         $('#mbira-kits').prop('disabled', false)
         $('#mbira-tabs').prop('disabled', false)
         $('#mbira-bpm').prop('disabled', false)
+    }   
+    
+    var loadOptions = () => {
+        if (window.innerWidth > 500) {
+            loadOptionsAsButtons();
+        } else {
+            loadOptionsAsDropdowns();
+        }
     }
-    var loadOptions = function(){
+
+    var loadOptionsAsButtons = function(){
+        var makeButton = (id, name) => {
+            return [
+                $("<input type='radio' />").attr('id', id),
+                $("<label class='button' type='radio' />").attr('for', id).text(name)
+            ]
+        }
+        var kitSelector = $("<div class='button-group round toggle' disabled='disabled'></div>");
         mbiraTone.getKitList().forEach(x=> {
-            $('#mbira-kits').append($("<input type='radio' name='r-group-kit' />").attr('id', x.id));
-            $('#mbira-kits').append($("<label class='button' type='radio' name='r-group-kit' />").attr('for', x.id).text(x.name));
+            makeButton(x.id, x.name).forEach(e => e.attr('name','r-group-kit').appendTo(kitSelector));
         })
+        kitSelector.appendTo($('#mbira-kits'));
+        $('#mbira-kits input').change(function() { mbiraSelectKit($(this).attr('id')) });
+
+        var bpmSelector = $("<div class='button-group round toggle' disabled='disabled'></div>");
         mbiraTone.getBpmList().forEach(x=> {            
-            $('#mbira-bpm').append($("<input type='radio' name='r-group-bpm' />").attr('id', x.id));
-            $('#mbira-bpm').append($("<label class='button' type='radio' name='r-group-bpm' />").attr('for', x.id).text(x.name));
+            makeButton(x.id, x.name).forEach(e => e.attr('name','r-group-bpm').appendTo(bpmSelector));
         })
+        bpmSelector.appendTo($('mbira-bpm'));
+        $('#mbira-bpm input').change(function() { mbiraSelectBpm($(this).attr('id')) });
+
+        var tabSelector = $("<div class='button-group round toggle' disabled='disabled'></div>");
         mbiraTone.getTabList().forEach(x=> {
-            $('#mbira-tabs').append($("<input type='radio' name='r-group-tab' />").attr('id', x.id));
-            $('#mbira-tabs').append($("<label class='button' type='radio' name='r-group-tab' />").attr('for', x.id).text(x.name));
+            makeButton(x.id, x.name).forEach(e => e.attr('name','r-group-tab').appendTo(tabSelector));            
         })
+        tabSelector.appendTo($('#mbira-tabs'));
+        $('#mbira-tabs input').change(function() { mbiraSelectTab($(this).attr('id')) });
     }
+
+    var loadOptionsAsDropdowns = function(){
+        var kitSelector = $("<select></select>");
+        $("<option name='select'>Select Kit</option>").appendTo(kitSelector);
+        mbiraTone.getKitList().forEach(x=> {
+            $("<option />").val(x.id).text(x.name).appendTo(kitSelector);            
+        })
+        kitSelector.appendTo($('#mbira-kits'));
+        $('#mbira-kits select').change(function() { mbiraSelectKit($(this).val()) } );
+
+        var bpmSelector = $("<select></select>");
+        $("<option name='select'>Select Bpm</option>").appendTo(bpmSelector);
+        mbiraTone.getBpmList().forEach(x=> {            
+            $("<option />").val(x.id).text(x.name).appendTo(bpmSelector);            
+        })
+        bpmSelector.appendTo($('#mbira-bpm'));
+        $('#mbira-bpm select').change(function() { mbiraSelectBpm($(this).val()) } );
+
+        var tabSelector = $("<select></select>");
+        $("<option name='select'>Select Piece</option>").appendTo(tabSelector);
+        mbiraTone.getTabList().forEach(x=> {
+            $("<option />").val(x.id).text(x.name).appendTo(tabSelector);            
+        })
+        tabSelector.appendTo($('#mbira-tabs'));
+        $('#mbira-tabs select').change(function() { mbiraSelectTab($(this).val()) } );
+    }
+
     var showLoading = function() {
         $('.content').hide()
         $('.preloader').show()
@@ -105,7 +151,7 @@ $(function () {
         mbiraTone = MbiraTone(function() {
             loadOptions()
             bindEvents()
-            $("#mbira-bpm").val(80);
+            $("#mbira-bpm").val(selectedBpm);
             log(TAG+': mbiraTone: ready')
             hideLoading()
         })
