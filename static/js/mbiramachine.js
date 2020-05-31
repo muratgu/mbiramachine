@@ -313,7 +313,7 @@ var MbiraTone = function(onReadyCallback){
     }
 
     var getBpmList = function() {
-        var bpms = [ 40, 50, 60, 80, 90, 100, 120 ]
+        var bpms = [ 40, 50, 60, 80, 90, 100, 120, 140, 160 ]
         return bpms.map(x => { 
             return {'id': x, 'name': x+' bpm' } 
         })
