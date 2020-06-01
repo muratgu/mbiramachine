@@ -101,7 +101,7 @@ $(function () {
         mbiraTone.getBpmList().forEach(x=> {            
             makeButton(x.id, x.name).forEach(e => e.attr('name','r-group-bpm').appendTo(bpmSelector));
         })
-        bpmSelector.appendTo($('mbira-bpm'));
+        bpmSelector.appendTo($('#mbira-bpm'));
         $('#mbira-bpm input').change(function() { mbiraSelectBpm($(this).attr('id')) });
 
         var tabSelector = $("<div class='button-group round toggle' disabled='disabled'></div>");
