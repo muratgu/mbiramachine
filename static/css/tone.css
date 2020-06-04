@@ -1,6 +1,6 @@
 * {
     font-family: 'Droid Sans', Arial, sans-serif;
-    xxfont-size: 14pt;
+    font-size: 14pt;
 }
 
 body, option, select {
@@ -35,6 +35,10 @@ select {
 #mbira-controls, 
 .selector {
     padding: 10px;
+}
+
+#mbira-controls label {
+    margin: 20px;
 }
 
 #mbira-bpm {
