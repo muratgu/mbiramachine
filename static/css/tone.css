@@ -38,7 +38,7 @@ select {
 }
 
 #mbira-controls label {
-    margin: 20px;
+    padding: 15px;
 }
 
 #mbira-bpm {
@@ -52,7 +52,7 @@ select {
     width: 100%;
     height: 100%;
     z-index: 9999;
-    background: url(../images/preloader.gif) center no-repeat #fff;
+    background: url(../img/preloader.gif) center no-repeat #fff;
 }
 
 
