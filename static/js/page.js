@@ -76,11 +76,11 @@ $(function () {
     }   
     
     var loadOptions = () => {
-        if (window.innerWidth > 500) {
-            loadOptionsAsButtons();
-        } else {
+        //if (window.innerWidth > 600) {
+        //    loadOptionsAsButtons();
+        //} else {
             loadOptionsAsDropdowns();
-        }
+        //}
     }
 
     var loadOptionsAsButtons = function(){
