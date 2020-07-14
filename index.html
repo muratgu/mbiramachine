@@ -1,36 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mbira Machine 1.0</title>
-<link href="static/css/tone.css" rel="stylesheet" />
-</head>
-<body>
-    <div class='preloader'></div>
-    <div id='content'>
-        <div id='title'>Mbira Machine 1.0</div>   
-        <div id='mbira-kits' class='selector'>
-            <!-- kits go in here as radio buttons or drop-down -->
-        </div>
-        <div id='mbira-tabs' class='selector'>
-            <!-- tabs go in here as radio buttons or drop-down -->
-        </div>
-        <div id='mbira-bpm' class='selector'>
-            <!-- bpms go in here as radio buttons or drop-down -->
-        </div>        
-        <div id='mbira-controls' class='button-group round toggle'>
-            <input type='radio' name='r-group-play' id='mbira-start' />
-            <label class='button' type='radio' name='r-group-play' for='mbira-start'>Play</label>
-            <input type='radio' name='r-group-play' id='mbira-stop' />
-            <label class='button' type='radio' name='r-group-stop' for='mbira-stop'>Stop</label>
-        </div>
-        <canvas id='mbira-instrument' width='800' height='600'></canvas>
-    <div>
-    <script src="static/js/jquery.min.js"></script>
-    <script src="static/js/tone.js"></script>
-    <script src="static/js/mbiramachine.js"></script>
-    <script src="static/js/page.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Mbira Machine 2.0</title>
+    <script src="./tone.js"></script>
+    <script src="./mbira.js"></script>
+    <script src="./catalog.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body> 
+    <div id="mbira"></div>
+  </body>
+  <script src="./index.js"></script>
 </html>

@@ -1,0 +1,263 @@
+piece Bukatiende EA Kushaura 2a
+hosho 1,2,0
+R2 L1, L2, R2, L1, R1   , L5, R4, L5, R1   , L4, R4, L4,
+R2 L1, L2, R2, L1, R2 L3, L6, R2, L6, R1   , L4, R4, L4,
+R3 L7, L4, R3, B7, R2 L3, L6, R2, L6, R2 L3, L5, R5, L5,
+R3 L7, L4, R3, B7, L3   , L6, R2, L6, R1   , L4, R4, L4
+endpiece
+
+piece Bukatiende EA Kushaura 2c
+hosho 1,2,0
+R2 L1, L2, R2, L1, R4 R1   , L5, R4, L5, R7   , L4, R7, L4,
+R6 L1, L2, R6, L1, R7    L3, L6, R5, L6, R4 R1, L4, R4, L4,
+R3 L7, L4, R3, B7, R5 R2 L3, L6, R5, L6, R8 L3, L5, R8, L5,
+R7 L7, L4, R7, B7, R6    L3, L6, R5, L6, R4 R1, L4, R4, L4
+endpiece
+
+piece Bukatiende KM Kushaura
+hosho 1,2,0
+R7 L4, , R3, R7 L4, , R3, R5 L3, , R8 L5 ,      , R8 L5, ,
+R7 L4, , R3, R7 L4, , R3, R5 L3, ,    L4 , R4 R1,    L4, ,
+R6 L2, , R2, R6 L2, , R2, R6 L2, ,    L5 , R4 R1,    L4, ,
+R6 L2, , R2, R6 L2, , R2, R5 L3, ,    L4 , R4 R1,    L4, 
+endpiece
+
+piece Bukatiende FM Kushaura
+hosho 1,2,0
+R3 B7, L4, R7, R3 B7, L3, R5   , B3, R9, L5, R8 B6, L5, R5,
+R3 B7, L4, R7, R3 B7, L3, R5   , B3, R9, L4, R7 B5, L4, R4,
+R2 L1, L2, R6, R2 B1,   , R4 R1, B6, R9, L4, R7 B5, L4, R4,
+R2 L1, L2, R6, R2 L1, L3, R5   , B3, R9, L4, R7 B5, L4, R4
+endpiece
+
+piece Bukatiende KM Kutsinhira 
+hosho 1,2,0
+L1, R2, L1, R4 R1 B5, R4 R1 B5, , R7 B7, , R3 B5, R7 B7, B3   , ,
+L1, R2, L1, R3    B6, R3    B6, , R7 B7, , R3 B5, R7 B7, B3   , ,
+L1, R2, L1, R4 R1 B5, R4 R1 B5, , R6 B4, , R2 L1, R6 B1, R2 B1, ,
+L2,   , L4, R4    B5, R4    B5, , R6 B4, , R2 L1, R6 B1, B3   ,  
+endpiece
+
+piece Dangurangu
+hosho 0,1,2
+R5 L3 , L5 , R8 , L3 , R8 L5 , R3 , R8 L3 , L5 , R8 , L3 , R7 L4 , R3 ,
+R6 L2 , L5 , R6 , L2 , R6 L5 , R3 , R5 L3 , L4 , R7 , R1 , R6 L2 , R2 ,
+R5 L3 , L4 , R4 , L6 , R2    , L6 , R4 R1 , L2 , R6 , R1 , R6 L2 , R2 ,
+R5 L3 , L4 , R4 , L6 , R2    , L6 , R5 L3 , L4 , R3 , L3 , R2 L4 , R2
+endpiece
+
+piece Dangurangu 4
+hosho 0,1,2
+R5 L3, L5 , R5    , R3 B7 , B6    , R3 , R5 , B3 , R5 , B2    , R3 , R5    ,
+B6   , R5 , L5    , R3    , R4 B1 , R3 , R4 , B2 , R4 , R1    , L5 , R4 B6 ,
+B6   , R3 , R4 B5 , R2    , B0    , R2 , R4 , B2 , R4 , B4    , R2 , R5    ,
+B4   , R5 , R4 B5 , R2    , L1    , R2 , R5 , B3 , R5 , R4 B5 , R2 , L1
+endpiece
+
+piece Nhemamusasa Kushaura 1
+hosho 0,1,2
+L3 , R2 , B3 , R5 , L4 , R2 , B5 , R4 , L4 , R3 , B7 , R5 ,
+L3 , R2 , B3 , R5 , L5 , R3 , B6 , R5 , L4 , R3 , B7 , R6 ,
+L2 , R3 , B4 , R6 , L5 , R3 , B6 , R5 , L4 , R3 , B7 , R5 ,
+L3 , R2 , B3 , R5 , L4 , R2 , B5 , R4 , L2 , R2 , L1 , R5
+endpiece
+
+piece Nhemamusasa Kutsinhira 1
+hosho 0,1,2
+R2 , B3 , R5 , L4 , R4 B5 , , R2 , B3 , R4 , L4 , R3 B7 , ,
+R2 , B3 , R5 , L5 , R5 B6 , , R3 , B6 , R5 , L5 , R5 B7 , ,
+R3 , B4 , R6 , L5 , R5 B6 , , R3 , B5 , R5 , L4 , R5 B7 , ,
+R2 , B3 , R5 , L4 , R4 B5 , , R2 , B5 , R4 , L1 , R4 L2 , 
+endpiece
+
+piece Nhemamusasa Kutsinhira 2
+hosho 0,1,2
+R5 L3 , L4 , R5 , L1 , R2 L4 , , R5 L3 , L4 , R7 , L3 , R3 L4 , ,
+R5 L3 , L4 , R5 , L3 , R3 L5 , , R5 L3 , L5 , R5 , L3 , R3 L4 , ,
+R6 L2 , L5 , R6 , L2 , R3 L5 , , R5 L3 , L5 , R5 , L3 , R3 L4 , ,
+R5 L3 , L4 , R5 , L1 , R2 L4 , , R4 L3 , L4 , R7 , L1 , R6 L2 ,
+endpiece
+
+piece Nyamaropa CG Basic
+hosho 0,1,2
+R2 L1, L2, R2, B1, R4 R1 L5, , R4 R1 B6, L2, R3   , B4, R3 B7   , , 
+R2 L1, L2, R2, B1, R4 R1 L5, , R4 R1 L1, L4, R2   , B5, R4 R1 L4, ,
+R2 L1, L2, R2, B1, R5 R2 L4, , R5 R2 L1, L3, R5 R2, B5, R4 R1 L4, ,
+R3 B7, L3, R3, B5, R5 R2 L4, , R5 R2 L1, L3, R5 R2, B5, R4 R1 L4, 
+endpiece
+
+piece Nyamaropa CG Variation 
+hosho 0,1,2
+R2 L1, L2, R2, B1, R4 R1 L5, , R4 R1 B6, L2, R3   , B4, R3 B7   , , 
+R2 L1, L2, R2, B1, R4 R1 L5, , R4 R1 L1, L4, R2   , B5, R4 R1 L4, ,
+R9 L1, L2, R8, B1, R7    L4, , R6    L1, L3, R5   , B5, R4    L4, ,
+R3 B7, L3, R7, B5, R7    L4, , R6    L1, L3, R5   , B5, R4    L4, 
+endpiece
+
+piece Ngozi Yemurura Kushaura
+hosho 0,1,2
+L4 , R5 L3 , , L4 , R3 B7 , R3 , L4 , R5 L3 , ,    L4 , R3 B7 , R3 , 
+L5 , R6 L2 , , L5 , R3 B7 , R3 , L4 , R5 L3 , , R4 L4 ,    B7 , R3 , 
+L4 , R5 L3 , , L4 , R2 L1 , R2 , L4 , R4 R1 , ,    L4 , R2 L2 , R2 , 
+L4 , R5 L3 , , L4 , R2 L1 , R2 , L4 , R4 R1 , ,    L4 , R3 B7 , R3 
+endpiece 
+
+piece Ngozi Yemurura Kutsinhira 1
+hosho 0,1,2
+, L4 , R5 B5 , , R5 L4 , B7 , R5 , L4 , R4 R1 B5 , , R4 L4 , R3 B7 ,
+, L5 , R6 B6 , , R6 L5 , B7 , R5 , L4 , R4 R1 B5 , , R4 L4 , R3 B7 ,
+, L4 , R5 B5 , , R5 L4 , L1 , R5 , L4 , R4 R1 B5 , , R4 L4 , R2 L1 ,
+, L4 , R5 B5 , , R5 L4 , L1 , R5 , L4 , R4 R1 B5 , , R4 L4 , R3 B7
+endpiece 
+
+piece Ngozi Yemurura Kutsinhira 2
+hosho 1,2,0
+L3 , R5 B4 , , R5 L4 , B8 , R5, L4 , R4 R1 B6 , , R4 L4 , R3 B2 , ,
+L2 , R6 B5 , , R6 L5 , B8 , R5, L4 , R4 R1 B6 , , R4 L4 , R3 B2 , ,
+L3 , R5 B4 , , R5 L4 , L1 , R5, L4 , R4 R1 B6 , , R4 L4 , R2 L1 , ,
+L4 , R5 B6 , , R5 L4 , L1 , R5, L4 , R4 R1 B6 , , R4 L4 , R3 B2 ,
+endpiece
+
+piece Tadzungaira Kushaura
+hosho 1,2,0
+R7 L4 , B5 , R7 , L4 , R7 B5 , , R6 L2 , L1 , R6 , L2 , R6 L1 , , R5 L3    , B3 , R2    , L3 ,       B3 , ,
+R4 L4 , B5 , R4 , L4 , R4 B5 , , R3 L4 , B7 , R3 , L4 , R3 B7 , , R5 L3    , B3 , R2    , L3 ,       B3 , ,
+R8 L5 , B6 , R8 , L5 , R8 B6 , , R7 L4 , B5 , R7 , L4 , R7 B5 , , R5 L3    , B3 , R2    , L3 ,       B3 , ,
+R4 L4 , B5 , R4 , L4 , R4 B5 , , R2 L2 , L1 , R2 , L2 , R2 L1 , , R4 R1 L5 , B2 , R4 R1 , L5 , R4 R1 B3 ,
+endpiece
+
+piece Marenje Kushaura
+hosho 1,2,0
+R4 R1 B5 , L4 , R4 , L1 , R2 L2 , , R4 R1 B5 , L4 , R4    , L1 , R2    L3 , ,
+R4 R1 B5 , L4 , R4 , B7 , R3 L3 , , R3    B5 , L4 , R3    , L1 , R2    L3 , ,
+R5    B6 , L5 , R5 , B7 , R5 L3 , , R4    B5 , L4 , R3    , L1 , R2    L3 , ,
+R4 R1 B5 , L4 , R4 , L1 , R2 L2 , , R4 R1 B6 , L5 , R4 R1 , L2 , R4 R1 L5 ,
+endpiece
+
+piece Mahororo EA Kushaura 1
+hosho 0,1,2
+L2 , , R2 , , R4 R1 , , L4 , , R2 , , R4 R1 , , 
+L2 , , R2 , , R5 L3 , , L4 , , R2 , , R4 R1 , ,
+L4 , , R3 , , R5 L3 , , L4 , , R2 , , R4 R1 , ,
+L2 , , R2 , , R4 R1 , , L2 , , R3 , , R4 R1 ,  
+endpiece
+
+piece Mahororo EA Kushaura 2
+hosho 0,1,2
+L2 , R2 , B1 , R4 R1 , B2 , R4 , L4 , R2 , B1 , R4 R1 , B2 , R4 ,
+L2 , R2 , B1 , R5    , L4 , R5 , L1 , R2 , L6 , R4 R1 , B2 , R4 ,
+L4 , R3 , B7 , R5    , L4 , R5 , L1 , R2 , L6 , R4 R1 , B2 , R4 ,
+L2 , R2 , B1 , R4 R1 , B2 , R4 , L2 , R3 , B4 , R4 R1 , B2 , R4 
+endpiece
+
+piece Mahororo EA Kutsinhira
+hosho 0,1,2
+L2 , R2 B1 , , R4 R1 , B2 , R7 , L4 , R2 B1 , , R4 R1 , B2 , R6 ,
+L2 , R2 B1 , , R5    , B3 , R7 , L4 , R2 B1 , , R4 R1 , B2 , R7 ,
+L4 , R3 B7 , , R5    , L3 , R7 , L4 , R2 B1 , , R4 R1 , B2 , R6 ,
+L2 , R2 B1 , , R4 R1 , B2 , R6 , L2 , R3 B4 , , R4 R1 , B4 , R6 
+endpiece
+
+piece Mahororo CG Basic
+hosho 2,0,1
+L2 , R2 , B1 , R4 R1 , L5 , R4 R1 , L4 , R2 , B5 , R4 R1 , L4 , R4 R1 ,
+L2 , R2 , B1 , R5    , L3 , R5    , L1 , R2 , B5 , R4 R1 , L4 , R4 R1 ,
+B7 , R3 , B5 , R5    , L3 , R5    , L1 , R2 , B5 , R4 R1 , L4 , R4 R1 ,
+L2 , R2 , B1 , R4 R1 , L5 , R4 R1 , L2 , R3 , B4 , R4 R1 , L5 , R4 R1
+endpiece
+
+piece Mahororo CG Variation 1
+hosho 2,0,1
+L2 , R2 , B1 , R4 R1 , L5 , R7 , L4 , R2 , B5 , R4 R1 , L4 , R6 ,
+L2 , R2 , B1 , R6    , L3 , R5 , L1 , R2 , B5 , R4 R1 , L4 , R7 ,
+B7 , R3 , B5 , R7    , L3 , R5 , L1 , R2 , B5 , R4 R1 , L4 , R6 ,
+L2 , R2 , B1 , R4 R1 , L5 , R6 , L2 , R3 , B4 , R4 R1 , L5 , R6
+endpiece
+
+piece Mahororo CG Variation 2
+hosho 2,0,1
+L1 , R2 , B1 , R4 R1 , B2 , R4 R1 , L1 , R2 , B5 , R4 R1 , B2 , R4 R1 ,
+L1 , R2 , B1 , R5    , B3 , R5    , L1 , R2 , B5 , R4 R1 , B2 , R4 R1 ,
+B7 , R3 , B5 , R5    , B3 , R5    , L1 , R2 , B5 , R4 R1 , B2 , R4 R1 ,
+L1 , R2 , B1 , R4 R1 , B2 , R4 R1 , B4 , R3 , B4 , R4 R1 , B2 , R4 R1
+endpiece
+
+piece Dande EA Kushaura VB
+hosho 0,1,2
+L4 , R5 L3 ,    , L4 , R2 , L6 , R2 , R5 L3 ,    , L5 , R3 B7 , R3 ,
+L4 , R5 L3 ,    , L4 , R2 , L6 , R2 , R1    , R4 , L4 , R2 L1 , R3 ,
+L2 , R1    , R4 , L2 , L5 ,    , L5 , R1    , R4 , L4 , R2 L1 , R3 ,
+L4 , R5 L3 ,    , L4 , R2 , L6 , R2 , R1    , R4 , L4 , R3 B7 , R3 
+endpiece
+
+piece Dande EA Kutsinhira VB
+hosho 0,1,2
+R7 R3 , L3 , R5 R2 B3 , , R5 R2 L1 , B3 , R5 R2 , L5 , R5    B6 , , R3 L4    , B1 ,
+R3    , L3 , R2    B3 , , R2    L1 , B3 , R2    , L4 , R4 R1 B5 , , R2 L1    , B0 ,
+R2    , L5 , R4 R1 B2 , , R4 R1 L5 , B2 , R4 R1 , L4 , R7 R2 B5 , , R7 R2 L1 , B1 ,
+R6 R2 , L3 , R5 R2 B3 , , R5 R2 L1 , B3 , R5 R2 , L4 , R7 R3 B5 , , R7 R3 B7 , B0 
+endpiece
+
+piece Chipembere
+hosho 0,1,2
+R4 B5 , L4 , R2 L1 , L6 , R2 , R1 , R4 B5 , L4 , R2 L1 , L6 , R2 , R1 ,
+R4 B5 , L4 , R3 B7 , L7 , R5 , L3 , R3 B5 , L4 , R2 L1 , L6 , R2 , R1 ,
+R4 B5 , L4 , R2 L1 , L6 , R2 , R1 , R4 B2 , L2 , R4 B6 , L5 , R4 , B7 ,
+R3    , L2 , R2 L1 , L6 , R2 , R1 , R4 B2 , L2 , R4 B6 , L5 , R4 , R1   
+endpiece
+
+piece Chipindura EA Kushaura 1
+hosho 0,1,2
+R2 L1 , B1 , R4 R1 , L2 , R6 B4, , R2 L1 , B1 , R4 R1 , L4 , R7 B5 , ,
+R2 L1 , B1 , R4    , L2 , R6 B4, , R5 L3 , B3 , R4    , L4 , R7 B5 , ,
+R7 L4 , B7 , R3    , L4 , R5 B5, , R5 L4 , B7 , R3    , L2 , R6 B4 , ,
+R6 L2 , B4 , R3    , L2 , R5 B4, , R4 L3 , B3 , R3    , L2 , R6 B4 ,
+endpiece
+
+piece Chipindura EA Kushaura 2
+hosho 0,1,2
+R2 L1 , B1 , R9 , L2 , R9 B4 , , R9 L1 , B1 , R8 , L4 , R7 B5 , ,
+R6 L1 , B1 , R6 , L2 , R7 B4 , , R6 L3 , B3 , R5 , L4 , R4 B5 , ,
+R4 L4 , B7 , R3 , L4 , R9 B5 , , R8 L4 , B7 , R7 , L2 , R6 B4 , ,
+R6 L2 , B4 , R3 , L2 , R5 B4 , , R4 L3 , B3 , R3 , L2 , R6 B4 ,
+endpiece
+
+piece Chipindura NN Kutsinhira
+hosho 0,1,2
+R2   , L6 , R2 , L2 ,    L1 ,    , R1    , L5 , R1 , L4 , R7 B5 , ,
+R7   , L6 , R7 , L2 , R6 L1 ,    , R5 L3 , B3 , R5 , L4 , R4 B5 , ,
+R4 B5, B7 , R3 , B5 ,    L1 , R2 ,    B5 , L4 , R1 , L2 , R6 B4 , ,
+R6   , B7 , R3 , L2 , R6 B4 ,    , R5    , B7 , R4 , L2 , R3 B4 ,
+endpiece
+
+piece Baya Wabaya EA Kushaura 1
+hosho 1,2,0,1,0,1,2,0
+R6 L2 , R2 L2 , R2 , R4 L5 , R1 , R7 L4 , B5    , R4 R1 ,
+R6 L2 , R2 L2 , R2 , R5 L3 , R2 , R7 L4 , B5    , R4 R1 ,
+R6 L4 , R3 B7 , R3 , R5 L3 , R2 , R7 L4 , B5    , R4 R1 ,
+R6 L2 , R2 L2 , R2 , R4 L5 , R1 , R6 L2 , R3 B4 , R3
+endpiece
+
+piece Baya Wabaya EA Kushaura 2
+hosho 1,2,0,1,0,1,2,0
+R9  L2 , R9  L2 , R9  , R9 L5 , R8 , R7 L4 , R9 B5 , R8    ,
+R7  L2 , R6  L2 , R2  , R5 L3 , R2 , R7 L4 , B5    , R4 R1 ,
+R10 L4 , R10 B7 , R10 , R9 L3 , R9 , R8 L4 , R7 B5 , R7    ,
+R6  L2 , R2  L2 , R2  , R4 L5 , R1 , R6 L2 , R3 B4 , R3
+endpiece
+
+piece Baya Wabaya EA Kutsinhira
+hosho 1,2,0,1,0,1,2,0
+R2 L1 , B1 , R2 , B2 , R4 R1 , B5 , R7    L4 , B5 ,
+R6 L1 , B4 , R6 , B3 , R5    , B5 , R4 R1 L4 , B5 ,
+R3 B7 , B5 , R3 , B3 , R5    , B5 , R4 R1 L4 , B5 ,
+R2 L1 , B1 , R2 , B2 , R4 R1 , B4 , R3    L2 , B4
+endpiece
+
+piece Baya Wabaya BMW Standard
+hosho 1,2,0,1,0,1,2,0
+L1 , R2 , L2 , R5 L3    , B3 , R4    L4,  B5 , R4 L4 ,
+B7 , R3 , L4 , R2 L3    , B3 , R4 R1 L4 , B5 , R4 R1 ,
+L1 , R2 , L2 , R4 R1 L5 , B2 , R3    L2 , B4 , R3    ,
+L1 , R2 , L2 , R4 R1 L5 , B2 , R4 R1 L4 , B5 , R4 R1
+endpiece

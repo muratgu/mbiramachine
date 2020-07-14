@@ -1,0 +1,56 @@
+* {
+    font-family: Arial;
+    font-size: 14pt;
+}
+
+table, td {
+    border-style: solid;
+    border-width: 1px;
+    border-color: gray;
+    border-collapse: collapse;
+}
+
+td.midbar {
+    border-right-width: 2px;
+    border-right-color: rgb(107, 107, 107);
+}
+
+td span {
+    font-family: Consolas;
+    font-size: 10pt;
+    text-align: center;
+}
+
+td span.cell {
+    font-size: 14pt;
+}
+
+td span.bar {
+    font-weight: bold;
+}
+
+td.current {
+    background-color: gray;    
+}
+
+td {
+    width: 25px;
+    height:25px;
+    background-color: white;    
+}
+
+.track {
+    padding: 5px;
+}
+
+button {
+    margin: 5px;
+}
+
+select {
+    margin: 5px;
+}
+
+span {
+    margin-left: 5px;
+}
