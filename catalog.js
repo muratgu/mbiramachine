@@ -140,7 +140,7 @@ let Catalog = () => { return {
     let res = await fetch(url)
     let data = await res.text()
     pieces = {}
-    let lines = data.split('\r\n')
+    let lines = data.split('\n')
     let piece = {}
     let inpiece = false
     for(i in lines) {
