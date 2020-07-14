@@ -177,7 +177,7 @@
   const defaultTrackSize = 48;
 
   var catalog = Catalog();
-  catalog.pieces = await catalog.load('catalog.dat');
+  catalog.pieces = await catalog.load('./catalog.dat');
 
   var mbira = Mbira(Tone, catalog);
 
