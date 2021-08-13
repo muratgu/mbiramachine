@@ -45,7 +45,7 @@ let Catalog = () => { return {
     "nyamaropa": {
       "name": "Nyamaropa"
     , "left": {
-          "B1" : "assets/nyamaropa_b_B1.mp3"
+           "B1" : "assets/nyamaropa_b_B1.mp3"
           ,"B2" : "assets/nyamaropa_b_B2.mp3"
           ,"B3" : "assets/nyamaropa_b_B3.mp3"
           ,"B4" : "assets/nyamaropa_b_B4.mp3"
@@ -61,7 +61,7 @@ let Catalog = () => { return {
           ,"L7" : "assets/nyamaropa_b_L7.mp3"
         },
       "right":  {
-          "R1" : "assets/nyamaropa_b_R1.mp3"
+           "R1" : "assets/nyamaropa_b_R1.mp3"
           ,"R2" : "assets/nyamaropa_b_R2.mp3"
           ,"R3" : "assets/nyamaropa_b_R3.mp3"
           ,"R4" : "assets/nyamaropa_b_R4.mp3"
@@ -92,7 +92,7 @@ let Catalog = () => { return {
         ,"L7" : "assets/nyamaropa-w-L7.wav"
     },
       "right":  {
-          "R1" : "assets/nyamaropa-w-R1.wav"
+         "R1" : "assets/nyamaropa-w-R1.wav"
         ,"R2" : "assets/nyamaropa-w-R2.wav"
         ,"R3" : "assets/nyamaropa-w-R3.wav"
         ,"R4" : "assets/nyamaropa-w-R4.wav"
@@ -107,7 +107,7 @@ let Catalog = () => { return {
     "dambatsoko": {
       "name": "Dambatsoko"
     , "left": {
-          "B1" : "assets/dambatsoko_e_B1.mp3"
+           "B1" : "assets/dambatsoko_e_B1.mp3"
           ,"B2" : "assets/dambatsoko_e_B2.mp3"
           ,"B3" : "assets/dambatsoko_e_B3.mp3"
           ,"B4" : "assets/dambatsoko_e_B4.mp3"
@@ -123,7 +123,7 @@ let Catalog = () => { return {
           ,"L7" : "assets/dambatsoko_e_L7.mp3"
         },
       "right":  {
-          "R1" : "assets/dambatsoko_e_R1.mp3"
+           "R1" : "assets/dambatsoko_e_R1.mp3"
           ,"R2" : "assets/dambatsoko_e_R2.mp3"
           ,"R3" : "assets/dambatsoko_e_R3.mp3"
           ,"R4" : "assets/dambatsoko_e_R4.mp3"

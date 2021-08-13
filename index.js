@@ -80,9 +80,7 @@
                 const note = notes[i];
                 let key = note[0];
                 const val = note[1];
-                if (key == 'R') {
-                  key = (val == '1' || val == '2' || val == '3') ? 'RI':'RT'; 
-                }
+                if (key == 'R') key = (val == '1' || val == '2' || val == '3') ? 'RI':'RT';                 
                 const elCell = elTable.querySelector('.cell.bar-'+bar+'.key-'+key);
                 if (elCell) elCell.parentElement.classList.add('current');
               }
