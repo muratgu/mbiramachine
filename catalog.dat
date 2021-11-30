@@ -127,11 +127,19 @@ R4 L4 , B5 , R4 , L4 , R4 B5 , , R2 L2 , L1 , R2 , L2 , R2 L1 , , R4 R1 L5 , B2 
 endpiece
 
 piece Marenje Kushaura
-hosho 1,2,0
+hosho 0,1,2
 R4 R1 B5 , L4 , R4 , L1 , R2 L2 , , R4 R1 B5 , L4 , R4    , L1 , R2    L3 , ,
 R4 R1 B5 , L4 , R4 , B7 , R3 L3 , , R3    B5 , L4 , R3    , L1 , R2    L3 , ,
 R5    B6 , L5 , R5 , B7 , R5 L3 , , R4    B5 , L4 , R3    , L1 , R2    L3 , ,
 R4 R1 B5 , L4 , R4 , L1 , R2 L2 , , R4 R1 B6 , L5 , R4 R1 , L2 , R4 R1 L5 ,
+endpiece
+
+piece Marenje Kushaura 6
+hosho 0,1,2
+R4 R1 B5 , L4 , R4    , L1 , R2 B0 , , R4 R1 B5 , L4 , R4    , L1 , R2    B3 , ,
+R4 R1 B5 , L4 , R4 R1 , B7 , R3 B1 , , R3    B7 , B5 , R3    , L1 , R2    B0 , ,
+R5    B6 , L5 , R5    , B7 , R5 B1 , , R4    B7 , B5 , R3    , L1 , R2    B0 , ,
+R4 R1 B5 , L4 , R4    , L1 , R2 B2 , , R4 R1 B6 , L5 , R4 R1 , B6 , R4 R1 B2 ,
 endpiece
 
 piece Mahororo EA Kushaura 1
